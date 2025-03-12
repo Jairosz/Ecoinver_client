@@ -1,24 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { AuthService } from '../../services/AuthService';
+import { AuthService } from '../../services/Auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
-  
-  // Almacena la referencia al timer para poder cancelarlo si fuera necesario
+  connectionError: boolean = false;  // <-- variable para "no hay conexión"
+
   private errorTimer: any;
 
   constructor(
@@ -39,36 +36,48 @@ export class LoginComponent {
 
     this.authService.login(usuario, password).subscribe({
       next: (resp) => {
-        // Limpia el mensaje de error y cualquier timer previo
-        this.clearError();
+        localStorage.setItem('token', resp.token); // Guarda el token en el localStorage
+        this.clearErrors();
         // Redirige en caso de éxito
-        this.router.navigate(['/principal']);
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        // Limpia cualquier timer previo para reiniciar la cuenta
-        this.clearError();
-
-        if (err.status === 400) {
-          this.errorMessage = 'Credenciales inválidas. Por favor, verifica tu usuario y contraseña.';
-        } else {
-          this.errorMessage = 'Ocurrió un error inesperado. Inténtalo nuevamente.';
+        this.clearErrors();
+        // Caso: no hay conexión con el servidor
+        if (err.status === 0) {
+          this.connectionError = true;
+          // Opcional: cerrar el mensaje tras 10s
+          this.errorTimer = setTimeout(() => {
+            this.connectionError = false;
+          }, 10000);
         }
-
-        // Programa la limpieza del mensaje de error a los 10s
-        this.errorTimer = setTimeout(() => {
-          this.errorMessage = '';
-        }, 10000);
+        // Caso: credenciales inválidas (400)
+        else if (err.status === 400) {
+          this.errorMessage = 'Credenciales inválidas. Por favor, verifica tu usuario y contraseña.';
+          // Cerrar el mensaje tras 10s
+          this.errorTimer = setTimeout(() => {
+            this.errorMessage = '';
+          }, 10000);
+        }
+        // Caso: otro tipo de error
+        else {
+          this.errorMessage = 'Ocurrió un error inesperado. Inténtalo nuevamente.';
+          this.errorTimer = setTimeout(() => {
+            this.errorMessage = '';
+          }, 5000);
+        }
       }
     });
   }
 
-  private clearError(): void {
-    // Si había un timer activo, lo limpiamos
+  private clearErrors(): void {
+    // Limpia cualquier temporizador previo
     if (this.errorTimer) {
       clearTimeout(this.errorTimer);
       this.errorTimer = null;
     }
-    // Reseteamos el mensaje de error
+    // Resetea ambos mensajes
     this.errorMessage = '';
+    this.connectionError = false;
   }
 }
