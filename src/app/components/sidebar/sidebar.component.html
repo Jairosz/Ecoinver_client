@@ -1,55 +1,179 @@
-<div id="view" class="w-screen flex flex-row" style="height: calc(100vh - 4rem);">
-    <!-- Botón para mostrar el sidebar (visible en móviles) -->
-    <button (click)="sidenav = true"
-        class="p-2 border-2 bg-white rounded-md border-gray-200 shadow-lg text-gray-500 focus:bg-teal-500 focus:outline-none focus:text-white absolute top-0 left-0 sm:hidden">
-        <svg class="w-5 h-5 fill-current" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd"
-                d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                clip-rule="evenodd"></path>
-        </svg>
-    </button>
-    <!-- Sidebar: se muestra siempre y ocupa el 100% del alto del contenedor -->
-    <div id="sidebar"
-        class="bg-white h-full md:block shadow-xl px-3 w-30 md:w-60 lg:w-60 overflow-x-hidden transition-transform duration-300 ease-in-out">
-        <div class="space-y-6 md:space-y-10 mt-10">
-            <h1 class="font-bold text-4xl text-center md:hidden">
-                D<span class="text-teal-600">.</span>
-            </h1>
-            <h1 class="hidden md:block font-bold text-sm md:text-xl text-center"
-                style="font-family: 'Horizon', sans-serif;">
-                <span class="text-teal-600">Cultive </span>Cloud
-            </h1>
-
-            <div id="profile" class="space-y-3">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541" alt="Avatar user" class="w-10 md:w-16 rounded-full mx-auto" />
-                <div>
-                    <h2 class="font-medium text-xs md:text-sm text-center text-teal-500">
-                        {{ name }}
-                    </h2>
-                    <p class="text-xs text-gray-500 text-center">
-                        {{ role }}
-                    </p>
-                </div>
-
-            </div>
-            <div class="flex border-2 border-gray-200 rounded-md focus-within:ring-2 ring-teal-500">
-                <input type="text"
-                    class="w-full rounded-tl-md rounded-bl-md px-2 py-3 text-sm text-gray-600 focus:outline-none"
-                    placeholder="Buscar" />
-                <button class="rounded-tr-md rounded-br-md px-2 py-3 hidden md:block">
-                    <svg class="w-4 h-4 fill-current" fill="currentColor" viewBox="0 0 20 20"
+<nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+    <div class="px-3 py-3 lg:px-5 lg:pl-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center justify-start rtl:justify-end">
+                <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar"
+                    type="button"
+                    class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+                    <span class="sr-only">Open sidebar</span>
+                    <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd"
-                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                            clip-rule="evenodd"></path>
+                        <path clip-rule="evenodd" fill-rule="evenodd"
+                            d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z">
+                        </path>
                     </svg>
                 </button>
+                <a href="https://flowbite.com" class="flex ms-2 md:me-24">
+                    <img src="logo.png" class="h-10 me-3" alt="Ecoinver Logo" />
+                    <span
+                        class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">Ecoinver</span>
+                </a>
             </div>
-            <div id="menu" class="flex flex-col space-y-2">
-                <!-- Resto del menú (Dashboard, Products, etc.) -->
-                <!-- ... -->
+            <div class="flex items-center">
+                <div class="flex items-center ms-3">
+                    <div>
+                        <button type="button"
+                            class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                            aria-expanded="false" data-dropdown-toggle="dropdown-user">
+                            <span class="sr-only">Open user menu</span>
+                            <img class="w-8 h-8 rounded-full"
+                                src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="user photo">
+                        </button>
+                    </div>
+                    <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600"
+                        id="dropdown-user">
+                        <div class="px-4 py-3" role="none">
+                            <p class="text-sm text-gray-900 dark:text-white" role="none">
+                                Neil Sims
+                            </p>
+                            <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300" role="none">
+                                neil.simsflowbite.com
+                            </p>
+                        </div>
+                        <ul class="py-1" role="none">
+                            <li>
+                                <a href="#"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                                    role="menuitem">Dashboard</a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                                    role="menuitem">Sign out</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <!-- Aquí iría el resto del contenido si lo hubiera -->
-</div>
+</nav>
+
+<aside id="logo-sidebar"
+    class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+    aria-label="Sidebar">
+    <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
+        <ul class="space-y-2 font-medium">
+            <li>
+                <a href="#"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
+                        <path
+                            d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
+                        <path
+                            d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+                    </svg>
+                    <span class="ms-3">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <svg class="shrink-0 w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        fill="currentColor" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 565.701 565.701">
+                        <g>
+                            <path d="M47.567,164.346c0-37.285,30.225-67.504,67.504-67.504c37.279,0,67.504,30.228,67.504,67.504
+                        c0,37.279-30.225,67.501-67.504,67.501C77.792,231.847,47.567,201.625,47.567,164.346z M450.637,231.847
+                        c37.273,0,67.501-30.222,67.501-67.501c0-37.285-30.228-67.504-67.501-67.504c-37.279,0-67.507,30.228-67.507,67.504
+                        C383.13,201.625,413.357,231.847,450.637,231.847z M565.701,308.258v70.072l-0.484-0.006l-4.521,2.294
+                        c-2.199,1.123-36.907,18.098-96.824,19.162c-30.057,40.631-98.231,69.079-177.377,69.079c-79.266,0-147.532-28.531-177.523-69.269
+                        c-13.134-0.531-27.26-1.844-42.327-4.196l-18.515-3.381c-13.716-2.79-28.059-6.378-43.113-11.077l-4.835-1.513L0,378.33v-70.072
+                        c0-40.024,27.405-73.695,64.41-83.469c13.293,12.401,31.076,20.059,50.655,20.059c19.579,0,37.356-7.658,50.655-20.059
+                        c15.439,4.079,29.093,12.425,39.874,23.555c24.639-6.777,52.03-10.592,80.895-10.592c26.581,0,51.927,3.215,75.014,9.014
+                        c10.568-10.362,23.738-18.087,38.468-21.977c13.299,12.401,31.073,20.059,50.655,20.059c19.576,0,37.355-7.658,50.655-20.059
+                        c28.773,7.602,51.672,29.675,60.461,57.929l3.6,17.928C565.577,303.151,565.701,305.692,565.701,308.258z M446.162,399.639
+                        c-13.601-0.485-28.254-1.797-43.946-4.244l-18.519-3.381c-13.713-2.802-28.059-6.384-43.119-11.089l-4.829-1.513l-0.184-1.088
+                        v-70.066c0-18.418,5.864-35.443,15.723-49.461c-20.108-4.407-41.942-6.851-64.787-6.851c-25.301,0-49.373,2.976-71.222,8.328
+                        c4.631,6.871,8.399,14.363,10.917,22.443l3.603,17.928c0.225,2.512,0.346,5.053,0.346,7.612v70.072l-0.485-0.006l-4.522,2.294
+                        c-2.222,1.123-37.418,18.358-98.154,19.186c29.912,32.557,90.166,54.87,159.517,54.87
+                        C355.952,454.674,416.283,432.284,446.162,399.639z" />
+                        </g>
+                    </svg>
+                    <span class="flex-1 ms-3 whitespace-nowrap">Comercial</span>
+                    <span
+                        class="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">Pro</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#"
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="shrink-0 w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                        viewBox="0 0 24 24" id="Layer_1" data-name="Layer 1">
+                        <defs>
+                            <style>
+                                .cls-1 {
+                                    fill: none;
+                                    stroke: currentColor;
+                                    stroke-miterlimit: 10;
+                                    stroke-width: 2px;
+                                }
+                            </style>
+                        </defs>
+                        <polyline class="cls-1" points="1 10.5 12 1.5 23 10.5" />
+                        <polyline class="cls-1" points="20 7.5 20 22.5 4 22.5 4 7.5" />
+                        <line class="cls-1" x1="22" y1="22.5" x2="2" y2="22.5" />
+                        <path class="cls-1"
+                            d="M7,10.5h.77A4.23,4.23,0,0,1,12,14.73v.77a0,0,0,0,1,0,0h-.77A4.23,4.23,0,0,1,7,11.27V10.5A0,0,0,0,1,7,10.5Z" />
+                        <path class="cls-1"
+                            d="M16.23,11.5H17a0,0,0,0,1,0,0v.77a4.23,4.23,0,0,1-4.23,4.23H12a0,0,0,0,1,0,0v-.77A4.23,4.23,0,0,1,16.23,11.5Z"
+                            transform="translate(29 28) rotate(180)" />
+                        <line class="cls-1" x1="12" y1="21.5" x2="12" y2="14.5" />
+                    </svg>
+                    <span class="flex-1 ms-3 whitespace-nowrap">Cultivos</span>
+                    <span
+                        class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
+                </a>
+            </li>
+            <li>
+                <button type="button"
+                    class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    aria-controls="dropdown-example" data-collapse-toggle="dropdown-example">
+                    <svg class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:fill-black dark:text-gray-400 dark:group-hover:fill-white"
+                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M6.50001 0H9.50001L10.0939 2.37548C10.7276 2.6115 11.3107 2.95155 11.8223 3.37488L14.1782 2.70096L15.6782 5.29904L13.9173 7.00166C13.9717 7.32634 14 7.65987 14 8C14 8.34013 13.9717 8.67366 13.9173 8.99834L15.6782 10.701L14.1782 13.299L11.8223 12.6251C11.3107 13.0484 10.7276 13.3885 10.0939 13.6245L9.50001 16H6.50001L5.90614 13.6245C5.27242 13.3885 4.68934 13.0484 4.17768 12.6251L1.82181 13.299L0.321808 10.701L2.08269 8.99834C2.02831 8.67366 2.00001 8.34013 2.00001 8C2.00001 7.65987 2.02831 7.32634 2.08269 7.00166L0.321808 5.29904L1.82181 2.70096L4.17768 3.37488C4.68934 2.95155 5.27241 2.6115 5.90614 2.37548L6.50001 0ZM8.00001 10C9.10458 10 10 9.10457 10 8C10 6.89543 9.10458 6 8.00001 6C6.89544 6 6.00001 6.89543 6.00001 8C6.00001 9.10457 6.89544 10 8.00001 10Z"
+                            fill="#6B7280" />
+                    </svg>
+                    <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Administración</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 10 6">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m1 1 4 4 4-4" />
+                    </svg>
+                </button>
+
+
+                <!-- Agregamos un padding izquierdo para que los hijos queden anidados -->
+                <ul id="dropdown-example" class="hidden py-2 space-y-2 pl-8">
+                    <li>
+                        <a href="#"
+                            class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            <svg class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                viewBox="0 0 20 18">
+                                <path
+                                    d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z" />
+                            </svg>
+                            <span class="flex-1 ms-3 whitespace-nowrap">Usuarios</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+    </div>
+</aside>
