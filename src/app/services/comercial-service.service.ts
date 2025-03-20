@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../app/environment/environment';
-interface Comercial {
-  codCliente: string;
-  nombCliente: string;
-  fInicio: string;
-  fFin: string;
-  kg: string;
+interface comercial {
+  
+  clientCode: string;
+  clientName: string;
+  startDate: string;
+  endDate: string;
+  kgs: number;
 }
 
 @Injectable({
@@ -18,8 +19,8 @@ export class ComercialServiceService {
 
   constructor(private http:HttpClient) { }
 
-  getComercial ():Observable<Comercial[]>{
-    const url=environment.baseUrl+'/comercial';
-    return this.http.get<Comercial[]>(url);
+  getComercial ():Observable<comercial[]>{
+    const url=environment.baseUrl+'/commercialneeds';
+    return this.http.get<comercial[]>(url);
   }
 }
