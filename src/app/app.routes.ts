@@ -3,6 +3,8 @@ import { LoginComponent } from './components/login/login.component';
 import { LayoutComponent } from './components/layout/layout.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { CultiveComponent } from './components/cultive/cultive.component';
+import { ComercialComponent } from './components/comercial/comercial.component';
+
 
 export const routes: Routes = [
   // Redirige la raíz al login
@@ -18,8 +20,10 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'cultive', component: CultiveComponent },
+      { path: 'comercial', component: ComercialComponent },
       // Otras rutas dentro del layout, si las hay
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    
     ]
   },
 
