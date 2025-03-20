@@ -8,7 +8,6 @@ import { jwtDecode } from 'jwt-decode';
   selector: 'app-sidebar',
   standalone: true,
   imports: [CommonModule],
-  styleUrls: ['./sidebar.component.css'],
   templateUrl: './sidebar.component.html'
 })
 export class SidebarComponent{
