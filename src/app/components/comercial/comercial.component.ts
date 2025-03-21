@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { ComercialServiceService } from '../../services/comercial-service.service';
 
 interface comercial {
-  codCliente: string;
-  nombCliente: string;
-  fInicio: string;
-  fFin: string;
-  kg: string;
+  clientCode: string;
+  clientName: string;
+  startDate: string;
+  endDate: string;
+  kgs: number;
 }
 
 @Component({
@@ -23,7 +23,7 @@ export class ComercialComponent implements OnInit {
   Math = Math;
 
   // Datos originales
-  comerciales: comercial[] = [];//Se recibe de la base de datos
+  
 
   constructor(private comercialServicio: ComercialServiceService) { }
 
@@ -45,7 +45,8 @@ export class ComercialComponent implements OnInit {
 
     this.comercialServicio.getComercial().subscribe(
       (data) => {
-        this.comerciales = data;
+        this.paginatedData = data;
+       
 
       },
       (error)=>{
@@ -61,17 +62,17 @@ export class ComercialComponent implements OnInit {
   filterData(): void {
     const query = this.searchQuery.toLowerCase().trim();
     if (query) {
-      this.filteredData = this.comerciales.filter(item => {
+      this.filteredData = this.paginatedData.filter(item => {
         return (
-          item.codCliente.toLowerCase().includes(query) ||
-          item.nombCliente.toLowerCase().includes(query) ||
-          item.fInicio.toLowerCase().includes(query) ||
-          item.fFin.toLowerCase().includes(query) ||
-          item.kg.toLowerCase().includes(query)
+          item.clientCode.toLowerCase().includes(query) ||
+          item.clientName.toLowerCase().includes(query) ||
+          item.startDate.toLowerCase().includes(query) ||
+          item.endDate.toLowerCase().includes(query) ||
+          item.kgs.toString().includes(query)
         );
       });
     } else {
-      this.filteredData = [...this.comerciales];
+      this.filteredData = [...this.paginatedData];
     }
     // Reinicia la paginación a la primera página
     this.currentPage = 1;
