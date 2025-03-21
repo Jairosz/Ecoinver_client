@@ -30,45 +30,45 @@ export class CultiveComponent implements OnInit {
 
   // Datos originales (ejemplo con datos ficticios)
   data: Cultivo[] = [
-    { 
+    {
       idCultivo: 1,
-      codAgr: 'AG001',  
-      finca: 'Finca La Esperanza', 
-      nave: 'Nave 1', 
-      genero: 'Tomate', 
-      familia: 'Cherry', 
-      tipoVariedad: 'Variedad Comercial A', 
-      superficie: '2 ha', 
+      codAgr: 'AG001',
+      finca: 'Finca La Esperanza',
+      nave: 'Nave 1',
+      genero: 'Tomate',
+      familia: 'Cherry',
+      tipoVariedad: 'Variedad Comercial A',
+      superficie: '2 ha',
       produccionEstimada: '10 ton',
       fechaTrasplante: new Date('2022-03-15'),
       fechaInicioCultivo: new Date('2022-03-01'),
       fechaFinCultivo: new Date('2022-06-01'),
       calidadCultivo: 4
     },
-    { 
+    {
       idCultivo: 2,
-      codAgr: 'AG002',  
-      finca: 'Finca El Sol', 
-      nave: 'Nave 3', 
-      genero: 'Lechuga', 
-      familia: 'Romana', 
+      codAgr: 'AG002',
+      finca: 'Finca El Sol',
+      nave: 'Nave 3',
+      genero: 'Lechuga',
+      familia: 'Romana',
       tipoVariedad: 'Variedad Comercial B',
-      superficie: '1.5 ha', 
+      superficie: '1.5 ha',
       produccionEstimada: '8 ton',
       fechaTrasplante: new Date('2022-04-10'),
       fechaInicioCultivo: new Date('2022-04-01'),
       fechaFinCultivo: new Date('2022-07-01'),
       calidadCultivo: 3
     },
-    { 
+    {
       idCultivo: 3,
-      codAgr: 'AG003',  
-      finca: 'Finca Los Pinos', 
-      nave: 'Nave 2', 
-      genero: 'Pepino', 
-      familia: 'English', 
+      codAgr: 'AG003',
+      finca: 'Finca Los Pinos',
+      nave: 'Nave 2',
+      genero: 'Pepino',
+      familia: 'English',
       tipoVariedad: 'Variedad Comercial C',
-      superficie: '3 ha', 
+      superficie: '3 ha',
       produccionEstimada: '12 ton',
       fechaTrasplante: new Date('2022-05-05'),
       fechaInicioCultivo: new Date('2022-05-01'),
@@ -141,7 +141,13 @@ export class CultiveComponent implements OnInit {
     this.selectedCultivo = this.selectedCultivo?.idCultivo === item.idCultivo ? null : item;
   }
 
-  // Método para editar (implementa la lógica que necesites)
+  // Método para crear un cultivo nuevo
+  create(): void {
+    console.log('Crear cultivo');
+    // Aquí puedes abrir un formulario o navegar a otra vista para crear un nuevo cultivo.
+  }
+
+  // Método para editar
   edit(): void {
     if (this.selectedCultivo) {
       console.log('Editar cultivo', this.selectedCultivo);
@@ -149,7 +155,7 @@ export class CultiveComponent implements OnInit {
     }
   }
 
-  // Método para borrar (implementa la lógica que necesites)
+  // Método para borrar
   delete(): void {
     if (this.selectedCultivo) {
       console.log('Borrar cultivo', this.selectedCultivo);
