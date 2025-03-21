@@ -1,13 +1,13 @@
-<div class="relative min-h-screen bg-gray-100 dark:bg-gray-900">
-  <!-- SIDEBAR (Fijo a la izquierda) -->
+<div class="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+  <!-- SIDEBAR (fijo a la izquierda) -->
   <app-sidebar></app-sidebar>
 
   <!-- CONTENIDO PRINCIPAL -->
-  <!-- Añadimos margen a partir de sm: (640px) para que no quede detrás del sidebar -->
-  <main class="p-4 sm:ml-64 pt-16">
+  <!-- Usamos flex-grow para que ocupe todo el espacio disponible, empujando el footer hacia abajo -->
+  <main class="flex-grow p-4 sm:ml-64 pt-16">
     <router-outlet></router-outlet>
   </main>
-  
-  <!-- FOOTER (opcional) -->
+
+  <!-- FOOTER (siempre abajo) -->
   <app-footer></app-footer>
 </div>

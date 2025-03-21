@@ -4,12 +4,18 @@ import { FormsModule } from '@angular/forms';
 
 interface Cultivo {
   idCultivo: number;
+  codAgr: string;            // Nuevo: Código del Agricultor (Cod Agr)
   finca: string;
   nave: string;
   genero: string;
-  variedad: string;
+  familia: string;           // Se reemplaza "variedad" por "familia"
+  tipoVariedad: string;      // Nuevo: Tipo de variedad comercial
   superficie: string;
   produccionEstimada: string;
+  fechaTrasplante: Date;     // Nuevo: Fecha trasplante
+  fechaInicioCultivo: Date;  // Nuevo: Fecha inicio cultivo
+  fechaFinCultivo: Date;     // Nuevo: Fecha fin cultivo
+  calidadCultivo: number;    // Nuevo: Calidad del cultivo (1 al 5)
 }
 
 @Component({
@@ -24,9 +30,51 @@ export class CultiveComponent implements OnInit {
 
   // Datos originales (ejemplo con datos ficticios)
   data: Cultivo[] = [
-    { idCultivo: 1, finca: 'Finca La Esperanza', nave: 'Nave 1', genero: 'Tomate', variedad: 'Cherry', superficie: '2 ha', produccionEstimada: '10 ton' },
-    { idCultivo: 2, finca: 'Finca El Sol', nave: 'Nave 3', genero: 'Lechuga', variedad: 'Romana', superficie: '1.5 ha', produccionEstimada: '8 ton' },
-    { idCultivo: 3, finca: 'Finca Los Pinos', nave: 'Nave 2', genero: 'Pepino', variedad: 'English', superficie: '3 ha', produccionEstimada: '12 ton' },
+    { 
+      idCultivo: 1,
+      codAgr: 'AG001',  
+      finca: 'Finca La Esperanza', 
+      nave: 'Nave 1', 
+      genero: 'Tomate', 
+      familia: 'Cherry', 
+      tipoVariedad: 'Variedad Comercial A', 
+      superficie: '2 ha', 
+      produccionEstimada: '10 ton',
+      fechaTrasplante: new Date('2022-03-15'),
+      fechaInicioCultivo: new Date('2022-03-01'),
+      fechaFinCultivo: new Date('2022-06-01'),
+      calidadCultivo: 4
+    },
+    { 
+      idCultivo: 2,
+      codAgr: 'AG002',  
+      finca: 'Finca El Sol', 
+      nave: 'Nave 3', 
+      genero: 'Lechuga', 
+      familia: 'Romana', 
+      tipoVariedad: 'Variedad Comercial B',
+      superficie: '1.5 ha', 
+      produccionEstimada: '8 ton',
+      fechaTrasplante: new Date('2022-04-10'),
+      fechaInicioCultivo: new Date('2022-04-01'),
+      fechaFinCultivo: new Date('2022-07-01'),
+      calidadCultivo: 3
+    },
+    { 
+      idCultivo: 3,
+      codAgr: 'AG003',  
+      finca: 'Finca Los Pinos', 
+      nave: 'Nave 2', 
+      genero: 'Pepino', 
+      familia: 'English', 
+      tipoVariedad: 'Variedad Comercial C',
+      superficie: '3 ha', 
+      produccionEstimada: '12 ton',
+      fechaTrasplante: new Date('2022-05-05'),
+      fechaInicioCultivo: new Date('2022-05-01'),
+      fechaFinCultivo: new Date('2022-08-01'),
+      calidadCultivo: 5
+    }
     // Agrega más registros según necesites...
   ];
 
@@ -51,19 +99,25 @@ export class CultiveComponent implements OnInit {
     this.filterData();
   }
 
-  // Filtra datos en base a la búsqueda (en todas las columnas)
+  // Filtra datos en base a la búsqueda (se buscan en todas las columnas)
   filterData(): void {
     const query = this.searchQuery.toLowerCase().trim();
     if (query) {
       this.filteredData = this.data.filter(item => {
         return (
           item.idCultivo.toString().includes(query) ||
+          item.codAgr.toLowerCase().includes(query) ||
           item.finca.toLowerCase().includes(query) ||
           item.nave.toLowerCase().includes(query) ||
           item.genero.toLowerCase().includes(query) ||
-          item.variedad.toLowerCase().includes(query) ||
+          item.familia.toLowerCase().includes(query) ||
+          item.tipoVariedad.toLowerCase().includes(query) ||
           item.superficie.toLowerCase().includes(query) ||
-          item.produccionEstimada.toLowerCase().includes(query)
+          item.produccionEstimada.toLowerCase().includes(query) ||
+          item.fechaTrasplante.toLocaleDateString().toLowerCase().includes(query) ||
+          item.fechaInicioCultivo.toLocaleDateString().toLowerCase().includes(query) ||
+          item.fechaFinCultivo.toLocaleDateString().toLowerCase().includes(query) ||
+          item.calidadCultivo.toString().includes(query)
         );
       });
     } else {

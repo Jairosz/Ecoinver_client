@@ -23,7 +23,7 @@
         <!-- Selector de Items por página -->
         <div class="flex items-center">
             <label for="itemsPerPage" class="mr-2 text-sm text-gray-700 dark:text-gray-300">
-                Show
+                Mostrar
             </label>
             <select id="itemsPerPage" [(ngModel)]="itemsPerPage" (change)="updatePagination()" class="px-2 py-1 border border-gray-300 rounded-md
                  focus:outline-none focus:ring focus:ring-blue-200
@@ -33,7 +33,7 @@
                 </option>
             </select>
             <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                entries per page
+                resultados por página
             </span>
         </div>
     </div>
@@ -43,13 +43,23 @@
         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 border-collapse">
             <thead class="text-xs uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                    <th scope="col" class="px-4 py-3">ID CULTIVO</th>
+                    <th scope="col" class="px-4 py-3">ID</th>
+                    <!-- Nueva columna: Cod Agr -->
+                    <th scope="col" class="px-4 py-3">Cod Agr</th>
                     <th scope="col" class="px-4 py-3">Finca</th>
                     <th scope="col" class="px-4 py-3">Nave</th>
                     <th scope="col" class="px-4 py-3">Género</th>
+                    <!-- Se cambia "Variedad" por "Familia" -->
+                    <th scope="col" class="px-4 py-3">Familia</th>
+                    <!-- Nueva columna: Tipo de Variedad Comercial (se etiqueta como "Variedad") -->
                     <th scope="col" class="px-4 py-3">Variedad</th>
                     <th scope="col" class="px-4 py-3">Superficie</th>
                     <th scope="col" class="px-4 py-3">Producción Estimada</th>
+                    <!-- Nuevas columnas -->
+                    <th scope="col" class="px-4 py-3">Fecha Trasplante</th>
+                    <th scope="col" class="px-4 py-3">Fecha Inicio Cultivo</th>
+                    <th scope="col" class="px-4 py-3">Fecha Fin Cultivo</th>
+                    <th scope="col" class="px-4 py-3">Calidad del Cultivo</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,14 +69,23 @@
                     <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         {{ item.idCultivo }}
                     </td>
+                    <!-- Se muestra el código del agricultor -->
+                    <td class="px-4 py-3">{{ item.codAgr }}</td>
                     <td class="px-4 py-3">{{ item.finca }}</td>
                     <td class="px-4 py-3">{{ item.nave }}</td>
                     <td class="px-4 py-3">{{ item.genero }}</td>
-                    <td class="px-4 py-3">{{ item.variedad }}</td>
+                    <!-- Se utiliza la propiedad "familia" en lugar de "variedad" -->
+                    <td class="px-4 py-3">{{ item.familia }}</td>
+                    <!-- Nueva columna: Tipo de Variedad Comercial -->
+                    <td class="px-4 py-3">{{ item.tipoVariedad }}</td>
                     <td class="px-4 py-3">{{ item.superficie }}</td>
                     <td class="px-4 py-3">{{ item.produccionEstimada }}</td>
+                    <!-- Nuevas columnas -->
+                    <td class="px-4 py-3">{{ item.fechaTrasplante | date:'dd/MM/yyyy' }}</td>
+                    <td class="px-4 py-3">{{ item.fechaInicioCultivo | date:'dd/MM/yyyy' }}</td>
+                    <td class="px-4 py-3">{{ item.fechaFinCultivo | date:'dd/MM/yyyy' }}</td>
+                    <td class="px-4 py-3">{{ item.calidadCultivo }}</td>
                 </tr>
-
             </tbody>
         </table>
     </div>
@@ -75,19 +94,20 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4">
         <!-- Descripción de la página actual -->
         <div class="text-sm text-gray-600 dark:text-gray-300 mb-2 sm:mb-0">
-            Showing
+            Mostrando de
             <span class="font-semibold">
                 {{ (currentPage - 1) * itemsPerPage + 1 }}
             </span>
-            to
+            a
             <span class="font-semibold">
                 {{ Math.min(currentPage * itemsPerPage, filteredData.length) }}
             </span>
-            of
+            sobre
             <span class="font-semibold">
                 {{ filteredData.length }}
             </span>
-            entries
+            resultados
+
         </div>
 
         <!-- Botones de paginación -->
@@ -95,12 +115,12 @@
             <button class="px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md
              hover:bg-gray-100 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                 (click)="goToPreviousPage()" [disabled]="currentPage === 1">
-                Previous
+                Anterior
             </button>
             <button class="px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md
              hover:bg-gray-100 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                 (click)="goToNextPage()" [disabled]="currentPage === totalPages">
-                Next
+                Siguiente
             </button>
         </div>
     </div>
