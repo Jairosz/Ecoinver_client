@@ -33,7 +33,7 @@ export class UsersComponent implements OnInit {
   // Propiedades para el modal
   newUser: UpdateUserDTO = {
     nombreCompleto: "",
-    username: "",
+    userName: "",
     password: "",
     role: "",
     email: ""
@@ -113,7 +113,7 @@ export class UsersComponent implements OnInit {
     this.editMode = false
     this.newUser = {
       nombreCompleto: "",
-      username: "",
+      userName: "",
       password: "",
       role: "",
       email: "",
@@ -168,7 +168,7 @@ export class UsersComponent implements OnInit {
     this.showModal = false
     this.newUser = {
       nombreCompleto: "",
-      username: "",
+      userName: "",
       password: "",
       role: "",
       email: "",

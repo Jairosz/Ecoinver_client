@@ -76,7 +76,7 @@
                         <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                             {{ item.nombreCompleto }}
                         </td>
-                        <td class="px-4 py-3">{{ item.username }}</td>
+                        <td class="px-4 py-3">{{ item.userName }}</td>
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-2 w-[180px]">
                                 <span class="font-mono w-[100px] inline-block">
@@ -151,8 +151,8 @@
                         <input type="text" name="nombreCompleto" id="nombreCompleto" [(ngModel)]="newUser.nombreCompleto" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Nombre completo" required>
                     </div>
                     <div class="col-span-2">
-                        <label for="userName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Usuario</label>
-                        <input type="text" name="userName" id="userName" [(ngModel)]="newUser.username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Nombre de usuario" required>
+                        <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Usuario</label>
+                        <input type="text" name="userName" id="userName" [(ngModel)]="newUser.userName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Nombre de usuario" required>
                     </div>
                     <div class="col-span-2">
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>

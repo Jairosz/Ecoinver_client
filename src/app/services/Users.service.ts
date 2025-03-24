@@ -10,7 +10,7 @@ import { RoleResponse } from '../types/RoleResponse';
 export interface Usuario {
   id: number;
   nombreCompleto: string;
-  username: string;
+  userName: string;
   password: string;
   email: string;
   role: string; //devielve un hash ahora mismos 9.06am
