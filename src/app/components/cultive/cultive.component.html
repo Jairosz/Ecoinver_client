@@ -1,50 +1,74 @@
 <div class="mt-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-    <!-- Encabezado: Búsqueda, Botones Editar/Borrar y Selector de Items por Página -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+    <!-- Encabezado: Búsqueda, Selector de Columnas y Selector de Items por Página -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
       <!-- Búsqueda -->
       <div class="mb-2 sm:mb-0 sm:mr-4">
         <input
           [(ngModel)]="searchQuery"
           (ngModelChange)="filterData()"
           type="text"
-          placeholder="Search..."
+          placeholder="Buscar..."
           class="block w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md
                  focus:outline-none focus:ring focus:ring-blue-200
                  dark:bg-gray-700 dark:text-white dark:border-gray-600"
         />
       </div>
   
-      <!-- Botones de Crear/Editar/Borrar -->
-      <div class="mb-4 flex space-x-2">
-        <!-- Botón de Crear (siempre activo) -->
+      <!-- Dropdown "Selector de Columnas" -->
+      <div class="relative inline-block text-left mb-4 sm:mb-0">
+        <!-- Botón que abre/cierra el menú -->
         <button
-          (click)="create()"
-          class="px-3 py-1 text-sm text-white bg-green-600 border border-green-600 rounded-md hover:bg-green-700"
+          type="button"
+          (click)="toggleColumnSelector()"
+          class="inline-flex justify-center items-center rounded-md border border-gray-300 bg-white px-4 py-2
+                 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50
+                 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600
+                 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          aria-haspopup="true"
+          [attr.aria-expanded]="showColumnSelector ? 'true' : 'false'"
         >
-          Crear
+          Selector de Columnas
+          <!-- Flecha del botón -->
+          <svg
+            class="ml-2 h-5 w-5 text-gray-400"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M5.23 7.21a.75.75 0 011.06.02L10 11.2l3.72-3.97a.75.75 
+                 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.2 
+                 8.27a.75.75 0 01.02-1.06z"
+              clip-rule="evenodd"
+            />
+          </svg>
         </button>
   
-        <!-- Botón de Editar (se habilita solo cuando haya un cultivo seleccionado) -->
-        <button
-          (click)="edit()"
-          [disabled]="!selectedCultivo"
-          [ngClass]="selectedCultivo
-            ? 'px-3 py-1 text-sm text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700'
-            : 'px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50'"
+        <!-- Contenedor del menú desplegable de checkboxes -->
+        <div
+          class="origin-top-right absolute mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black
+                 ring-opacity-5 focus:outline-none dark:bg-gray-700 z-50"
+          role="menu"
+          *ngIf="showColumnSelector"
         >
-          Editar
-        </button>
-  
-        <!-- Botón de Borrar (se habilita solo cuando haya un cultivo seleccionado) -->
-        <button
-          (click)="delete()"
-          [disabled]="!selectedCultivo"
-          [ngClass]="selectedCultivo
-            ? 'px-3 py-1 text-sm text-white bg-red-600 border border-red-600 rounded-md hover:bg-red-700'
-            : 'px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50'"
-        >
-          Borrar
-        </button>
+          <div class="py-2" role="none">
+            <!-- Aquí ponemos las checkboxes -->
+            <label
+              *ngFor="let col of allColumns"
+              class="flex items-center px-3 py-1 text-sm text-gray-700
+                     hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                [checked]="selectedColumns.includes(col.name)"
+                (change)="toggleColumn(col.name)"
+                class="mr-2"
+              />
+              {{ col.label }}
+            </label>
+          </div>
+        </div>
       </div>
   
       <!-- Selector de Items por página -->
@@ -63,7 +87,10 @@
                  focus:outline-none focus:ring focus:ring-blue-200
                  dark:bg-gray-700 dark:text-white dark:border-gray-600"
         >
-          <option *ngFor="let size of [5, 10, 15, 20, 25]" [value]="size">
+          <option
+            *ngFor="let size of [5, 10, 15, 20, 25]"
+            [value]="size"
+          >
             {{ size }}
           </option>
         </select>
@@ -71,21 +98,6 @@
           resultados por página
         </span>
       </div>
-    </div>
-  
-    <!-- Panel de checkboxes para seleccionar columnas -->
-    <div class="mb-4">
-      <label *ngFor="let col of allColumns" class="inline-flex items-center mr-4">
-        <input
-          type="checkbox"
-          [checked]="selectedColumns.includes(col.name)"
-          (change)="toggleColumn(col.name)"
-          class="mr-1"
-        />
-        <span class="text-sm text-gray-800 dark:text-gray-200">
-          {{ col.label }}
-        </span>
-      </label>
     </div>
   
     <!-- Tabla -->
@@ -140,7 +152,9 @@
     </div>
   
     <!-- Información y controles de paginación -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4">
+    <div
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4"
+    >
       <!-- Descripción de la página actual -->
       <div class="text-sm text-gray-600 dark:text-gray-300 mb-2 sm:mb-0">
         Mostrando de
