@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -8,7 +8,7 @@ interface Cultivo {
   finca: string;
   nave: string;
   genero: string;
-  familia: string;           // Se reemplaza "variedad" por "familia"
+  familia: string;           // Reemplaza "variedad" por "familia"
   tipoVariedad: string;      // Nuevo: Tipo de variedad comercial
   superficie: string;
   produccionEstimada: string;
@@ -17,12 +17,13 @@ interface Cultivo {
   fechaFinCultivo: Date;     // Nuevo: Fecha fin cultivo
   calidadCultivo: number;    // Nuevo: Calidad del cultivo (1 al 5)
 }
+type CultivoKey = keyof Cultivo;
 
 @Component({
   selector: 'app-cultive',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './cultive.component.html'
+  templateUrl: './cultive.component.html',
 })
 export class CultiveComponent implements OnInit {
   // Para usar Math en el template
@@ -74,8 +75,8 @@ export class CultiveComponent implements OnInit {
       fechaInicioCultivo: new Date('2022-05-01'),
       fechaFinCultivo: new Date('2022-08-01'),
       calidadCultivo: 5
-    }
-    // Agrega más registros según necesites...
+    },
+    // ... añade más si quieres ...
   ];
 
   // Variables para búsqueda y paginación
@@ -90,6 +91,46 @@ export class CultiveComponent implements OnInit {
   // Cultivo seleccionado
   selectedCultivo: Cultivo | null = null;
 
+  allColumns: Array<{
+    name: CultivoKey;
+    label: string;
+    isDate: boolean;
+  }> = [
+    { name: 'idCultivo', label: 'ID', isDate: false },
+    { name: 'codAgr', label: 'Cod Agr', isDate: false },
+    { name: 'finca', label: 'Finca', isDate: false },
+    { name: 'nave', label: 'Nave', isDate: false },
+    { name: 'genero', label: 'Género', isDate: false },
+    { name: 'familia', label: 'Familia', isDate: false },
+    { name: 'tipoVariedad', label: 'Variedad', isDate: false },
+    { name: 'superficie', label: 'Superficie', isDate: false },
+    { name: 'produccionEstimada', label: 'Producción Estimada', isDate: false },
+    { name: 'fechaTrasplante', label: 'Fecha Trasplante', isDate: true },
+    { name: 'fechaInicioCultivo', label: 'Fecha Inicio Cultivo', isDate: true },
+    { name: 'fechaFinCultivo', label: 'Fecha Fin Cultivo', isDate: true },
+    { name: 'calidadCultivo', label: 'Calidad del Cultivo', isDate: false },
+  ];
+
+  // Columnas que se mostrarán al inicio
+  selectedColumns: string[] = [
+    'idCultivo',
+    'codAgr',
+    'finca',
+    'nave',
+    'genero',
+    'familia',
+    'tipoVariedad',
+    'superficie',
+    'produccionEstimada',
+    'fechaTrasplante',
+    'fechaInicioCultivo',
+    'fechaFinCultivo',
+    'calidadCultivo',
+  ];
+
+  // Control del dropdown de columnas
+  showColumnSelector: boolean = false;
+
   // Calcula el total de páginas
   get totalPages(): number {
     return Math.ceil(this.filteredData.length / this.itemsPerPage);
@@ -99,7 +140,24 @@ export class CultiveComponent implements OnInit {
     this.filterData();
   }
 
-  // Filtra datos en base a la búsqueda (se buscan en todas las columnas)
+  // --- A) Mostrar/ocultar el desplegable de columnas ---
+  toggleColumnSelector(): void {
+    this.showColumnSelector = !this.showColumnSelector;
+  }
+
+  // OPCIONAL: cerrar el menú al hacer clic fuera
+  // (Necesita importar HostListener)
+  @HostListener('document:click', ['$event.target'])
+  onClickOutside(target: HTMLElement) {
+    // Asegúrate de que el contenedor del dropdown tenga una clase "relative"
+    // o algún identificador para diferenciarlo de otros. Ajusta la lógica si lo deseas.
+    const clickedInside = target.closest('.relative');
+    if (!clickedInside) {
+      this.showColumnSelector = false;
+    }
+  }
+
+  // Filtra datos en base a la búsqueda (buscando en todas las columnas)
   filterData(): void {
     const query = this.searchQuery.toLowerCase().trim();
     if (query) {
@@ -141,13 +199,13 @@ export class CultiveComponent implements OnInit {
     this.selectedCultivo = this.selectedCultivo?.idCultivo === item.idCultivo ? null : item;
   }
 
-  // Método para crear un cultivo nuevo
+  // Crear nuevo cultivo (ejemplo)
   create(): void {
     console.log('Crear cultivo');
     // Aquí puedes abrir un formulario o navegar a otra vista para crear un nuevo cultivo.
   }
 
-  // Método para editar
+  // Editar cultivo seleccionado (ejemplo)
   edit(): void {
     if (this.selectedCultivo) {
       console.log('Editar cultivo', this.selectedCultivo);
@@ -155,7 +213,7 @@ export class CultiveComponent implements OnInit {
     }
   }
 
-  // Método para borrar
+  // Eliminar cultivo seleccionado (ejemplo)
   delete(): void {
     if (this.selectedCultivo) {
       console.log('Borrar cultivo', this.selectedCultivo);
@@ -181,6 +239,18 @@ export class CultiveComponent implements OnInit {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
       this.updatePagination();
+    }
+  }
+
+  // --- C) Método para alternar columnas mostradas ---
+  toggleColumn(columnName: string): void {
+    const index = this.selectedColumns.indexOf(columnName);
+    if (index === -1) {
+      // Si no está, la añadimos
+      this.selectedColumns.push(columnName);
+    } else {
+      // Si ya está, la quitamos
+      this.selectedColumns.splice(index, 1);
     }
   }
 }
