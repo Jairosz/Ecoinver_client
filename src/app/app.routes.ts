@@ -4,6 +4,7 @@ import { LayoutComponent } from './components/layout/layout.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { CultiveComponent } from './components/cultive/cultive.component';
 import { ComercialComponent } from './components/comercial/comercial.component';
+import { UsersComponent } from './components/users/users.component';
 
 
 export const routes: Routes = [
@@ -21,6 +22,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'cultive', component: CultiveComponent },
       { path: 'comercial', component: ComercialComponent },
+      { path: 'users', component: UsersComponent},
       // Otras rutas dentro del layout, si las hay
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     
