@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -76,7 +76,7 @@ export class CultiveComponent implements OnInit {
       fechaFinCultivo: new Date('2022-08-01'),
       calidadCultivo: 5
     },
-    // ... puedes añadir más registros ...
+    // ... añade más si quieres ...
   ];
 
   // Variables para búsqueda y paginación
@@ -91,27 +91,27 @@ export class CultiveComponent implements OnInit {
   // Cultivo seleccionado
   selectedCultivo: Cultivo | null = null;
 
-
   allColumns: Array<{
     name: CultivoKey;
     label: string;
     isDate: boolean;
   }> = [
-      { name: 'idCultivo', label: 'ID', isDate: false },
-      { name: 'codAgr', label: 'Cod Agr', isDate: false },
-      { name: 'finca', label: 'Finca', isDate: false },
-      { name: 'nave', label: 'Nave', isDate: false },
-      { name: 'genero', label: 'Género', isDate: false },
-      { name: 'familia', label: 'Familia', isDate: false },
-      { name: 'tipoVariedad', label: 'Variedad', isDate: false },
-      { name: 'superficie', label: 'Superficie', isDate: false },
-      { name: 'produccionEstimada', label: 'Producción Estimada', isDate: false },
-      { name: 'fechaTrasplante', label: 'Fecha Trasplante', isDate: true },
-      { name: 'fechaInicioCultivo', label: 'Fecha Inicio Cultivo', isDate: true },
-      { name: 'fechaFinCultivo', label: 'Fecha Fin Cultivo', isDate: true },
-      { name: 'calidadCultivo', label: 'Calidad del Cultivo', isDate: false },
-    ];
-  // --- B) Columnas que se mostrarán al inicio ---
+    { name: 'idCultivo', label: 'ID', isDate: false },
+    { name: 'codAgr', label: 'Cod Agr', isDate: false },
+    { name: 'finca', label: 'Finca', isDate: false },
+    { name: 'nave', label: 'Nave', isDate: false },
+    { name: 'genero', label: 'Género', isDate: false },
+    { name: 'familia', label: 'Familia', isDate: false },
+    { name: 'tipoVariedad', label: 'Variedad', isDate: false },
+    { name: 'superficie', label: 'Superficie', isDate: false },
+    { name: 'produccionEstimada', label: 'Producción Estimada', isDate: false },
+    { name: 'fechaTrasplante', label: 'Fecha Trasplante', isDate: true },
+    { name: 'fechaInicioCultivo', label: 'Fecha Inicio Cultivo', isDate: true },
+    { name: 'fechaFinCultivo', label: 'Fecha Fin Cultivo', isDate: true },
+    { name: 'calidadCultivo', label: 'Calidad del Cultivo', isDate: false },
+  ];
+
+  // Columnas que se mostrarán al inicio
   selectedColumns: string[] = [
     'idCultivo',
     'codAgr',
@@ -128,6 +128,9 @@ export class CultiveComponent implements OnInit {
     'calidadCultivo',
   ];
 
+  // Control del dropdown de columnas
+  showColumnSelector: boolean = false;
+
   // Calcula el total de páginas
   get totalPages(): number {
     return Math.ceil(this.filteredData.length / this.itemsPerPage);
@@ -137,7 +140,24 @@ export class CultiveComponent implements OnInit {
     this.filterData();
   }
 
-  // Filtra datos en base a la búsqueda (se buscan en todas las columnas)
+  // --- A) Mostrar/ocultar el desplegable de columnas ---
+  toggleColumnSelector(): void {
+    this.showColumnSelector = !this.showColumnSelector;
+  }
+
+  // OPCIONAL: cerrar el menú al hacer clic fuera
+  // (Necesita importar HostListener)
+  @HostListener('document:click', ['$event.target'])
+  onClickOutside(target: HTMLElement) {
+    // Asegúrate de que el contenedor del dropdown tenga una clase "relative"
+    // o algún identificador para diferenciarlo de otros. Ajusta la lógica si lo deseas.
+    const clickedInside = target.closest('.relative');
+    if (!clickedInside) {
+      this.showColumnSelector = false;
+    }
+  }
+
+  // Filtra datos en base a la búsqueda (buscando en todas las columnas)
   filterData(): void {
     const query = this.searchQuery.toLowerCase().trim();
     if (query) {
