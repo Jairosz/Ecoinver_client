@@ -1,31 +1,57 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ComercialServiceService } from '../../services/comercial-service.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ComercialServiceService } from '../../services/Comercial.service';
+import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CreateComercial } from '../../types/createComercial';
 
-interface comercial {
+interface Comercial {
+  id: number;
   clientCode: string;
   clientName: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
   kgs: number;
 }
 
 @Component({
   selector: 'app-comercial',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,ReactiveFormsModule],
   templateUrl: './comercial.component.html',
   styleUrls: ['./comercial.component.css']
 })
 export class ComercialComponent implements OnInit {
   // Propiedad para acceder a Math desde el template
   Math = Math;
+  //Variables
+  selectedComercial: Comercial | null = null;
+  validarFechas:boolean=false;
+  numId: number = 0;
+  isModalOpen: boolean = false;
+  miFormulario: FormGroup;
+  clientData: CreateComercial = {
+    clientCode: '',
+    clientName: '',
+    startDate: undefined,
+    endDate: undefined,
+    kgs: 0
+  };
 
-  // Datos originales
-  
 
-  constructor(private comercialServicio: ComercialServiceService) { }
+
+  constructor(private comercialServicio: ComercialServiceService, private ruta: Router, private fb: FormBuilder) {
+
+    this.miFormulario = this.fb.group(
+      {
+        clientCode: ['', Validators.required],
+        clientName: ['', Validators.required],
+        startDate: ['', Validators.required],
+        endDate: ['', Validators.required],
+        kgs: ['', [Validators.required, Validators.pattern('^[0-9]+$')]]
+      });
+  }
 
   // Variables para búsqueda y paginación
   searchQuery: string = '';
@@ -33,8 +59,8 @@ export class ComercialComponent implements OnInit {
   currentPage: number = 1;
 
   // Arrays auxiliares
-  filteredData: comercial[] = [];
-  paginatedData: comercial[] = [];
+  filteredData: Comercial[] = [];
+  paginatedData: Comercial[] = [];
 
   // Getter para calcular el total de páginas
   get totalPages(): number {
@@ -43,14 +69,16 @@ export class ComercialComponent implements OnInit {
 
   ngOnInit(): void {
 
+    
+    //Obtenemos los registros de los datos de la base de datos
     this.comercialServicio.getComercial().subscribe(
       (data) => {
         this.paginatedData = data;
-       
+
 
       },
-      (error)=>{
-        console.error('Error: '+error);
+      (error) => {
+        console.error('Error: ' + error);
       }
 
     );
@@ -66,8 +94,8 @@ export class ComercialComponent implements OnInit {
         return (
           item.clientCode.toLowerCase().includes(query) ||
           item.clientName.toLowerCase().includes(query) ||
-          item.startDate.toLowerCase().includes(query) ||
-          item.endDate.toLowerCase().includes(query) ||
+          item.startDate.toLocaleDateString('en-US').includes(query) ||
+          item.endDate.toLocaleDateString('en-US').includes(query) ||
           item.kgs.toString().includes(query)
         );
       });
@@ -106,4 +134,70 @@ export class ComercialComponent implements OnInit {
       this.updatePagination();
     }
   }
+  create(): void {
+
+    const formulario=this.miFormulario.value;
+
+    this.clientData={
+      clientCode:formulario.clientCode,
+      clientName:formulario.clientName,
+      startDate:formulario.startDate,
+      endDate:formulario.endDate,
+      kgs:formulario.kgs
+    };
+
+    if (this.clientData.startDate && this.clientData.endDate) {
+      const startDate=new Date(this.clientData.startDate);
+      const endDate=new Date (this.clientData.endDate);
+
+      if(startDate.getTime()>endDate.getTime()){
+       this.validarFechas=true;
+      }
+      else{
+        this.validarFechas=false;
+      }
+    }
+    else{
+      this.validarFechas=false;
+    }
+    
+    this.comercialServicio.createComercial(this.clientData).subscribe(
+
+      (data) => {
+        this.paginatedData = data;
+      },
+      (error) => {
+        console.error('Error al crear el cliente ', error);
+      }
+    )
+    window.location.reload();
+  }
+  // Método para editar
+  edit(): void {
+    if (this.selectedComercial) {
+      console.log('Editar cultivo', this.selectedComercial);
+      // Aquí puedes abrir un modal o navegar a otra vista para editar.
+    }
+  }
+
+  // Método para borrar
+  delete(id: number): void {
+    this.comercialServicio.deleteComercial(id).subscribe(
+      (data) => {
+        this.paginatedData = data;
+      }
+
+    )
+    window.location.reload();
+
+  }
+
+  selectRow(item: Comercial) {
+    this.selectedComercial = item;
+    this.numId = this.selectedComercial.id;
+  }
+
+  
+
+
 }
