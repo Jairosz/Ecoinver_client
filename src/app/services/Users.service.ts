@@ -65,7 +65,7 @@ export class UsersService {
   //Para obtener roles de la tabla aspnetuserroles
   getRoles(): Observable<RoleResponse[]> {
     return this.http
-      .get<RoleResponse[]>(this.apiUrl)
+      .get<RoleResponse[]>(this.roleUrl)
       .pipe(catchError(this.handleError));
   }
 
