@@ -9,4 +9,40 @@ html, body {
     /* Si necesitas forzar sin scroll, podrías usar: */
     /* overflow: hidden; */
   }
-  
+  /* Alternative: Add this to your global styles.css/scss file */
+.ng-dropdown-panel {
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #e5e7eb !important;
+  overflow: hidden !important;
+  margin-top: 4px !important;
+  background-color: white !important;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items {
+  max-height: 250px !important;
+}
+
+.ng-dropdown-panel .ng-option {
+  padding: 0.75rem 1rem !important;
+  font-size: 0.875rem !important;
+  color: #374151 !important;
+}
+
+.ng-dropdown-panel .ng-option:hover {
+  background-color: #f9fafb !important;
+}
+
+.ng-dropdown-panel .ng-option.ng-option-selected {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+  font-weight: 500 !important;
+}
+
+.ng-dropdown-panel .ng-option.ng-option-marked {
+  background-color: #f3f4f6 !important;
+}
+
+.ng-dropdown-panel .ng-option.ng-option-disabled {
+  color: #9ca3af !important;
+}
