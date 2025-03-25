@@ -1,22 +1,27 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environment/environment';
 
 interface Cultivo {
+  id: number;
   idCultivo: number;
-  codAgr: string;            // Nuevo: Código del Agricultor (Cod Agr)
-  finca: string;
-  nave: string;
-  genero: string;
-  familia: string;           // Reemplaza "variedad" por "familia"
-  tipoVariedad: string;      // Nuevo: Tipo de variedad comercial
-  superficie: string;
-  produccionEstimada: string;
-  fechaTrasplante: Date;     // Nuevo: Fecha trasplante
-  fechaInicioCultivo: Date;  // Nuevo: Fecha inicio cultivo
-  fechaFinCultivo: Date;     // Nuevo: Fecha fin cultivo
-  calidadCultivo: number;    // Nuevo: Calidad del cultivo (1 al 5)
+  idAgricultor: number;
+  nombreAgricultor: string;
+  idFinca: number;
+  nombreFinca: string;
+  idNave: number;
+  nombreNave: string;
+  idGenero: number;
+  nombreGenero: string;
+  nombreVariedad: string;
+  superficie: number;
+  produccionEstimada: number;
+  fechaSiembra: Date;
+  fechaFin: Date;
 }
+
 type CultivoKey = keyof Cultivo;
 
 @Component({
@@ -26,198 +31,127 @@ type CultivoKey = keyof Cultivo;
   templateUrl: './cultive.component.html',
 })
 export class CultiveComponent implements OnInit {
-  // Para usar Math en el template
   Math = Math;
+  data: Cultivo[] = [];
 
-  // Datos originales (ejemplo con datos ficticios)
-  data: Cultivo[] = [
-    {
-      idCultivo: 1,
-      codAgr: 'AG001',
-      finca: 'Finca La Esperanza',
-      nave: 'Nave 1',
-      genero: 'Tomate',
-      familia: 'Cherry',
-      tipoVariedad: 'Variedad Comercial A',
-      superficie: '2 ha',
-      produccionEstimada: '10 ton',
-      fechaTrasplante: new Date('2022-03-15'),
-      fechaInicioCultivo: new Date('2022-03-01'),
-      fechaFinCultivo: new Date('2022-06-01'),
-      calidadCultivo: 4
-    },
-    {
-      idCultivo: 2,
-      codAgr: 'AG002',
-      finca: 'Finca El Sol',
-      nave: 'Nave 3',
-      genero: 'Lechuga',
-      familia: 'Romana',
-      tipoVariedad: 'Variedad Comercial B',
-      superficie: '1.5 ha',
-      produccionEstimada: '8 ton',
-      fechaTrasplante: new Date('2022-04-10'),
-      fechaInicioCultivo: new Date('2022-04-01'),
-      fechaFinCultivo: new Date('2022-07-01'),
-      calidadCultivo: 3
-    },
-    {
-      idCultivo: 3,
-      codAgr: 'AG003',
-      finca: 'Finca Los Pinos',
-      nave: 'Nave 2',
-      genero: 'Pepino',
-      familia: 'English',
-      tipoVariedad: 'Variedad Comercial C',
-      superficie: '3 ha',
-      produccionEstimada: '12 ton',
-      fechaTrasplante: new Date('2022-05-05'),
-      fechaInicioCultivo: new Date('2022-05-01'),
-      fechaFinCultivo: new Date('2022-08-01'),
-      calidadCultivo: 5
-    },
-    // ... añade más si quieres ...
-  ];
-
-  // Variables para búsqueda y paginación
   searchQuery: string = '';
   itemsPerPage: number = 5;
   currentPage: number = 1;
 
-  // Arrays auxiliares para filtrado y paginación
   filteredData: Cultivo[] = [];
   paginatedData: Cultivo[] = [];
-
-  // Cultivo seleccionado
   selectedCultivo: Cultivo | null = null;
 
-  allColumns: Array<{
-    name: CultivoKey;
-    label: string;
-    isDate: boolean;
-  }> = [
-    { name: 'idCultivo', label: 'ID', isDate: false },
-    { name: 'codAgr', label: 'Cod Agr', isDate: false },
-    { name: 'finca', label: 'Finca', isDate: false },
-    { name: 'nave', label: 'Nave', isDate: false },
-    { name: 'genero', label: 'Género', isDate: false },
-    { name: 'familia', label: 'Familia', isDate: false },
-    { name: 'tipoVariedad', label: 'Variedad', isDate: false },
+  allColumns: Array<{ name: CultivoKey; label: string; isDate: boolean }> = [
+    { name: 'idCultivo', label: 'ID Cultivo', isDate: false },
+    { name: 'idAgricultor', label: 'ID Agricultor', isDate: false },
+    { name: 'nombreAgricultor', label: 'Agricultor', isDate: false },
+    { name: 'nombreFinca', label: 'Finca', isDate: false },
+    { name: 'nombreNave', label: 'Nave', isDate: false },
+    { name: 'idGenero', label: 'ID Género', isDate: false },
+    { name: 'nombreGenero', label: 'Género', isDate: false },
+    { name: 'nombreVariedad', label: 'Variedad', isDate: false },
     { name: 'superficie', label: 'Superficie', isDate: false },
     { name: 'produccionEstimada', label: 'Producción Estimada', isDate: false },
-    { name: 'fechaTrasplante', label: 'Fecha Trasplante', isDate: true },
-    { name: 'fechaInicioCultivo', label: 'Fecha Inicio Cultivo', isDate: true },
-    { name: 'fechaFinCultivo', label: 'Fecha Fin Cultivo', isDate: true },
-    { name: 'calidadCultivo', label: 'Calidad del Cultivo', isDate: false },
+    { name: 'fechaSiembra', label: 'Fecha Siembra', isDate: true },
+    { name: 'fechaFin', label: 'Fecha Fin', isDate: true },
   ];
 
-  // Columnas que se mostrarán al inicio
-  selectedColumns: string[] = [
-    'idCultivo',
-    'codAgr',
-    'finca',
-    'nave',
-    'genero',
-    'familia',
-    'tipoVariedad',
-    'superficie',
-    'produccionEstimada',
-    'fechaTrasplante',
-    'fechaInicioCultivo',
-    'fechaFinCultivo',
-    'calidadCultivo',
-  ];
-
-  // Control del dropdown de columnas
+  selectedColumns: string[] = this.allColumns.map(col => col.name as string);
   showColumnSelector: boolean = false;
 
-  // Calcula el total de páginas
+  constructor(private http: HttpClient) { }
+
   get totalPages(): number {
     return Math.ceil(this.filteredData.length / this.itemsPerPage);
   }
 
   ngOnInit(): void {
-    this.filterData();
+    this.loadCultivos();
   }
 
-  // --- A) Mostrar/ocultar el desplegable de columnas ---
+  loadCultivos(): void {
+    const url = `${environment.baseUrl}/Erp/cultives`;
+    this.http.get<any>(url).subscribe({
+      next: (response) => {
+        // Convertir las cadenas de fecha a objetos Date
+        this.data = response.cultives.map((cultivo: any) => ({
+          ...cultivo,
+          fechaSiembra: new Date(cultivo.fechaSiembra),
+          fechaFin: new Date(cultivo.fechaFin)
+        }));
+        this.filterData();
+      },
+      error: (error) => {
+        console.error('Error al cargar cultivos:', error);
+      }
+    });
+  }
+
   toggleColumnSelector(): void {
     this.showColumnSelector = !this.showColumnSelector;
   }
 
-  // OPCIONAL: cerrar el menú al hacer clic fuera
-  // (Necesita importar HostListener)
   @HostListener('document:click', ['$event.target'])
   onClickOutside(target: HTMLElement) {
-    // Asegúrate de que el contenedor del dropdown tenga una clase "relative"
-    // o algún identificador para diferenciarlo de otros. Ajusta la lógica si lo deseas.
     const clickedInside = target.closest('.relative');
     if (!clickedInside) {
       this.showColumnSelector = false;
     }
   }
 
-  // Filtra datos en base a la búsqueda (buscando en todas las columnas)
   filterData(): void {
     const query = this.searchQuery.toLowerCase().trim();
     if (query) {
       this.filteredData = this.data.filter(item => {
         return (
           item.idCultivo.toString().includes(query) ||
-          item.codAgr.toLowerCase().includes(query) ||
-          item.finca.toLowerCase().includes(query) ||
-          item.nave.toLowerCase().includes(query) ||
-          item.genero.toLowerCase().includes(query) ||
-          item.familia.toLowerCase().includes(query) ||
-          item.tipoVariedad.toLowerCase().includes(query) ||
-          item.superficie.toLowerCase().includes(query) ||
-          item.produccionEstimada.toLowerCase().includes(query) ||
-          item.fechaTrasplante.toLocaleDateString().toLowerCase().includes(query) ||
-          item.fechaInicioCultivo.toLocaleDateString().toLowerCase().includes(query) ||
-          item.fechaFinCultivo.toLocaleDateString().toLowerCase().includes(query) ||
-          item.calidadCultivo.toString().includes(query)
+          item.idAgricultor.toString().includes(query) ||
+          item.nombreAgricultor.toLowerCase().includes(query) ||
+          item.idFinca.toString().includes(query) ||
+          item.nombreFinca.toLowerCase().includes(query) ||
+          item.idNave.toString().includes(query) ||
+          item.nombreNave.toLowerCase().includes(query) ||
+          item.idGenero.toString().includes(query) ||
+          item.nombreGenero.toLowerCase().includes(query) ||
+          item.nombreVariedad.toLowerCase().includes(query) ||
+          item.superficie.toString().includes(query) ||
+          item.produccionEstimada.toString().includes(query) ||
+          (item.fechaSiembra && item.fechaSiembra.toLocaleDateString().toLowerCase().includes(query)) ||
+          (item.fechaFin && item.fechaFin.toLocaleDateString().toLowerCase().includes(query))
         );
       });
     } else {
       this.filteredData = [...this.data];
     }
-    // Reinicia paginación y selección
     this.currentPage = 1;
     this.selectedCultivo = null;
     this.updatePagination();
   }
 
-  // Actualiza el subset de datos mostrado en la página actual
   updatePagination(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     this.paginatedData = this.filteredData.slice(startIndex, endIndex);
   }
 
-  // Selecciona o deselecciona una fila
   selectRow(item: Cultivo): void {
     this.selectedCultivo = this.selectedCultivo?.idCultivo === item.idCultivo ? null : item;
   }
 
-  // Crear nuevo cultivo (ejemplo)
   create(): void {
     console.log('Crear cultivo');
-    // Aquí puedes abrir un formulario o navegar a otra vista para crear un nuevo cultivo.
   }
 
-  // Editar cultivo seleccionado (ejemplo)
   edit(): void {
     if (this.selectedCultivo) {
       console.log('Editar cultivo', this.selectedCultivo);
-      // Aquí puedes abrir un modal o navegar a otra vista para editar.
     }
   }
 
-  // Eliminar cultivo seleccionado (ejemplo)
   delete(): void {
     if (this.selectedCultivo) {
       console.log('Borrar cultivo', this.selectedCultivo);
-      // Aquí podrías eliminar el registro de la lista, llamar a un servicio, etc.
     }
   }
 
@@ -242,15 +176,19 @@ export class CultiveComponent implements OnInit {
     }
   }
 
-  // --- C) Método para alternar columnas mostradas ---
   toggleColumn(columnName: string): void {
     const index = this.selectedColumns.indexOf(columnName);
     if (index === -1) {
-      // Si no está, la añadimos
       this.selectedColumns.push(columnName);
     } else {
-      // Si ya está, la quitamos
       this.selectedColumns.splice(index, 1);
     }
+  }
+
+  // Nuevo método para manejar el cambio de registros por página
+  onItemsPerPageChange(value: string): void {
+    this.itemsPerPage = Number(value);
+    this.currentPage = 1; // Reinicia a la primera página
+    this.updatePagination();
   }
 }
