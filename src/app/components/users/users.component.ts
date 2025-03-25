@@ -4,6 +4,8 @@ import { FormsModule } from "@angular/forms"
 import { finalize } from "rxjs/operators"
 import  { UsersService, Usuario } from "../../services/Users.service"
 import { UpdateUserDTO } from '../../types/UpdateUserDto';
+import { RoleResponse } from '../../types/RoleResponse';
+
 @Component({
   selector: "app-users",
   standalone: true,
@@ -20,12 +22,13 @@ export class UsersComponent implements OnInit {
   searchQuery = ""
   itemsPerPage = 5
   currentPage = 1
-  rols: string[]=[]
 
   filteredData: Usuario[] = []
   paginatedData: Usuario[] = []
   selectedUsuario: Usuario | null = null
   numId: number=0;
+
+  
 
   upData : UpdateUserDTO[]=[]
   
@@ -40,6 +43,9 @@ export class UsersComponent implements OnInit {
   }
   editMode = false
   showModal = false
+
+  showDeleteModal = false; // Para controlar la visibilidad del modal
+
 
   constructor(private UsersService: UsersService) {}
 
@@ -71,15 +77,16 @@ export class UsersComponent implements OnInit {
   }
 
   private loadRoles(): void {
-    this.UsersService.getRolesUsuarios().subscribe({
-      next: (roles: string[]) => {
-        this.roles = roles // Aquí almacenamos los roles de los usuarios
+    this.UsersService.getRoles().subscribe({
+      next: (roles: RoleResponse[]) => {
+        this.roles = roles.map(role => role.name); // Extrae solo los nombres de los roles
       },
       error: (err) => {
-        console.error("Error al cargar los roles:", err)
+        console.error("Error al cargar los roles:", err);
       },
-    })
+    });
   }
+  
 
   filterData(): void {
     const query = this.searchQuery.toLowerCase().trim()
@@ -177,23 +184,38 @@ export class UsersComponent implements OnInit {
     this.editMode = false
   }
 
-  delete(): void {
-    if (this.selectedUsuario && this.selectedUsuario.id) {
-      if (!confirm("¿Está seguro de eliminar este usuario?")) return
+  delete() {
+    console.log("Mostrando modal de eliminación");
+    this.showDeleteModal = true;
 
-      this.UsersService.deleteUsuario(this.selectedUsuario.id).subscribe({
-        next: () => {
-          this.data = this.data.filter((u) => u.id !== this.selectedUsuario?.id)
-          this.filterData()
-          this.selectedUsuario = null
-        },
-        error: (err) => {
-          console.error("Error al eliminar usuario:", err)
-          alert("Error al eliminar el usuario")
-        },
-      })
-    }
   }
+  
+  
+
+  // Método para confirmar la eliminación
+confirmDelete(): void {
+  if (this.selectedUsuario && this.selectedUsuario.id) {
+    this.UsersService.deleteUsuario(this.selectedUsuario.id).subscribe({
+      next: () => {
+        // Actualiza la lista de usuarios después de la eliminación
+        this.data = this.data.filter((u) => u.id !== this.selectedUsuario?.id);
+        this.filterData();
+        this.selectedUsuario = null;
+        this.showDeleteModal = false;  // Cierra el modal después de eliminar
+      },
+      error: (err) => {
+        console.error("Error al eliminar usuario:", err);
+        alert("Error al eliminar el usuario");
+      },
+    });
+  }
+}
+
+// Método para cancelar la eliminación
+cancelDelete(): void {
+  this.showDeleteModal = false; // Solo cierra el modal
+}
+
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
@@ -215,4 +237,8 @@ export class UsersComponent implements OnInit {
       this.updatePagination()
     }
   }
+
+
+
+
 }
