@@ -46,9 +46,7 @@ export class CultiveComponent implements OnInit {
     { name: 'idCultivo', label: 'ID Cultivo', isDate: false },
     { name: 'idAgricultor', label: 'ID Agricultor', isDate: false },
     { name: 'nombreAgricultor', label: 'Agricultor', isDate: false },
-    { name: 'idFinca', label: 'ID Finca', isDate: false },
     { name: 'nombreFinca', label: 'Finca', isDate: false },
-    { name: 'idNave', label: 'ID Nave', isDate: false },
     { name: 'nombreNave', label: 'Nave', isDate: false },
     { name: 'idGenero', label: 'ID Género', isDate: false },
     { name: 'nombreGenero', label: 'Género', isDate: false },
@@ -62,7 +60,7 @@ export class CultiveComponent implements OnInit {
   selectedColumns: string[] = this.allColumns.map(col => col.name as string);
   showColumnSelector: boolean = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   get totalPages(): number {
     return Math.ceil(this.filteredData.length / this.itemsPerPage);
@@ -76,8 +74,12 @@ export class CultiveComponent implements OnInit {
     const url = `${environment.baseUrl}/Erp/cultives`;
     this.http.get<any>(url).subscribe({
       next: (response) => {
-        // Extraemos el array desde response.cultives
-        this.data = response.cultives;
+        // Convertir las cadenas de fecha a objetos Date
+        this.data = response.cultives.map((cultivo: any) => ({
+          ...cultivo,
+          fechaSiembra: new Date(cultivo.fechaSiembra),
+          fechaFin: new Date(cultivo.fechaFin)
+        }));
         this.filterData();
       },
       error: (error) => {
@@ -181,5 +183,12 @@ export class CultiveComponent implements OnInit {
     } else {
       this.selectedColumns.splice(index, 1);
     }
+  }
+
+  // Nuevo método para manejar el cambio de registros por página
+  onItemsPerPageChange(value: string): void {
+    this.itemsPerPage = Number(value);
+    this.currentPage = 1; // Reinicia a la primera página
+    this.updatePagination();
   }
 }
