@@ -6,6 +6,8 @@ import  { UsersService, Usuario } from "../../services/Users.service"
 import { UpdateUserDTO } from '../../types/UpdateUserDto';
 import { RoleResponse } from '../../types/RoleResponse';
 
+//alertas
+import { AlertService, AlertType } from '../../services/Alert.service';
 @Component({
   selector: "app-users",
   standalone: true,
@@ -28,10 +30,14 @@ export class UsersComponent implements OnInit {
   selectedUsuario: Usuario | null = null
   numId: number=0;
 
-  
-
   upData : UpdateUserDTO[]=[]
+
   
+  // Variables para alertas
+  showAlert: boolean = false;
+  alertMessage: string = '';
+  alertType: 'success' | 'error' | 'warning' = 'success';
+  private alertTimer: any;
 
   // Propiedades para el modal
   newUser: UpdateUserDTO = {
@@ -47,7 +53,10 @@ export class UsersComponent implements OnInit {
   showDeleteModal = false; // Para controlar la visibilidad del modal
 
 
-  constructor(private UsersService: UsersService) {}
+  constructor(
+    private UsersService: UsersService,//Users
+    private alertService: AlertService//Alertas
+  ) {}
 
   get totalPages(): number {
     return Math.ceil(this.filteredData.length / this.itemsPerPage)
@@ -56,6 +65,11 @@ export class UsersComponent implements OnInit {
   ngOnInit(): void {
     this.loadUsers()
     this.loadRoles()
+    this.alertService.show({
+      message: 'TEST: Alerta funcionando',
+      type: 'success',
+      duration: 3000
+    });
   }
 
   private loadUsers(): void {
@@ -136,39 +150,68 @@ export class UsersComponent implements OnInit {
     }
   }
 
+//funciones para alertas
+  private showAlertMessage(type: 'success' | 'error' | 'warning', message: string, duration: number = 5000): void {
+    this.clearAlert();
+    this.alertType = type;
+    this.alertMessage = message;
+    this.showAlert = true;
+    
+    this.alertTimer = setTimeout(() => {
+      this.showAlert = false;
+    }, duration);
+  }
+
+  private clearAlert(): void {
+    if (this.alertTimer) {
+      clearTimeout(this.alertTimer);
+    }
+    this.showAlert = false;
+    this.alertMessage = '';
+  }
+
+
+
+
+
+
   saveUser(): void {
+    // Validación del formulario
+    if (!this.isFormValid()) {
+      this.showAlertMessage('warning', 'Por favor complete todos los campos requeridos');
+      return;
+    }
+
     if (this.editMode) {
-      // Actualizar usuario existente
       this.UsersService.updateUsuario(this.newUser, this.numId).subscribe({
-        next: (updatedUsuario) => {
-          const index = this.data.findIndex((u) => u.id === updatedUsuario.id)
-          if (index !== -1) {
-            this.data[index] = updatedUsuario
-            this.filterData()
-          }
-          this.closeModal()
-          alert("Usuario actualizado exitosamente")
+        next: (updatedUsuario) => {//222222
+          this.showAlertMessage('success', 'Usuario actualizado exitosamente', 3000);
         },
         error: (err) => {
-          console.error("Error al actualizar usuario:", err)
-          alert("Error al actualizar el usuario")
+          this.showAlertMessage('error', `Error al actualizar: ${err.message}`);
         },
-      })
+      });
     } else {
-      // Crear nuevo usuario
       this.UsersService.createUsuario(this.newUser).subscribe({
         next: (newUser) => {
-          this.upData.push(newUser)
-          this.filterData()
-          this.closeModal()
-          alert("Usuario creado exitosamente")
+          this.upData.push(newUser);
+          this.filterData();
+          this.closeModal();
+          this.showAlertMessage('success', 'Usuario creado exitosamente', 3000);
         },
         error: (err) => {
-          console.error("Error al crear usuario:", err)
-          alert("Error al crear el usuario")
+          this.showAlertMessage('error', `Error al crear: ${err.message}`);
         },
-      })
+      });
     }
+  }
+  
+  private isFormValid(): boolean {
+    return !!this.newUser.nombreCompleto?.trim() &&
+           !!this.newUser.userName?.trim() &&
+           !!this.newUser.email?.trim() &&
+           !!this.newUser.role?.trim() &&
+           (this.editMode || !!this.newUser.password?.trim());
   }
 
   closeModal(): void {
@@ -186,6 +229,7 @@ export class UsersComponent implements OnInit {
 
   delete() {
     console.log("Mostrando modal de eliminación");
+    
     this.showDeleteModal = true;
 
   }
@@ -193,23 +237,22 @@ export class UsersComponent implements OnInit {
   
 
   // Método para confirmar la eliminación
-confirmDelete(): void {
-  if (this.selectedUsuario && this.selectedUsuario.id) {
-    this.UsersService.deleteUsuario(this.selectedUsuario.id).subscribe({
-      next: () => {
-        // Actualiza la lista de usuarios después de la eliminación
-        this.data = this.data.filter((u) => u.id !== this.selectedUsuario?.id);
-        this.filterData();
-        this.selectedUsuario = null;
-        this.showDeleteModal = false;  // Cierra el modal después de eliminar
-      },
-      error: (err) => {
-        console.error("Error al eliminar usuario:", err);
-        alert("Error al eliminar el usuario");
-      },
-    });
+  confirmDelete(): void {
+    if (this.selectedUsuario?.id) {
+      this.UsersService.deleteUsuario(this.selectedUsuario.id).subscribe({
+        next: () => {
+          this.data = this.data.filter((u) => u.id !== this.selectedUsuario?.id);
+          this.filterData();
+          this.selectedUsuario = null;
+          this.showDeleteModal = false;
+          this.showAlertMessage('success', 'Usuario eliminado exitosamente', 3000);
+        },
+        error: (err) => {
+          this.showAlertMessage('error', `Error al eliminar: ${err.message}`);
+        },
+      });
+    }
   }
-}
 
 // Método para cancelar la eliminación
 cancelDelete(): void {
@@ -238,6 +281,12 @@ cancelDelete(): void {
     }
   }
 
+  //----------------------------------------------------------------------------------------
+  //Controlar alertas de errores
+  
+  
+
+  //Arriba alertas.-------------------------------------------------------------------------
 
 
 
