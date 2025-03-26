@@ -37,6 +37,7 @@ export class LoginComponent {
     this.authService.login(usuario, password).subscribe({
       next: (resp) => {
         localStorage.setItem('token', resp.token); // Guarda el token en el localStorage
+        localStorage.setItem('userId', resp.userId||"fallo"); // Guarda el token en el localStorage
         this.clearErrors();
         // Redirige en caso de éxito
         this.router.navigate(['/dashboard']);

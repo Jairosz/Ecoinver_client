@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../environment/environment';
 import { map } from 'rxjs/operators';
@@ -8,13 +8,14 @@ import { UpdateUserDTO } from '../types/UpdateUserDto';
 import { RoleResponse } from '../types/RoleResponse';
 
 export interface Usuario {
-  id: number;
+  id: string;
   nombreCompleto: string;
   userName: string;
   password: string;
   email: string;
   role: string; //devielve un hash ahora mismos 9.06am
   showPassword?: boolean;
+  //level:number;
 }
 
 @Injectable({
@@ -41,13 +42,13 @@ export class UsersService {
   }
 
   // En UsersService
-  updateUsuario(usuario: UpdateUserDTO, id: number): Observable<Usuario> {
+  updateUsuario(usuario: UpdateUserDTO, id: string): Observable<Usuario> {
     return this.http
       .put<Usuario>(`${this.apiUrl}/${id}`, usuario)
       .pipe(catchError(this.handleError));
   }
 
-  deleteUsuario(id: number): Observable<any> {
+  deleteUsuario(id: string): Observable<any> {
     return this.http
       .delete(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
@@ -63,11 +64,15 @@ export class UsersService {
 
 
   //Para obtener roles de la tabla aspnetuserroles
-  getRoles(): Observable<RoleResponse[]> {
-    return this.http
-      .get<RoleResponse[]>(this.roleUrl)
-      .pipe(catchError(this.handleError));
-  }
+  // users.service.ts
+getRoles(): Observable<RoleResponse[]> {
+  return this.http.get<RoleResponse[]>(this.roleUrl).pipe(
+    catchError((error: HttpErrorResponse) => {
+      this.handleError(error);
+      return of([]); // Retornar array vacío en caso de error
+    })
+  );
+}
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Error desconocido';
