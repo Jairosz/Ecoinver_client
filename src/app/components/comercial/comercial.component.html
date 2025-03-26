@@ -1,4 +1,4 @@
-<div class="transition-all duration-300" class="margen p-4 pt bg-white dark:bg-gray-800 rounded-lg shadow">
+<div class="margen transition-all duration-300" class="margen p-4 pt bg-white dark:bg-gray-800 rounded-lg shadow">
   <!-- Encabezado: Búsqueda, Selector de Items por Página -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
 
@@ -11,19 +11,19 @@
     <div class="mb-4 flex space-x-2">
       <!-- Botón de Crear -->
       <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
-        class="px-3 py-1 text-sm text-white bg-green-600 border border-green-600 rounded-md hover:bg-green-700">
+        class="cursor-pointer px-3 py-1 text-sm text-white bg-green-600 border border-green-600 rounded-md hover:bg-green-700">
         Crear
       </button>
 
       <!-- Botón de Editar (habilitado solo cuando hay un comercial seleccionado) -->
       <button [disabled]="!selectedComercial" data-modal-target="edit-modal" data-modal-toggle="edit-modal"
-        [ngClass]="selectedComercial ? 'px-3 py-1 text-sm text-white bg-green-600 border border-green-600 rounded-md hover:bg-green-700' : 'px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50'">
+        [ngClass]="selectedComercial ? 'cursor-pointer px-3 py-1 text-sm text-white bg-green-600 border border-green-600 rounded-md hover:bg-green-700' : 'px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50'">
         Editar
       </button>
 
       <!-- Botón de Borrar (habilitado solo cuando hay un comercial seleccionado) -->
       <button data-modal-target="popup-modal" data-modal-toggle="popup-modal" [disabled]="!selectedComercial"
-        [ngClass]="selectedComercial ? 'px-3 py-1 text-sm text-white bg-red-600 border border-red-600 rounded-md hover:bg-red-700' : 'px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50'">
+        [ngClass]="selectedComercial ? 'cursor-pointer px-3 py-1 text-sm text-white bg-red-600 border border-red-600 rounded-md hover:bg-red-700' : 'px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50'">
         Borrar
       </button>
     </div>
@@ -87,7 +87,7 @@
               <span class="sr-only">Close modal</span>
             </button>
           </div>
-          <!-- Modal body -->
+          <!-- Modal body para crear-->
           <form class="p-4 md:p-5" [formGroup]="miFormulario" (ngSubmit)="create()">
             <div class="grid gap-4 mb-4 grid-cols-2">
               <div class="col-span-2">
@@ -95,11 +95,25 @@
                   cliente</label>
                   <ng-select
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                  [items]="paginatedData" 
-                  bindLabel="clientCode" 
-                  bindValue="clientName"
+                  [items]="clientErp" 
+                  bindLabel="name"
+                  bindValue="clientId"
                   placeholder="Selecciona un código" 
-                  [searchable]="true">
+                  [searchable]="true"
+                  formControlName="clientCode"
+                  
+                  [searchFn]="search"
+                  (change)="buscarComercial($event)"
+                  >
+                  <ng-template ng-option-tmp let-item="item">
+                    {{ item.clientId }} - {{ item.name }}
+                  </ng-template>
+                
+                  <!-- Template para el valor seleccionado (la etiqueta) -->
+                  <ng-template ng-label-tmp let-item="item">
+                    {{ item.clientId }}
+                  </ng-template>
+                  
                 </ng-select>
                 
                 @if(miFormulario.get('clientCode')?.touched && miFormulario.get('clientCode')?.invalid){
@@ -165,7 +179,7 @@
         </div>
       </div>
     </div>
-    <!--Modal-->
+    <!--Modal para editar-->
     <div id="edit-modal" tabindex="-1" aria-hidden="true"
       class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full backdrop-blur-xs">
       <div class="relative p-4 w-full max-w-md max-h-full">
@@ -194,9 +208,27 @@
               <div class="col-span-2">
                 <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Código
                   cliente</label>
-                <input type="text" name="codigo" formControlName="clientCode"
-                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="código cliente" required="">
+                  <ng-select
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                  [items]="clientErp" 
+                  bindLabel="name"
+                  bindValue="clientId"
+                  placeholder="Selecciona un código" 
+                  [searchable]="true"
+                  formControlName="clientCode"
+                  [searchFn]="search"
+                  (change)="buscarComercial($event)"
+                  >
+                  <ng-template ng-option-tmp let-item="item">
+                    {{ item.clientId }} - {{ item.name }}
+                  </ng-template>
+                
+                  <!-- Template para el valor seleccionado (la etiqueta) -->
+                  <ng-template ng-label-tmp let-item="item">
+                    {{ item.clientId }}
+                  </ng-template>
+                  >
+                </ng-select>
                 @if(miFormulario.get('clientCode')?.touched && miFormulario.get('clientCode')?.invalid){
                 <small class="text-red-500 text-xs">Error, el campo código debe tener una longitud 1-5</small>
                 }
@@ -253,7 +285,7 @@
                   d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                   clip-rule="evenodd"></path>
               </svg>
-              Add new product
+              Add new product 
             </button>
 
           </form>

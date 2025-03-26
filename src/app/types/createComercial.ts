@@ -1,6 +1,6 @@
 export interface CreateComercial {
    
-        clientCode:string;
+        clientCode:number;
         clientName:string;
         startDate:Date | undefined;
         endDate:  Date | undefined;
