@@ -1,0 +1,76 @@
+<!-- Contenedor principal con fondo distinto (dark:bg-gray-900) -->
+<div class="container mx-auto p-4 bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <h1 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Crear Planificación</h1>
+  
+    <!-- Selección del número de partes -->
+    <div class="mb-4">
+      <label 
+        for="numCards" 
+        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+      >
+        Número de partes:
+      </label>
+      <select 
+        id="numCards"
+        [(ngModel)]="numCards" 
+        (change)="updateCards()"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+               rounded-lg focus:ring-blue-500 focus:border-blue-500 
+               block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 
+               dark:placeholder-gray-400 dark:text-white"
+      >
+        <option *ngFor="let n of numbers" [value]="n">{{ n }}</option>
+      </select>
+    </div>
+  
+    <!-- Grid o flex para organizar las cards -->
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <!-- Repetimos una card por cada parte -->
+      <div 
+        *ngFor="let card of cards; let i = index"
+        class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm 
+               dark:bg-gray-800 dark:border-gray-700"
+      >
+        <div class="p-5">
+          <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Parte {{ i + 1 }}
+          </h3>
+          <label 
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            KG/Metro Cuadrado:
+          </label>
+          <input 
+            type="number"
+            [(ngModel)]="card.value"
+            placeholder="Ingresa el valor"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                   rounded-lg focus:ring-blue-500 focus:border-blue-500 
+                   block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 
+                   dark:placeholder-gray-400 dark:text-white"
+          />
+        </div>
+      </div>
+    </div>
+  
+    <!-- Card para la sección de cultivos (opcionalmente, igual estilo de Flowbite) -->
+    <div 
+      class="max-w-sm mt-6 bg-white border border-gray-200 rounded-lg shadow-sm 
+             dark:bg-gray-800 dark:border-gray-700 p-5"
+    >
+      <h2 class="mb-2 text-xl font-semibold text-gray-900 dark:text-white">Asignar Cultivos</h2>
+      <select
+        multiple
+        [(ngModel)]="selectedCultivos"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+               rounded-lg focus:ring-blue-500 focus:border-blue-500 
+               block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 
+               dark:placeholder-gray-400 dark:text-white"
+      >
+        <option *ngFor="let cultivo of cultivos" [value]="cultivo">
+          {{ cultivo }}
+        </option>
+      </select>
+    </div>
+  </div>
+  

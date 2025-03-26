@@ -71,14 +71,15 @@ export class CultiveComponent implements OnInit {
   }
 
   loadCultivos(): void {
-    const url = `${environment.baseUrl}/Erp/cultives`;
+    // Ahora apunta a /cultives
+    const url = `${environment.baseUrl}/cultives`;
     this.http.get<any>(url).subscribe({
       next: (response) => {
-        // Convertir las cadenas de fecha a objetos Date
-        this.data = response.cultives.map((cultivo: any) => ({
+        // Si la respuesta es un array directamente, no se utiliza "response.cultives"
+        this.data = response.map((cultivo: any) => ({
           ...cultivo,
-          fechaSiembra: new Date(cultivo.fechaSiembra),
-          fechaFin: new Date(cultivo.fechaFin)
+          fechaSiembra: cultivo.fechaSiembra ? new Date(cultivo.fechaSiembra) : null,
+          fechaFin: cultivo.fechaFin ? new Date(cultivo.fechaFin) : null
         }));
         this.filterData();
       },
@@ -185,10 +186,9 @@ export class CultiveComponent implements OnInit {
     }
   }
 
-  // Nuevo método para manejar el cambio de registros por página
   onItemsPerPageChange(value: string): void {
     this.itemsPerPage = Number(value);
-    this.currentPage = 1; // Reinicia a la primera página
+    this.currentPage = 1;
     this.updatePagination();
   }
 }
