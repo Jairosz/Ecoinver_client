@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
-
+import { RouterModule } from '@angular/router'; // para routerLink
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.component.html'
 })
-export class SidebarComponent{
- 
+export class SidebarComponent {
+  // Variable que controla si el dropdown "Administración" está abierto
+  administracionOpen = false;
+
+  toggleAdministracion(): void {
+    this.administracionOpen = !this.administracionOpen;
+  }
 }

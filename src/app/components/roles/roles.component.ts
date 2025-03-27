@@ -44,6 +44,7 @@ export class RolesComponent implements OnInit {
   showModal = false;
   showDeleteModal = false;
   currentUser: { id: string; role: string } | null = null;
+  currentUserLevel: number = 99; // Valor por defecto alto
 
   constructor(
     private roleService: RoleService,
@@ -53,6 +54,7 @@ export class RolesComponent implements OnInit {
   ngOnInit(): void {
     this.loadRoles();
     this.currentUser = this.authService.getCurrentUser();
+
   }
 
   private loadRoles(): void {
@@ -62,12 +64,20 @@ export class RolesComponent implements OnInit {
         next: (data: Rol[]) => {
           this.data = data;
           this.filterData();
+          this.setCurrentUserLevel(); // Actualizar nivel después de cargar datos
         },
         error: (err) => {
           console.error('Error al cargar roles:', err);
           this.errorMessage = 'Error al cargar los roles. Por favor, intente de nuevo más tarde.';
         },
       });
+  }
+
+  private setCurrentUserLevel(): void {
+    if (this.currentUser) {
+      const userRole = this.data.find(r => r.name === this.currentUser?.role);
+      this.currentUserLevel = userRole?.level || 99;
+    }
   }
 
   // Métodos de paginación
@@ -134,6 +144,10 @@ export class RolesComponent implements OnInit {
   }
 
   saveRole(): void {
+    if (this.newRol.level <= this.currentUserLevel) {
+      this.showAlertMessage('error', 'No puedes gestionar roles con nivel igual o mayor al tuyo');
+      return;
+    }
     if (this.editMode) {
       this.roleService.updateRole(this.newRol.id, this.newRol).subscribe({
         next: (updatedRole) => {
