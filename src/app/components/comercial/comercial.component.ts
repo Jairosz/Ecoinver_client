@@ -55,6 +55,7 @@ export class ComercialComponent implements OnInit {
         startDate: ['', Validators.required],
         endDate: ['', Validators.required],
         kgs: ['', [Validators.required, Validators.pattern('^[0-9]+$')]]
+        
       });
   }
 
@@ -211,6 +212,7 @@ export class ComercialComponent implements OnInit {
 
       (data) => {
         this.paginatedData = data;
+        window.location.reload();
       },
       (error) => {
         console.error('Error al crear el cliente ', error);
@@ -218,8 +220,10 @@ export class ComercialComponent implements OnInit {
     );
 
 
-     window.location.reload();//Al terminar recargamos la página para ver los resultados
+    
   }
+
+  
   // Método para editar
   edit(): void {
     const formulario = this.miFormulario.value;
@@ -258,13 +262,14 @@ export class ComercialComponent implements OnInit {
 
       (data) => {
         this.paginatedData = data;
+        window.location.reload();
       },
       (error) => {
         console.error('Error al crear el cliente ', error);
       }
     );
 
-   window.location.reload();
+   
 
   }
 
@@ -273,10 +278,11 @@ export class ComercialComponent implements OnInit {
     this.comercialServicio.deleteComercial(id).subscribe(
       (data) => {
         this.paginatedData = data;
+        window.location.reload();
       }
 
     );
-    window.location.reload();
+    
 
   }
 
@@ -302,13 +308,16 @@ export class ComercialComponent implements OnInit {
     this.miFormulario.get('clientName')?.setValue(selectedComercial?.name);
 
   }
+  buscarComercial2(evento: Client) {
+    const selectedComercial = this.clientErp.find(item => item.clientId == evento.clientId);
+    this.miFormulario.get('clientName2')?.setValue(selectedComercial?.name);
+
+  }
 
   search(nombre: string, cliente: Client) {
     nombre = nombre.toLowerCase();
     return cliente.clientId.toString().toLowerCase().includes(nombre) || cliente.name.toLowerCase().includes(nombre);
 
   }
-
- 
 
 }

@@ -62,7 +62,7 @@
         </div>
       </div>
     </div>
-    <!-- Modal para editar(oculto inicialmente) -->
+    <!-- Modal para crear(oculto inicialmente) -->
 
     <!-- Main modal -->
     <div id="crud-modal" tabindex="-1" aria-hidden="true"
@@ -93,29 +93,22 @@
               <div class="col-span-2">
                 <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Código
                   cliente</label>
-                  <ng-select
+                <ng-select
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                  [items]="clientErp" 
-                  bindLabel="name"
-                  bindValue="clientId"
-                  placeholder="Selecciona un código" 
-                  [searchable]="true"
-                  formControlName="clientCode"
-                  
-                  [searchFn]="search"
-                  (change)="buscarComercial($event)"
-                  >
+                  [items]="clientErp" bindLabel="name" bindValue="clientId" placeholder="Selecciona un código"
+                  [searchable]="true" formControlName="clientCode" [searchFn]="search"
+                  (change)="buscarComercial($event)">
                   <ng-template ng-option-tmp let-item="item">
                     {{ item.clientId }} - {{ item.name }}
                   </ng-template>
-                
+
                   <!-- Template para el valor seleccionado (la etiqueta) -->
                   <ng-template ng-label-tmp let-item="item">
                     {{ item.clientId }}
                   </ng-template>
-                  
+
                 </ng-select>
-                
+
                 @if(miFormulario.get('clientCode')?.touched && miFormulario.get('clientCode')?.invalid){
                 <small class="text-red-500 text-xs">Error, el campo código debe tener una longitud 1-5</small>
                 }
@@ -148,10 +141,15 @@
                   placeholder="fecha fin" required="">
 
               </div>
-              @if(fecha){
-              <small class="col text-red-500 text-xs">Error, la fecha de fin tiene que ser mayor a la fecha de
-                inicio</small>
+              @if(fecha) {
+              <div class="col-span-2">
+                <span class="block w-full text-red-500 text-xs">
+                  Error, la fecha de fin tiene que ser mayor a la fecha de inicio
+                </span>
+              </div>
               }
+
+
               <div class="col-span-2">
                 <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Kilogramos</label>
@@ -208,21 +206,15 @@
               <div class="col-span-2">
                 <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Código
                   cliente</label>
-                  <ng-select
+                <ng-select
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                  [items]="clientErp" 
-                  bindLabel="name"
-                  bindValue="clientId"
-                  placeholder="Selecciona un código" 
-                  [searchable]="true"
-                  formControlName="clientCode"
-                  [searchFn]="search"
-                  (change)="buscarComercial($event)"
-                  >
+                  [items]="clientErp" bindLabel="name" bindValue="clientId" placeholder="Selecciona un código"
+                  [searchable]="true" formControlName="clientCode" [searchFn]="search"
+                  (change)="buscarComercial($event)">
                   <ng-template ng-option-tmp let-item="item">
                     {{ item.clientId }} - {{ item.name }}
                   </ng-template>
-                
+
                   <!-- Template para el valor seleccionado (la etiqueta) -->
                   <ng-template ng-label-tmp let-item="item">
                     {{ item.clientId }}
@@ -238,7 +230,7 @@
                   cliente</label>
                 <input type="text" name="nombre" formControlName="clientName"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="nombre cliente" required="">
+                  placeholder="nombre cliente" required="" [disabled]="true">
                 @if(miFormulario.get('clientName')?.touched && miFormulario.get('clientName')?.invalid){
                 <small class="text-red-500 text-xs">Error, el campo nombre es obligatorio(Solo letras)</small>
                 }
@@ -261,11 +253,15 @@
                   placeholder="fecha fin" required="">
 
               </div>
-              @if(fecha){
-              <small class="col text-red-500 text-xs">Error, la fecha de fin tiene que ser mayor a la fecha de
-                inicio</small>
+              @if(fecha) {
+              <div class="col-span-2">
+                <small class="block w-full text-red-500 text-xs">
+                  Error, la fecha de fin tiene que ser mayor a la fecha de inicio
+                </small>
+              </div>
               }
               <div class="col-span-2">
+
                 <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Kilogramos</label>
                 <input type="number" name="kg" formControlName="kgs"
@@ -285,7 +281,7 @@
                   d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                   clip-rule="evenodd"></path>
               </svg>
-              Add new product 
+              Add new product
             </button>
 
           </form>
