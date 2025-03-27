@@ -6,6 +6,7 @@ import { CultiveComponent } from './components/cultive/cultive.component';
 import { ComercialComponent } from './components/comercial/comercial.component';
 import { UsersComponent } from './components/users/users.component';
 import { CultivePlanningComponent } from './cultive-planning/cultive-planning.component';
+import { ComercialPlanningComponent } from './components/comercial-planning/comercial-planning.component';
 
 
 export const routes: Routes = [
@@ -25,7 +26,7 @@ export const routes: Routes = [
       { path: 'comercial', component: ComercialComponent },
       { path: 'users', component: UsersComponent},
       { path: 'cultive-planning', component: CultivePlanningComponent},
-
+      {path:'comercial-planning',component:ComercialPlanningComponent},
       // Otras rutas dentro del layout, si las hay
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     

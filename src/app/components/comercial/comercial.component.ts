@@ -34,6 +34,7 @@ export class ComercialComponent implements OnInit {
   numId: number = 0;
   fecha: boolean = false;//Manejo de errores dentro del HTML.
   miFormulario: FormGroup;
+  miFormulario2: FormGroup;
   codigoElegido: number = 0;
   clientData: CreateComercial = {
     clientCode: 0,
@@ -54,9 +55,19 @@ export class ComercialComponent implements OnInit {
         clientName: ['', Validators.required],
         startDate: ['', Validators.required],
         endDate: ['', Validators.required],
-        kgs: ['', [Validators.required, Validators.pattern('^[0-9]+$')]]
+        kgs: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+       
         
       });
+      this.miFormulario2 = this.fb.group(
+        {
+          clientCode2: ['', Validators.required],
+          clientName2: ['', Validators.required],
+          startDate2: ['', Validators.required],
+          endDate2: ['', Validators.required],
+          kgs2: ['', [Validators.required, Validators.pattern('^[0-9]+$')]]
+          
+        });
   }
 
   // Variables para búsqueda y paginación
@@ -175,14 +186,14 @@ export class ComercialComponent implements OnInit {
   //Método para crear un nuevo comercial
   create(): void {
 
-    const formulario = this.miFormulario.value;
+    const formulario = this.miFormulario2.value;
 
     this.clientData = {
-      clientCode: formulario.clientCode,
-      clientName: formulario.clientName,
-      startDate: formulario.startDate,
-      endDate: formulario.endDate,
-      kgs: formulario.kgs
+      clientCode: formulario.clientCode2,
+      clientName: formulario.clientName2,
+      startDate: formulario.startDate2,
+      endDate: formulario.endDate2,
+      kgs: formulario.kgs2
     };
    
     //Comprobación de la fecha fechaInicio>fechaFin
@@ -253,7 +264,7 @@ export class ComercialComponent implements OnInit {
 
     if (this.validarFechas) {
       setTimeout(() => {
-
+        this.fecha=true;
         this.validarFechas = false; // De esta manera, Angular actualizará la vista.
       }, 0); //Cambiamos la variable para que el usuario pueda volver a darle al botón
       return;
@@ -310,7 +321,7 @@ export class ComercialComponent implements OnInit {
   }
   buscarComercial2(evento: Client) {
     const selectedComercial = this.clientErp.find(item => item.clientId == evento.clientId);
-    this.miFormulario.get('clientName2')?.setValue(selectedComercial?.name);
+    this.miFormulario2.get('clientName2')?.setValue(selectedComercial?.name);
 
   }
 
