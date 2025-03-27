@@ -3,8 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../environment/environment';
 import { CreateComercial } from '../types/createComercial';
+import { Client } from '../types/Client';
 
-import { Client } from '../types/client';
+
 
 export interface Comercial {
   id: number;

@@ -62,6 +62,9 @@ export class UsersComponent implements OnInit {
   //nueva propiedad para filtrar roles
   filteredRoles: RoleResponse[] = [];
 
+
+  currentUserLevel: number = 99;
+
   constructor(
     private UsersService: UsersService, //Users
     private authService: AuthService
@@ -72,11 +75,19 @@ export class UsersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadRoles(); // Primero cargar roles
-    this.loadListaRoles();
-    this.currentUser = this.authService.getCurrentUser();
-    console.log('Usuario actualizado:', this.currentUser); // Debug
-    this.loadUsers();
+    this.loadRoles().then(() => {
+      this.currentUser = this.authService.getCurrentUser();
+      this.setCurrentUserLevel();
+      this.loadListaRoles();
+      this.loadUsers();
+    });
+  }
+
+  
+  private setCurrentUserLevel(): void {
+    if (this.currentUser?.role) {
+      this.currentUserLevel = this.roleLevelMap[this.currentUser.role.toLowerCase()] || 99;
+    }
   }
 
   private loadUsers(): void {
@@ -235,6 +246,9 @@ export class UsersComponent implements OnInit {
           
           this.filterData(); // Actualizar datos filtrados
           this.showAlertMessage('success', 'Usuario actualizado exitosamente', 3000);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
           this.closeModal();
         },
         error: (err) => {
@@ -248,7 +262,11 @@ export class UsersComponent implements OnInit {
           this.upData.push(newUser);
           this.filterData();
           this.closeModal();
+          //window.location.reload();
           this.showAlertMessage('success', 'Usuario creado exitosamente', 3000);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
           //window.location.reload();
         },
         error: (err) => {
@@ -261,7 +279,7 @@ export class UsersComponent implements OnInit {
   private isFormValid(): boolean {
     return (
       !!this.newUser.nombreCompleto?.trim() &&
-      !!this.newUser.userName?.trim() &&
+      !!this.newUser.userName.trim() &&
       !!this.newUser.email?.trim() &&
       !!this.newUser.role?.trim() &&
       (this.editMode || !!this.newUser.password?.trim())

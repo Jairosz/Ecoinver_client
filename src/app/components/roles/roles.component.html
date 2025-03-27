@@ -3,7 +3,7 @@
   <div
     *ngIf="showAlert"
     class="fixed top-4 right-4 z-50 p-4 mb-4 text-sm rounded-lg shadow-lg border 
-              {{
+                {{
       alertType === 'success'
         ? 'text-green-800 bg-green-50 dark:bg-gray-800 dark:text-green-400 border-green-300'
         : alertType === 'error'
@@ -21,12 +21,13 @@
     }}</span>
     {{ alertMessage }}
   </div>
+
   <!-- Loading State -->
   <div *ngIf="loading" class="text-center p-4">
     <div
       class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 rounded-full border-t-transparent"
     ></div>
-    <p class="mt-2 text-gray-600 dark:text-gray-300">Cargando usuarios...</p>
+    <p class="mt-2 text-gray-600 dark:text-gray-300">Cargando roles...</p>
   </div>
 
   <!-- Content -->
@@ -38,6 +39,7 @@
     >
       {{ errorMessage }}
     </div>
+
     <!-- Header: Search, Buttons, and Pagination Selector -->
     <div
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4"
@@ -52,6 +54,7 @@
           class="block w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:text-white dark:border-gray-600"
         />
       </div>
+
       <!-- Edit/Delete Buttons -->
       <div class="mb-4 flex space-x-2">
         <button
@@ -61,11 +64,11 @@
           Crear
         </button>
         <button
-          *ngIf="selectedUsuario && canManageUser(selectedUsuario)"
+          *ngIf="selectedRol && canManageRole(selectedRol)"
           (click)="edit()"
-          [disabled]="!selectedUsuario"
+          [disabled]="!selectedRol"
           [ngClass]="
-            selectedUsuario
+            selectedRol
               ? 'px-3 py-1 text-sm text-white bg-green-600 border border-green-600 rounded-md hover:bg-green-700'
               : 'px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50'
           "
@@ -73,11 +76,11 @@
           Editar
         </button>
         <button
-          *ngIf="selectedUsuario && canManageUser(selectedUsuario)"
+          *ngIf="selectedRol && canManageRole(selectedRol)"
           (click)="delete()"
-          [disabled]="!selectedUsuario"
+          [disabled]="!selectedRol"
           [ngClass]="
-            selectedUsuario
+            selectedRol
               ? 'px-3 py-1 text-sm text-white bg-red-600 border border-red-600 rounded-md hover:bg-red-700'
               : 'px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50'
           "
@@ -85,6 +88,7 @@
           Borrar
         </button>
       </div>
+
       <!-- Items per Page Selector -->
       <div class="flex items-center">
         <label
@@ -103,9 +107,9 @@
             {{ size }}
           </option>
         </select>
-        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-          registros
-        </span>
+        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+          >registros</span
+        >
       </div>
     </div>
 
@@ -119,11 +123,8 @@
         >
           <tr>
             <th scope="col" class="px-4 py-3">Nombre</th>
-            <th scope="col" class="px-4 py-3">Usuario</th>
-            <th scope="col" class="px-4 py-3">Contraseña</th>
-            <th scope="col" class="px-4 py-3">Rol</th>
-            <th scope="col" class="px-4 py-3">Email</th>
-            <!-- Nueva columna para Email -->
+            <th scope="col" class="px-4 py-3">Descripción</th>
+            <th scope="col" class="px-4 py-3">Nivel</th>
           </tr>
         </thead>
         <tbody>
@@ -131,27 +132,18 @@
             *ngFor="let item of paginatedData"
             (click)="selectRow(item)"
             [ngClass]="{
-              'bg-blue-100 dark:bg-gray-600': selectedUsuario?.id === item.id,
-              'bg-white dark:bg-gray-800': selectedUsuario?.id !== item.id
+              'bg-blue-100 dark:bg-gray-600': selectedRol?.id === item.id,
+              'bg-white dark:bg-gray-800': selectedRol?.id !== item.id
             }"
             class="cursor-pointer border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
           >
             <td
               class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              {{ item.nombreCompleto }}
+              {{ item.name }}
             </td>
-            <td class="px-4 py-3">{{ item.userName }}</td>
-            <td class="px-4 py-3">
-              <div class="flex items-center gap-0 w-[40px]">
-                <span class="font-mono w-[100px] inline-block">
-                  {{ item.showPassword ? item.password : "•••••••••" }}
-                </span>
-              </div>
-            </td>
-            <td class="px-4 py-3">{{ item.role }}</td>
-            <td class="px-4 py-3">{{ item.email }}</td>
-            <!-- Mostrar email -->
+            <td class="px-4 py-3">{{ item.description }}</td>
+            <td class="px-4 py-3">{{ item.level }}</td>
           </tr>
         </tbody>
       </table>
@@ -164,17 +156,15 @@
       <!-- Page Info -->
       <div class="text-sm text-gray-600 dark:text-gray-300 mb-2 sm:mb-0">
         Mostrando
-        <span class="font-semibold">
-          {{ (currentPage - 1) * itemsPerPage + 1 }}
-        </span>
+        <span class="font-semibold">{{
+          (currentPage - 1) * itemsPerPage + 1
+        }}</span>
         a
-        <span class="font-semibold">
-          {{ Math.min(currentPage * itemsPerPage, filteredData.length) }}
-        </span>
+        <span class="font-semibold">{{
+          Math.min(currentPage * itemsPerPage, filteredData.length)
+        }}</span>
         de
-        <span class="font-semibold">
-          {{ filteredData.length }}
-        </span>
+        <span class="font-semibold">{{ filteredData.length }}</span>
         registros
       </div>
 
@@ -198,7 +188,7 @@
     </div>
   </div>
 
-  <!-- Modal de Usuario -->
+  <!-- Modal de Rol -->
   <div
     *ngIf="showModal"
     class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-transparent backdrop-blur-xs"
@@ -209,7 +199,7 @@
           class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200"
         >
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ editMode ? "Editar Usuario" : "Crear Nuevo Usuario" }}
+            {{ editMode ? "Editar Rol" : "Crear Nuevo Rol" }}
           </h3>
           <button
             type="button"
@@ -234,125 +224,72 @@
             <span class="sr-only">Cerrar modal</span>
           </button>
         </div>
-        <form class="p-4 md:p-5" (ngSubmit)="saveUser()" #userForm="ngForm">
+        <form class="p-4 md:p-5" (ngSubmit)="saveRole()" #roleForm="ngForm">
           <div class="grid gap-4 mb-4 grid-cols-2">
             <div class="col-span-2">
               <label
-                for="nombreCompleto"
+                for="name"
                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >Nombre Completo</label
+                >Nombre</label
               >
               <input
                 type="text"
-                placeholder="Nombre"
-                name="nombreCompleto"
-                id="nombreCompleto"
-                [(ngModel)]="newUser.nombreCompleto"
+                name="name"
+                id="name"
+                [(ngModel)]="newRol.name"
                 required
-                maxlength="30"
-                #nombreCompleto="ngModel"
+                #name="ngModel"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
               />
               <p
-                *ngIf="nombreCompleto.invalid && nombreCompleto.touched"
-                class="text-yellow-600 dark:text-yellow-400 text-xs mt-1 bg-yellow-50 dark:bg-gray-800 px-2 py-1 rounded"
+                *ngIf="name.invalid && name.touched"
+                class="text-red-500 text-xs mt-1"
               >
-                Nombre requerido (máximo 30 caracteres).
+                Nombre requerido
               </p>
             </div>
+
             <div class="col-span-2">
               <label
-                for="userName"
+                for="description"
                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >Usuario</label
+                >Descripción</label
               >
-              <input
-                type="text"
-                name="userName"
-                id="userName"
-                [(ngModel)]="newUser.userName"
+              <textarea
+                name="description"
+                id="description"
+                [(ngModel)]="newRol.description"
                 required
-                maxlength="30"
-                #userName="ngModel"
+                #description="ngModel"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
-              />
+              ></textarea>
               <p
-                *ngIf="userName.invalid && userName.touched"
+                *ngIf="description.invalid && description.touched"
                 class="text-red-500 text-xs mt-1"
               >
-                Usuario requerido (máximo 30 caracteres).
+                Descripción requerida
               </p>
             </div>
+
             <div class="col-span-2">
               <label
-                for="email"
                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >Email</label
+                >Nivel</label
               >
               <input
-                type="email"
-                name="email"
-                id="email"
-                [(ngModel)]="newUser.email"
+                type="number"
+                name="level"
+                [(ngModel)]="newRol.level"
+                [min]="currentUserLevel + 1"
                 required
-                #email="ngModel"
-                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                #level="ngModel"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
               />
               <p
-                *ngIf="email.invalid && email.touched"
+                *ngIf="level.invalid && level.touched"
                 class="text-red-500 text-xs mt-1"
               >
-                Por favor ingresa un correo válido (ejemplo&#64;dominio.com).
-              </p>
-            </div>
-            <div class="col-span-2 sm:col-span-1">
-              <label
-                for="contrasena"
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >Contraseña</label
-              >
-              <input
-                type="password"
-                name="contrasena"
-                id="contrasena"
-                [(ngModel)]="newUser.password"
-                [required]="!editMode"
-                maxlength="30"
-                #password="ngModel"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
-              />
-              <p
-                *ngIf="password.invalid && password.touched"
-                class="text-red-500 text-xs mt-1"
-              >
-                Contraseña requerida (máximo 30 caracteres).
-              </p>
-            </div>
-            <div class="col-span-2 sm:col-span-1">
-              <label
-                for="role"
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >Rol</label
-              >
-              <select
-                id="role"
-                name="role"
-                [(ngModel)]="newUser.role"
-                required
-                #role="ngModel"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
-              >
-                <option value="" disabled>Seleccionar rol</option>
-                <option *ngFor="let role of roles" [value]="role.name">
-                  {{ role.name }}
-                </option>
-              </select>
-              <p
-                *ngIf="role.invalid && role.touched"
-                class="text-red-500 text-xs mt-1"
-              >
-                Selecciona un rol.
+                Nivel requerido (número)
               </p>
             </div>
           </div>
@@ -366,22 +303,10 @@
             </button>
             <button
               type="submit"
-              [disabled]="userForm.invalid"
+              [disabled]="roleForm.invalid"
               class="text-white inline-flex items-center bg-green-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5"
             >
-              <svg
-                *ngIf="!editMode"
-                class="me-1 -ms-1 w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
-              {{ editMode ? "Guardar cambios" : "Crear usuario" }}
+              {{ editMode ? "Guardar cambios" : "Crear rol" }}
             </button>
           </div>
         </form>
@@ -389,9 +314,6 @@
     </div>
   </div>
 
-  <!-- -------------------------------------------------------------------------------------------------------------------------------- -->
-
-  <!-- Modal de confirmación de eliminación -->
   <!-- Modal de confirmación de eliminación -->
   <div
     *ngIf="showDeleteModal"
@@ -438,7 +360,7 @@
             />
           </svg>
           <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-            ¿Estás seguro de que quieres borrar este usuario?
+            ¿Estás seguro de que quieres borrar este rol?
           </h3>
           <button
             (click)="confirmDelete()"
