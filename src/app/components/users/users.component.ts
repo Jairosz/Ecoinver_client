@@ -235,6 +235,9 @@ export class UsersComponent implements OnInit {
           
           this.filterData(); // Actualizar datos filtrados
           this.showAlertMessage('success', 'Usuario actualizado exitosamente', 3000);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
           this.closeModal();
         },
         error: (err) => {
@@ -248,7 +251,11 @@ export class UsersComponent implements OnInit {
           this.upData.push(newUser);
           this.filterData();
           this.closeModal();
+          //window.location.reload();
           this.showAlertMessage('success', 'Usuario creado exitosamente', 3000);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
           //window.location.reload();
         },
         error: (err) => {
@@ -261,7 +268,7 @@ export class UsersComponent implements OnInit {
   private isFormValid(): boolean {
     return (
       !!this.newUser.nombreCompleto?.trim() &&
-      !!this.newUser.userName?.trim() &&
+      !!this.newUser.userName.trim() &&
       !!this.newUser.email?.trim() &&
       !!this.newUser.role?.trim() &&
       (this.editMode || !!this.newUser.password?.trim())
