@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CreateComercial } from '../../types/createComercial';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { Client } from '../../types/client';
+import { Client } from '../../types/Client';
 
 
 export interface Comercial {
@@ -56,18 +56,18 @@ export class ComercialComponent implements OnInit {
         startDate: ['', Validators.required],
         endDate: ['', Validators.required],
         kgs: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
-       
-        
+
+
       });
-      this.miFormulario2 = this.fb.group(
-        {
-          clientCode2: ['', Validators.required],
-          clientName2: ['', Validators.required],
-          startDate2: ['', Validators.required],
-          endDate2: ['', Validators.required],
-          kgs2: ['', [Validators.required, Validators.pattern('^[0-9]+$')]]
-          
-        });
+    this.miFormulario2 = this.fb.group(
+      {
+        clientCode2: ['', Validators.required],
+        clientName2: ['', Validators.required],
+        startDate2: ['', Validators.required],
+        endDate2: ['', Validators.required],
+        kgs2: ['', [Validators.required, Validators.pattern('^[0-9]+$')]]
+
+      });
   }
 
   // Variables para búsqueda y paginación
@@ -93,7 +93,7 @@ export class ComercialComponent implements OnInit {
         this.paginatedData = data;
         this.filteredData = this.paginatedData;
         this.updatePagination();
-        
+
       },
       (error) => {
         console.error('Error: ' + error);
@@ -104,16 +104,16 @@ export class ComercialComponent implements OnInit {
     //Obtenemos los registros de la base de datos Erp.
     this.comercialServicio.getClienteErp();
     this.comercialServicio.getCliente().subscribe(
-      (data)=>{
-        this.clientErp=data;
-        
+      (data) => {
+        this.clientErp = data;
+
       },
-      (error)=>{
-        console.log('Error:'+error);
+      (error) => {
+        console.log('Error:' + error);
       }
-      
+
     );
-   
+
 
 
   }
@@ -123,8 +123,8 @@ export class ComercialComponent implements OnInit {
     const query = this.searchQuery.toLowerCase().trim();
 
 
-
     if (query) {
+
       // Si hay texto en la búsqueda, filtrar los datos
       this.filteredData = this.paginatedData.filter(item => {
         // Asegúrate de que las fechas estén formateadas de manera consistente
@@ -132,13 +132,16 @@ export class ComercialComponent implements OnInit {
         const endDate = new Date(item.endDate).toISOString().slice(0, 10); // 'YYYY-MM-DD'
 
         return (
+
           // Verifica si la propiedad es una cadena y realiza la búsqueda de manera insensible a mayúsculas
           (item.clientCode.toString().toLowerCase().includes(query)) ||
           (item.clientName.toLowerCase().includes(query)) ||
           (startDate.includes(query)) ||
           (endDate.includes(query)) ||
           (item.kgs?.toString().includes(query))
+
         );
+
       });
     } else {
       // Si no hay consulta, se restauran todos los datos y se restablece a la primera página
@@ -146,9 +149,9 @@ export class ComercialComponent implements OnInit {
 
       this.currentPage = 1;  // Restablecer la página a la primera
     }
-
+    console.log(this.filteredData);
     // Actualizar la paginación para reflejar los datos filtrados
-    this.updatePagination();
+    
   }
 
   // Actualiza los datos mostrados en la página actual
@@ -156,9 +159,7 @@ export class ComercialComponent implements OnInit {
     let startIndex = (this.currentPage - 1) * this.itemsPerPage;
     let endIndex = Number(startIndex) + Number(this.itemsPerPage);
     startIndex = Number(startIndex);
-    const currentPageData = this.paginatedData.slice(startIndex, endIndex);
-
-    this.filteredData = currentPageData;
+    this.filteredData = this.paginatedData.slice(startIndex, endIndex);
 
 
   }
@@ -195,7 +196,7 @@ export class ComercialComponent implements OnInit {
       endDate: formulario.endDate2,
       kgs: formulario.kgs2
     };
-   
+
     //Comprobación de la fecha fechaInicio>fechaFin
     if (this.clientData.startDate && this.clientData.endDate) {
       const startDate = new Date(this.clientData.startDate);
@@ -231,10 +232,10 @@ export class ComercialComponent implements OnInit {
     );
 
 
-    
+
   }
 
-  
+
   // Método para editar
   edit(): void {
     const formulario = this.miFormulario.value;
@@ -264,7 +265,7 @@ export class ComercialComponent implements OnInit {
 
     if (this.validarFechas) {
       setTimeout(() => {
-        this.fecha=true;
+        this.fecha = true;
         this.validarFechas = false; // De esta manera, Angular actualizará la vista.
       }, 0); //Cambiamos la variable para que el usuario pueda volver a darle al botón
       return;
@@ -280,7 +281,7 @@ export class ComercialComponent implements OnInit {
       }
     );
 
-   
+
 
   }
 
@@ -293,7 +294,7 @@ export class ComercialComponent implements OnInit {
       }
 
     );
-    
+
 
   }
 
@@ -301,15 +302,15 @@ export class ComercialComponent implements OnInit {
     this.selectedComercial = item;
     this.numId = this.selectedComercial.id;
 
-    this.miFormulario.patchValue({clientCode:this.selectedComercial.clientCode});
+    this.miFormulario.patchValue({ clientCode: this.selectedComercial.clientCode });
     this.miFormulario.get('clientName')?.setValue(this.selectedComercial.clientName);
-    
+
     let dateObj = new Date(this.selectedComercial.startDate);
     let formattedDate = dateObj.toISOString().slice(0, 10); // "YYYY-MM-DD"
     this.miFormulario.get('startDate')?.setValue(formattedDate);
-    
-     dateObj = new Date(this.selectedComercial.endDate);
-     formattedDate = dateObj.toISOString().slice(0, 10); // "YYYY-MM-DD"
+
+    dateObj = new Date(this.selectedComercial.endDate);
+    formattedDate = dateObj.toISOString().slice(0, 10); // "YYYY-MM-DD"
     this.miFormulario.get('endDate')?.setValue(formattedDate);
     this.miFormulario.get('kgs')?.setValue(this.selectedComercial.kgs);
   }

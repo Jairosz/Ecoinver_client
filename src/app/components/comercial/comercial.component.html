@@ -74,7 +74,11 @@
           <div
             class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-              Añadir Necesidad Comercial
+
+              Crear Proudcto
+
+             
+
             </h3>
             <button type="button"
               class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -88,7 +92,7 @@
             </button>
           </div>
           <!-- Modal body para crear-->
-          <form class="p-4 md:p-5" [formGroup]="miFormulario" (ngSubmit)="create()">
+          <form class="p-4 md:p-5" [formGroup]="miFormulario2" (ngSubmit)="create()">
             <div class="grid gap-4 mb-4 grid-cols-2">
               <div class="col-span-2">
                 <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Código
@@ -96,8 +100,8 @@
                 <ng-select
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                   [items]="clientErp" bindLabel="name" bindValue="clientId" placeholder="Selecciona un código"
-                  [searchable]="true" formControlName="clientCode" [searchFn]="search"
-                  (change)="buscarComercial($event)">
+                  [searchable]="true" formControlName="clientCode2" [searchFn]="search"
+                  (change)="buscarComercial2($event)">
                   <ng-template ng-option-tmp let-item="item">
                     {{ item.clientId }} - {{ item.name }}
                   </ng-template>
@@ -109,34 +113,34 @@
 
                 </ng-select>
 
-                @if(miFormulario.get('clientCode')?.touched && miFormulario.get('clientCode')?.invalid){
+                @if(miFormulario2.get('clientCode2')?.touched && miFormulario2.get('clientCode2')?.invalid){
                 <small class="text-red-500 text-xs">Error, el campo código debe tener una longitud 1-5</small>
                 }
               </div>
               <div class="col-span-2">
                 <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre del
                   cliente</label>
-                <input type="text" name="nombre" formControlName="clientName"
+                <input type="text" name="nombre" formControlName="clientName2"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   placeholder="nombre cliente" required="">
-                @if(miFormulario.get('clientName')?.touched && miFormulario.get('clientName')?.invalid){
+                @if(miFormulario2.get('clientName2')?.touched && miFormulario2.get('clientName2')?.invalid){
                 <small class="text-red-500 text-xs">Error, el campo nombre es obligatorio(Solo letras)</small>
                 }
               </div>
               <div class="col-span-2 sm:col-span-1">
                 <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha de
                   inicio</label>
-                <input type="date" name="fechI" formControlName="startDate"
+                <input type="date" name="fechI" formControlName="startDate2"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   placeholder="fecha inicio" required="">
-                @if(miFormulario.get('startDate')?.touched && miFormulario.get('startDate')?.invalid){
+                @if(miFormulario2.get('startDate2')?.touched && miFormulario2.get('startDate2')?.invalid){
                 <small class="text-red-500 text-xs">Error, el campo fecha inicio es obligatorio</small>
                 }
               </div>
               <div class="col-span-2 sm:col-span-1">
                 <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha
                   fin</label>
-                <input type="date" name="fechaF" formControlName="endDate"
+                <input type="date" name="fechaF" formControlName="endDate2"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   placeholder="fecha fin" required="">
 
@@ -153,16 +157,16 @@
               <div class="col-span-2">
                 <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Kilogramos</label>
-                <input type="number" name="kg" formControlName="kgs"
+                <input type="number" name="kg" formControlName="kgs2"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   placeholder="kgs" required="">
-                @if(miFormulario.get('kgs')?.touched && miFormulario.get('kgs')?.invalid){
+                @if(miFormulario2.get('kgs2')?.touched && miFormulario2.get('kgs2')?.invalid){
                 <small class="text-red-500 text-xs">Error, el campo kilogramos debe ser un número válido</small>
                 }
               </div>
             </div>
             <button type="submit" [disabled]="
-            miFormulario.invalid || validarFechas"
+            miFormulario2.invalid || validarFechas"
               class="text-white inline-flex items-center bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
               <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg">
@@ -281,7 +285,7 @@
                   d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                   clip-rule="evenodd"></path>
               </svg>
-              Add new product 
+              Editar
             </button>
 
           </form>
