@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router'; // para routerLink
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
@@ -9,10 +9,20 @@ import { RouterModule } from '@angular/router'; // para routerLink
   templateUrl: './sidebar.component.html'
 })
 export class SidebarComponent {
-  // Variable que controla si el dropdown "Administración" está abierto
+  // Variables para controlar el estado de cada dropdown
   administracionOpen = false;
+  comercialOpen = false;
+  campoOpen = false;
 
   toggleAdministracion(): void {
     this.administracionOpen = !this.administracionOpen;
+  }
+
+  toggleComercial(): void {
+    this.comercialOpen = !this.comercialOpen;
+  }
+
+  toggleCampo(): void {
+    this.campoOpen = !this.campoOpen;
   }
 }

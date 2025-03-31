@@ -5,6 +5,7 @@ import { finalize } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/Auth.service';
+import { HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-roles',
@@ -248,4 +249,31 @@ export class RolesComponent implements OnInit {
     this.newRol = { id: '', name: '', description: '', level: 0 };
     this.editMode = false;
   }
+
+
+
+  //----------------------------------------------------------------------------------------
+  //Control de clics
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Si hay un modal abierto, no hagas nada
+    if (this.showModal || this.showDeleteModal) {
+      return;
+    }
+  
+    const target = event.target as HTMLElement;
+    
+    // Verifica si el clic fue en una fila de la tabla (tbody tr)
+    const clickedRow = target.closest('tbody tr');
+    // Verifica si el clic fue en un botón de acción (editar/borrar)
+    const isActionButton = target.closest('.action-button');
+  
+    // Si no es una fila ni un botón de acción, deselecciona
+    if (!clickedRow && !isActionButton) {
+      this.selectedRol = null;
+    }
+  }
+
+
+  //-------------------------------------------------------------------------
 }
