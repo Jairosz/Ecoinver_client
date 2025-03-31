@@ -191,7 +191,7 @@
   <!-- Modal de Rol -->
   <div
     *ngIf="showModal"
-    class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-transparent backdrop-blur-xs"
+    class="overflow-y-auto overflow-x-hidden fixed inset-0 z-50 flex justify-center items-center bg-transparent backdrop-blur-xs"
   >
     <div class="relative p-4 w-full max-w-md max-h-full">
       <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
@@ -259,7 +259,7 @@
                 name="description"
                 id="description"
                 [(ngModel)]="newRol.description"
-                required
+                
                 #description="ngModel"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
               ></textarea>

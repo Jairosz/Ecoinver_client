@@ -131,10 +131,12 @@ export class UsersComponent implements OnInit {
   private loadListaRoles(): void {
     this.UsersService.getRoles().subscribe({
       next: (listaRoles: RoleResponse[]) => {
-        this.roles = listaRoles; // Guardar los objetos completos
+        this.roles = listaRoles.filter(role => 
+          this.canAssignRole(role.name)
+        );
       },
       error: (err) => {
-        console.error('Error al cargar los roles:', err);
+        console.error("Error al cargar roles:", err);
       },
     });
   }
@@ -223,54 +225,47 @@ export class UsersComponent implements OnInit {
   }
 
   saveUser(): void {
-    // Validación del formulario
     if (!this.isFormValid()) {
-      this.showAlertMessage(
-        'warning',
-        'Por favor complete todos los campos requeridos'
-      );
+      this.showAlertMessage('warning', 'Complete todos los campos requeridos');
+      return;
+    }
+
+    // Validar nivel del rol seleccionado
+    const selectedRoleLevel = this.roleLevelMap[this.newUser.role.toLowerCase()] || 99;
+    if (selectedRoleLevel <= this.currentUserLevel) {
+      this.showAlertMessage('error', 'No puedes asignar este rol');
       return;
     }
 
     if (this.editMode) {
       this.UsersService.updateUsuario(this.newUser, this.numId).subscribe({
         next: (updatedUsuario) => {
-          // Actualizar el usuario en la lista local
           const index = this.data.findIndex(u => u.id === updatedUsuario.id);
-          if (index > -1) {
-            this.data[index] = {
-              ...this.data[index],
-              ...updatedUsuario // Sobrescribir propiedades actualizadas
-            };
-          }
-          
-          this.filterData(); // Actualizar datos filtrados
-          this.showAlertMessage('success', 'Usuario actualizado exitosamente', 3000);
+          if (index > -1) this.data[index] = updatedUsuario;
+          this.filterData();
+          this.showAlertMessage('success', 'Usuario actualizado');
+          this.closeModal();
           setTimeout(() => {
             window.location.reload();
-          }, 1000);
-          this.closeModal();
+          }, 1500);
         },
         error: (err) => {
-          console.error("Error en actualización:", err);
-          this.showAlertMessage('error', `Error al actualizar: ${err.message}`);
+          this.showAlertMessage('error', `Error: ${err.message}`);
         },
       });
     } else {
       this.UsersService.createUsuario(this.newUser).subscribe({
         next: (newUser) => {
-          this.upData.push(newUser);
+          this.data = [...this.data, newUser];
           this.filterData();
+          this.showAlertMessage('success', 'Usuario creado');
           this.closeModal();
-          //window.location.reload();
-          this.showAlertMessage('success', 'Usuario creado exitosamente', 3000);
           setTimeout(() => {
             window.location.reload();
-          }, 1000);
-          //window.location.reload();
+          }, 1500);
         },
         error: (err) => {
-          this.showAlertMessage('error', `Error al crear: ${err.message}`);
+          this.showAlertMessage('error', `Error: ${err.message}`);
         },
       });
     }
@@ -322,10 +317,14 @@ export class UsersComponent implements OnInit {
     if (this.currentUser.id === targetUser.id) return false;
 
     // Obtener niveles
-    const currentLevel = this.roleLevelMap[this.currentUser.role] || 99;
     const targetLevel = this.roleLevelMap[targetUser.role.toLowerCase()] || 99;
+    return this.currentUserLevel < targetLevel;
+  }
 
-    return currentLevel < targetLevel;
+  // Nuevo método para validar roles asignables
+  canAssignRole(roleName: string): boolean {
+    const roleLevel = this.roleLevelMap[roleName.toLowerCase()] || 99;
+    return this.currentUserLevel < roleLevel;
   }
 
   delete() {

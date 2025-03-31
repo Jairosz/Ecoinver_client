@@ -157,6 +157,9 @@ export class RolesComponent implements OnInit {
           this.filterData();
           this.showAlertMessage('success', 'Rol actualizado exitosamente', 3000);
           this.closeModal();
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
         },
         error: (err) => {
           this.showAlertMessage('error', `Error al actualizar: ${err.message}`);
@@ -169,6 +172,9 @@ export class RolesComponent implements OnInit {
           this.filterData();
           this.closeModal();
           this.showAlertMessage('success', 'Rol creado exitosamente', 3000);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
         },
         error: (err) => {
           this.showAlertMessage('error', `Error al crear: ${err.message}`);
