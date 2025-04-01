@@ -17,6 +17,7 @@ export class CultivoService {
   getAll(): Observable<Cultive[]> {
     return this.http.get<Cultive[]>(this.baseUrl);
   }
+  
 
   // Podrías agregar más métodos: create, update, delete, etc.
 }

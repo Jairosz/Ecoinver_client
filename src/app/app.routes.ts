@@ -7,11 +7,7 @@ import { ComercialComponent } from './components/comercial/comercial.component';
 import { UsersComponent } from './components/users/users.component';
 import { CultivePlanningComponent } from './cultive-planning/cultive-planning.component';
 import { RolesComponent } from './components/roles/roles.component';
-
 import { ComercialPlanningComponent } from './components/comercial-planning/comercial-planning.component';
-
-
-
 
 export const routes: Routes = [
   // Redirige la raíz al login

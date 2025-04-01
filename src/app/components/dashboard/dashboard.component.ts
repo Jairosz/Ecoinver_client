@@ -16,6 +16,9 @@ export class DashboardComponent implements OnInit {
   constructor(private comercialServicio: ComercialServiceService) {}
   data: any;
   options: any;
+
+ 
+
   teoricaData: any;
 realData: any;
   teoricaOptions: any;
