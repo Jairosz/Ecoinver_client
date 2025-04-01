@@ -1,12 +1,78 @@
 
 
 <div class="p-4">
-  <!-- Card estilo Flowbite/Tailwind -->
   <div class="max-w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 p-6">
-    <!-- Título con estilo adecuado para ambos modos -->
-    <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
+    <!-- Encabezado con título y selector -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
+      <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Dashboard Agrícola</h2>
+      
+      <!-- Selector de género -->
+      <div class="w-full md:w-64">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Seleccionar Producto</label>
+        <select 
+          [(ngModel)]="selectedProduct" 
+          class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 
+                 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-200 
+                 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          (change)="onProductChange()">
+          <option *ngFor="let product of products" [value]="product.value">
+            {{ product.label }}
+          </option>
+        </select>
+      </div>
+    </div>
 
-    <!-- Componente de gráfico de PrimeNG -->
-    <p-chart type="line" [data]="data" [options]="options"></p-chart>
+    
+
+    <!-- Fila superior: Gráfico principal + Cuadro de información -->
+    <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 mb-6">
+      <!-- Gráfico principal -->
+      <div class="w-full lg:w-[65%] xl:w-[70%] card">
+        <p-chart type="line" [data]="data" [options]="options" class="h-[20rem] md:h-[25rem] lg:h-[30rem]" />
+      </div>
+
+      <!-- Cuadro de información lateral -->
+      <div class="w-full lg:w-[35%] xl:w-[30%] bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+        <h3 class="text-base md:text-lg font-semibold mb-3 md:mb-4 dark:text-gray-300">Información Adicional</h3>
+        <div class="space-y-2 md:space-y-3 text-sm md:text-base text-gray-600 dark:text-gray-400">
+          <p>• Última actualización: 24/06/2024</p>
+          <p>• Total registros: 1,234</p>
+          <p>• Variación mensual: +12%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fila inferior: Gráficas combinadas/separadas -->
+    <div class="flex flex-col gap-4 lg:gap-6">
+      <!-- Controles y gráfica combinada -->
+      <div class="w-full bg-white dark:bg-gray-800 p-3 md:p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-3 md:mb-4">
+          <h3 class="text-base md:text-lg font-semibold dark:text-gray-300 mb-2 md:mb-0">Comparativa Teórica vs Real</h3>
+          <button 
+            (click)="toggleView()"
+            class="w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 text-sm md:text-base bg-blue-500 text-white rounded-lg hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors"
+          >
+            {{ showCombined ? 'Separar' : 'Comparar' }}
+          </button>
+        </div>
+        
+        <div *ngIf="showCombined; else separateCharts">
+          <p-chart type="line" [data]="combinedData" [options]="combinedOptions" class="h-[16rem] md:h-[18rem] lg:h-[20rem]" />
+        </div>
+
+        <ng-template #separateCharts>
+          <div class="flex flex-col md:flex-row gap-3 md:gap-4">
+            <div class="w-full md:w-1/2">
+              <h4 class="text-sm md:text-base font-medium mb-1 md:mb-2 dark:text-gray-300">Teórica</h4>
+              <p-chart type="line" [data]="teoricaData" [options]="teoricaOptions" class="h-[14rem] md:h-[16rem]" />
+            </div>
+            <div class="w-full md:w-1/2">
+              <h4 class="text-sm md:text-base font-medium mb-1 md:mb-2 dark:text-gray-300">Real</h4>
+              <p-chart type="line" [data]="realData" [options]="realOptions" class="h-[14rem] md:h-[16rem]" />
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
   </div>
 </div>
