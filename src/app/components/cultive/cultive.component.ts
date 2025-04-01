@@ -137,8 +137,13 @@ export class CultiveComponent implements OnInit {
   }
 
   selectRow(item: Cultivo): void {
-    this.selectedCultivo = this.selectedCultivo?.idCultivo === item.idCultivo ? null : item;
+    this.selectedCultivo = item;
+  
+    // Abre la información detallada en una nueva pestaña o ventana
+    const url = `/cultive/${item.idCultivo}`;
+    window.open(url, '_blank');
   }
+  
 
   create(): void {
     console.log('Crear cultivo');
