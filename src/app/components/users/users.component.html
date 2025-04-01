@@ -192,7 +192,8 @@ Borrar
   <div
     *ngIf="showModal"
     class="overflow-y-auto overflow-x-hidden fixed inset-0 z-50 flex justify-center items-center bg-transparent backdrop-blur-xs"
-  >
+    [@modalAnimation]
+    >
     <div class="relative p-4 w-full max-w-md max-h-full">
       <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
         <div
@@ -260,6 +261,7 @@ Borrar
                 type="text"
                 name="userName"
                 id="userName"
+                placeholder="Usuario"
                 [(ngModel)]="newUser.userName"
                 required
                 maxlength="30"
@@ -283,6 +285,7 @@ Borrar
                 type="email"
                 name="email"
                 id="email"
+                placeholder="email@ejemplo.com"
                 [(ngModel)]="newUser.email"
                 required
                 #email="ngModel"
@@ -306,6 +309,7 @@ Borrar
                 type="password"
                 name="contrasena"
                 id="contrasena"
+                placeholder="Contraseña"
                 [(ngModel)]="newUser.password"
                 [required]="!editMode"
                 maxlength="30"
@@ -390,7 +394,8 @@ Borrar
   <div
     *ngIf="showDeleteModal"
     class="fixed inset-0 z-50 flex items-center justify-center w-full h-full backdrop-blur-xs"
-  >
+    [@modalAnimation]
+    >
     <div class="relative p-4 w-full max-w-md">
       <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
         <button
