@@ -6,7 +6,6 @@ import { CreateComercial } from '../types/createComercial';
 import { Client } from '../types/Client';
 
 
-
 export interface Comercial {
   id: number;
   clientCode: number;

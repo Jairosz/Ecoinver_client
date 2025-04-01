@@ -15,7 +15,11 @@ export interface Comercial {
   clientName: string;
   startDate: Date;
   endDate: Date;
+
   kgs: number;
+}
+interface Window {
+  Flowbite: any;
 }
 
 @Component({
@@ -44,8 +48,9 @@ export class ComercialComponent implements OnInit {
     kgs: 0
   };
   clientErp: Client[] = [];//Array para la base de datos del Erp
-
-
+  showDeleteModal: boolean = false;
+  showCreateModal: boolean = false;
+  showEditModal: boolean = false;
 
   constructor(private comercialServicio: ComercialServiceService, private ruta: Router, private fb: FormBuilder) {
 
@@ -55,6 +60,7 @@ export class ComercialComponent implements OnInit {
         clientName: ['', Validators.required],
         startDate: ['', Validators.required],
         endDate: ['', Validators.required],
+        
         kgs: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
 
 
@@ -65,6 +71,7 @@ export class ComercialComponent implements OnInit {
         clientName2: ['', Validators.required],
         startDate2: ['', Validators.required],
         endDate2: ['', Validators.required],
+      
         kgs2: ['', [Validators.required, Validators.pattern('^[0-9]+$')]]
 
       });
@@ -101,8 +108,8 @@ export class ComercialComponent implements OnInit {
 
     );
 
-    //Obtenemos los registros de la base de datos Erp.
-    this.comercialServicio.getClienteErp();
+   
+    
     this.comercialServicio.getCliente().subscribe(
       (data) => {
         this.clientErp = data;
@@ -151,7 +158,7 @@ export class ComercialComponent implements OnInit {
     }
     console.log(this.filteredData);
     // Actualizar la paginación para reflejar los datos filtrados
-    
+
   }
 
   // Actualiza los datos mostrados en la página actual
@@ -245,6 +252,7 @@ export class ComercialComponent implements OnInit {
       clientName: formulario.clientName,
       startDate: formulario.startDate,
       endDate: formulario.endDate,
+     
       kgs: formulario.kgs
     };
     //Comprobación de la fecha fechaInicio>fechaFin
@@ -331,5 +339,31 @@ export class ComercialComponent implements OnInit {
     return cliente.clientId.toString().toLowerCase().includes(nombre) || cliente.name.toLowerCase().includes(nombre);
 
   }
+  openDeleteModal() {
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+  }
+
+  openCreateModal() {
+    this.showCreateModal = true;
+  }
+
+  closeCreateModal() {
+    this.showCreateModal = false;
+  }
+
+  openEditModal() {
+    if (this.selectedComercial) {
+      this.showEditModal = true;
+    }
+  }
+
+  closeEditModal() {
+    this.showEditModal = false;
+  }
+
 
 }

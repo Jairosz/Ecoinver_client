@@ -11,7 +11,9 @@ import { ChartModule } from 'primeng/chart';
 export class DashboardComponent implements OnInit {
   data: any;
   options: any;
-
+  constructor(){
+    
+  }
   ngOnInit(): void {
     // Ejemplo de gráfico de líneas
     this.data = {
