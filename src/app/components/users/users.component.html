@@ -56,14 +56,14 @@
       <div class="mb-4 flex space-x-2">
         <button
           (click)="openCreateModal()"
-          class="cursor-pointer px-3 py-1 text-sm text-white bg-green-600 border border-green-600 rounded-md hover:bg-green-700"
+          class="cursor-pointer px-3 py-1 text-sm text-white  rounded-md border-1 border-[#437d3f] bg-[#437d3f] hover:bg-[#274925] hover:border-1"
         >
           Crear
         </button>
         <button
   *ngIf="selectedUsuario && canManageUser(selectedUsuario)"
   (click)="edit()"
-  class="action-button px-3 py-1 text-sm text-white bg-green-600 border border-green-600 rounded-md hover:bg-green-700"
+  class="action-button cursor-pointer px-3 py-1 text-sm text-white  rounded-md border-1 border-[#437d3f] bg-[#437d3f] hover:bg-[#274925] hover:border-1"
 >
   Editar
 </button>
@@ -365,7 +365,7 @@ Borrar
             <button
               type="submit"
               [disabled]="userForm.invalid"
-              class="text-white inline-flex items-center bg-green-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5"
+              class="text-white inline-flex items-center border-1 border-[#437d3f] bg-[#437d3f] hover:bg-[#274925] hover:border-1 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5"
             >
               <svg
                 *ngIf="!editMode"

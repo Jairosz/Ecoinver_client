@@ -4,20 +4,20 @@
 
     <!-- Búsqueda -->
     <div class="mb-2 sm:mb-0 sm:mr-4 w-full sm:w-64">
-      <input [(ngModel)]="searchQuery" (ngModelChange)="filterData()" type="text" placeholder="Search..."
+      <input [(ngModel)]="searchQuery" (ngModelChange)="filterData()" type="text" placeholder="Buscar..."
         class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:text-white dark:border-gray-600" />
     </div>
 
     <div class="mb-4 flex space-x-2">
       <!-- Botón de Crear -->
       <button (click)="openCreateModal()"
-        class="cursor-pointer px-3 py-1 text-sm text-white bg-green-600 border border-green-600 rounded-md hover:bg-green-700">
+        class="cursor-pointer px-3 py-1 text-sm text-white  rounded-md border-1 border-[#437d3f] bg-[#437d3f] hover:bg-[#274925] hover:border-1">
         Crear
       </button>
 
       <!-- Botón de Editar (habilitado solo cuando hay un comercial seleccionado) -->
       <button [disabled]="!selectedComercial" (click)="openEditModal()"
-        [ngClass]="selectedComercial ? 'cursor-pointer px-3 py-1 text-sm text-white bg-green-600 border border-green-600 rounded-md hover:bg-green-700' : 'px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50'">
+        [ngClass]="selectedComercial ? 'cursor-pointer px-3 py-1 text-sm text-white  rounded-md border-1 border-[#437d3f] bg-[#437d3f] hover:bg-[#274925] hover:border-1' : 'px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50'">
         Editar
       </button>
 
@@ -111,7 +111,7 @@
                   cliente</label>
                 <input type="text" name="nombre" formControlName="clientName2"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="nombre cliente" required="">
+                  placeholder="Nombre de cliente" required="">
                 @if(miFormulario2.get('clientName2')?.touched && miFormulario2.get('clientName2')?.invalid){
                 <small class="text-red-500 text-xs">Error, el campo nombre es obligatorio(Solo letras)</small>
                 }
@@ -121,7 +121,7 @@
                   inicio</label>
                 <input type="date" name="fechI" formControlName="startDate2"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="fecha inicio" required="">
+                  placeholder="Fecha de inicio" required="">
                 @if(miFormulario2.get('startDate2')?.touched && miFormulario2.get('startDate2')?.invalid){
                 <small class="text-red-500 text-xs">Error, el campo fecha inicio es obligatorio</small>
                 }
@@ -131,7 +131,7 @@
                   fin</label>
                 <input type="date" name="fechaF" formControlName="endDate2"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="fecha fin" required="">
+                  placeholder="Fecha de fin" required="">
               </div>
               @if(fecha) {
               <div class="col-span-2">
@@ -146,14 +146,14 @@
                   Kilogramos</label>
                 <input type="number" name="kg" formControlName="kgs2"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="kgs" required="">
+                  placeholder="200..." required="">
                 @if(miFormulario2.get('kgs2')?.touched && miFormulario2.get('kgs2')?.invalid){
                 <small class="text-red-500 text-xs">Error, el campo kilogramos debe ser un número válido</small>
                 }
               </div>
             </div>
             <button type="submit" [disabled]="miFormulario2.invalid || validarFechas"
-              class="text-white inline-flex items-center bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+              class="text-white inline-flex items-center  focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-green-800 border-1 border-[#437d3f] bg-[#437d3f] hover:bg-[#274925] hover:border-1">
               <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd"
@@ -258,7 +258,7 @@
               </div>
             </div>
             <button type="submit" [disabled]="miFormulario.invalid || validarFechas"
-              class="text-white inline-flex items-center bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+              class="text-white inline-flex items-center  focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-green-800 border-1 border-[#437d3f] bg-[#437d3f] hover:bg-[#274925] hover:border-1">
               <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd"
