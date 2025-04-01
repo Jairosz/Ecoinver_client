@@ -3,44 +3,58 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/Auth.service';
+import { CultivoService } from '../../services/Cultivo.service';
+import { ComercialServiceService } from '../../services/Comercial.service';
+
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
- 
+
 })
 export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
   connectionError: boolean = false;  // <-- variable para "no hay conexión"
-
+  loading: boolean = false;
   private errorTimer: any;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router, private cultivoServicio: CultivoService, private comercialServicio: ComercialServiceService
   ) {
     this.loginForm = this.fb.group({
       usuario: ['', Validators.required],
       password: ['', Validators.required]
     });
   }
+  ngOnInit(){
+    this.comercialServicio.getClienteErp().subscribe(
+  (data)=>{
+    console.log(data);
+  }      
 
+    );
+    this.cultivoServicio.getAll().subscribe(
+      (data)=>{
+        console.log(data);
+      }
+    );
+  }
   onSubmit(): void {
     if (this.loginForm.invalid) return;
-
+    this.loading = true;  
     const { usuario, password } = this.loginForm.value;
 
     this.authService.login(usuario, password).subscribe({
       next: (resp) => {
         localStorage.setItem('token', resp.token); // Guarda el token en el localStorage
-        localStorage.setItem('userId', resp.userId||"fallo"); // Guarda el token en el localStorage
+        localStorage.setItem('userId', resp.userId || "fallo"); // Guarda el token en el localStorage
         this.clearErrors();
-        // Redirige en caso de éxito
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard'])
       },
       error: (err) => {
         this.clearErrors();

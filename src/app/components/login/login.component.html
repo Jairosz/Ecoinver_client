@@ -1,3 +1,4 @@
+
 <!-- login.component.html -->
 <div class="w-screen h-screen bg-green-50 flex items-center justify-center">
   <!-- Contenedor interno con 70% de alto, dos columnas -->
@@ -15,28 +16,16 @@
         <div class="mb-4 w-full max-w-sm">
           <label for="usuario" class="block text-green-700 mb-2">Usuario</label>
           <div class="relative group">
-            <svg
-              class="absolute right-3 top-1/2 w-5 h-5 text-gray-700
+            <svg class="absolute right-3 top-1/2 w-5 h-5 text-gray-700
                      transform -translate-y-1/2
                      transition-all duration-300 
                      pointer-events-none
-                     group-focus-within:opacity-0 group-focus-within:translate-x-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                     group-focus-within:opacity-0 group-focus-within:translate-x-2" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M5.121 17.804A6 6 0 0112 14c1.63 0 3.137.65 4.243 1.707A6 6 0 0121 20v1a1 1 0 001 1H2a1 1 0 001-1v-1a6 6 0 013.121-5.196zM12 4a5 5 0 110 10 5 5 0 010-10z" />
             </svg>
-            <input
-              id="usuario"
-              type="text"
-              placeholder="Ingresa tu usuario"
-              formControlName="usuario"
-              class="w-full h-10 px-3 pr-10 border border-green-300
+            <input id="usuario" type="text" placeholder="Ingresa tu usuario" formControlName="usuario" class="w-full h-10 px-3 pr-10 border border-green-300
                      rounded placeholder-gray-800
                      focus:outline-none focus:border-green-500 
                      focus:ring-2 focus:ring-green-500" />
@@ -47,60 +36,36 @@
         <div class="mb-6 w-full max-w-sm">
           <label for="password" class="block text-green-700 mb-2">Contraseña</label>
           <div class="relative group">
-            <svg
-              class="absolute right-3 top-1/2 w-5 h-5 text-gray-700
+            <svg class="absolute right-3 top-1/2 w-5 h-5 text-gray-700
                      -translate-y-1/2 transform
                      transition-all duration-300 
                      pointer-events-none
-                     group-focus-within:opacity-0 group-focus-within:translate-x-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                     group-focus-within:opacity-0 group-focus-within:translate-x-2" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 11c1.104 0 2-.896 2-2V7a2 2 0 10-4 0v2c0 1.104.896 2 2 2zm6 0h-1V9a5 5 0 10-10 0v2H6a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2z" />
             </svg>
-            <input
-              id="password"
-              type="password"
-              placeholder="Ingresa tu contraseña"
-              formControlName="password"
-              class="w-full h-10 px-3 pr-10 border border-green-300
+            <input id="password" type="password" placeholder="Ingresa tu contraseña" formControlName="password" class="w-full h-10 px-3 pr-10 border border-green-300
                      rounded placeholder-gray-800
                      focus:outline-none focus:border-green-500 
                      focus:ring-2 focus:ring-green-500" />
           </div>
         </div>
 
-        <button
-          type="submit"
-          class="relative inline-flex items-center justify-center 
+        <button type="submit" class="relative inline-flex items-center justify-center 
                  p-4 px-6 py-3 mx-auto 
                  overflow-hidden font-medium text-green-100 
                  transition duration-300 ease-out 
                  border-2 border-green-500 rounded-full shadow-md group">
-          <span
-            class="absolute inset-0 flex items-center justify-center w-full h-full 
+          <span class="absolute inset-0 flex items-center justify-center w-full h-full 
                    text-white duration-300 -translate-x-full bg-green-800 
                    group-hover:translate-x-0 ease">
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </span>
-          <span
-            class="absolute flex items-center justify-center w-full h-full 
+          <span class="absolute flex items-center justify-center w-full h-full 
                    text-green-800 transition-all duration-300 transform 
                    group-hover:translate-x-full ease">
             Iniciar Sesión
@@ -111,8 +76,7 @@
     </div>
 
     <!-- Columna derecha: Imagen -->
-    <div
-      class="flex-1 hidden md:block 
+    <div class="flex-1 hidden md:block 
              bg-[url('assets/GMAO.png')]
              bg-cover bg-center bg-no-repeat 
              h-full">
@@ -122,25 +86,17 @@
 </div>
 
 <!-- Popup de error por credenciales u otros (status 400, 500, etc.) -->
-<div
-  *ngIf="errorMessage"
-  class="fixed top-4 right-4 z-50 p-4 mb-4 text-sm text-red-800 
+<div *ngIf="errorMessage" class="fixed top-4 right-4 z-50 p-4 mb-4 text-sm text-red-800 
          rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 
-         shadow-lg border border-red-300"
-  role="alert"
->
+         shadow-lg border border-red-300" role="alert">
   <span class="font-medium">¡Error!</span> {{ errorMessage }}
 </div>
 
 <!-- Popup de error por falta de conexión (status 0) -->
-<div
-  *ngIf="connectionError"
-  class="fixed top-4 right-4 z-50 p-4 mb-4 text-sm text-red-800 
+<div *ngIf="connectionError" class="fixed top-4 right-4 z-50 p-4 mb-4 text-sm text-red-800 
          rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 
-         shadow-lg border border-red-300"
-  role="alert"
->
-  <span class="font-medium">¡Sin Conexión!</span> 
+         shadow-lg border border-red-300" role="alert">
+  <span class="font-medium">¡Sin Conexión!</span>
   No se pudo conectar con el servidor. Intenta nuevamente más tarde.
 </div>
 

@@ -1,6 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
+import { CultivoService } from "../services/Cultivo.service";
+import { Cultive } from "../types/Cultive";
 
 @Component({
   selector: "app-cultive-planning",
@@ -19,10 +21,22 @@ export class CultivePlanningComponent implements OnInit {
   cultivos: string[] = ["Trigo", "Maíz", "Soja"];
   // Cultivos seleccionados (usado en el select múltiple)
   selectedCultivos: string[] = [];
-
-  constructor() {}
+  cultivo:Cultive[]=[];
+  constructor(private cultivoSrvicio:CultivoService) {}
 
   ngOnInit(): void {
+
+    this.cultivoSrvicio.getAll().subscribe(
+      (data)=>{
+        this.cultivo=data;
+        console.log(this.cultivo);
+      },
+      (error)=>{
+        console.error('Error '+error);
+      }
+
+
+    );
     this.updateCards();
   }
 
