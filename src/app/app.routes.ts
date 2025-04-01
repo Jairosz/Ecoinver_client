@@ -8,6 +8,7 @@ import { UsersComponent } from './components/users/users.component';
 import { CultivePlanningComponent } from './cultive-planning/cultive-planning.component';
 import { RolesComponent } from './components/roles/roles.component';
 import { ComercialPlanningComponent } from './components/comercial-planning/comercial-planning.component';
+import { CultiveDetailsComponent } from './components/cultive-details/cultive-details.component';
 
 export const routes: Routes = [
   // Redirige la raíz al login
@@ -27,6 +28,8 @@ export const routes: Routes = [
       { path: 'users', component: UsersComponent},
       { path: 'cultive-planning', component: CultivePlanningComponent},
       { path: 'roles', component: RolesComponent},
+      { path: 'cultive/:idCultivo', component: CultiveDetailsComponent },
+
 
       {path:'comercial-planning', component:ComercialPlanningComponent},
 
