@@ -1,3 +1,11 @@
+<!-- En el head de index.html -->
+<link 
+  rel="stylesheet" 
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
+  integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" 
+  crossorigin="anonymous" 
+  referrerpolicy="no-referrer"
+/>
 <div
   class="mb-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"
 >
@@ -9,7 +17,7 @@
         [class.active-tab]="activeTab === 'Datos de cultivo'"
         class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg dark:text-white hover:text-[#437d3f] dark:hover:text-[#65b15f] hover:border-[#437d3f] dark:hover:border-[#65b15f] transition-all"
         [ngClass]="{
-          'border-[#437d3f] dark:border-[#65b15f] bg-gray-50 dark:bg-gray-700 text-[#437d3f] dark:text-[#65b15f]':
+          'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
             activeTab === 'Datos de cultivo'
         }"
       >
@@ -22,7 +30,7 @@
         [class.active-tab]="activeTab === 'Mapping'"
         class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg dark:text-white hover:text-[#437d3f] dark:hover:text-[#65b15f] hover:border-[#437d3f] dark:hover:border-[#65b15f] transition-all"
         [ngClass]="{
-          'border-[#437d3f] dark:border-[#65b15f] bg-gray-50 dark:bg-gray-700 text-[#437d3f] dark:text-[#65b15f]':
+          'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
             activeTab === 'Mapping'
         }"
       >
@@ -35,7 +43,7 @@
         [class.active-tab]="activeTab === 'Insights'"
         class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg dark:text-white hover:text-[#437d3f] dark:hover:text-[#65b15f] hover:border-[#437d3f] dark:hover:border-[#65b15f] transition-all"
         [ngClass]="{
-          'border-[#437d3f] dark:border-[#65b15f] bg-gray-50 dark:bg-gray-700 text-[#437d3f] dark:text-[#65b15f]':
+          'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
             activeTab === 'Insights'
         }"
       >
@@ -71,7 +79,7 @@
           Cargando datos de cultivo...
         </p>
       </div>
-      <div *ngIf="error" class="bg-red-100 dark:bg-red-900 p-4 rounded-lg">
+      <div *ngIf="error" class="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
         <p class="text-red-600 dark:text-red-300">
           <i class="fas fa-exclamation-circle mr-2"></i>{{ error }}
         </p>
@@ -198,7 +206,7 @@
               class="overflow-hidden h-2 text-xs flex rounded bg-gray-200 dark:bg-gray-600"
             >
               <div
-                [style.width.%]="getProgressPercentage()"
+                [style.width.%]="progressPercentage"
                 class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-[#437d3f]"
               ></div>
             </div>
@@ -362,7 +370,7 @@
           <!-- Mensaje de error para pronóstico -->
           <div
             *ngIf="error && activeTab === 'Mapping'"
-            class="bg-red-100 dark:bg-red-900 p-4 rounded-lg mt-4"
+            class="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg mt-4"
           >
             <p class="text-red-600 dark:text-red-300">
               <i class="fas fa-exclamation-triangle mr-2"></i>
@@ -392,7 +400,7 @@
         Contenido de la pestaña
         <strong class="font-medium text-gray-800 dark:text-white"
           >Insights</strong
-        >.
+        >
       </p>
     </div>
   </div>

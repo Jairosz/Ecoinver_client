@@ -140,7 +140,7 @@ export class UsersComponent implements OnInit {
         return acc;
       }, {} as { [key: string]: number });
 
-      console.log('Mapa de roles actualizado:', this.roleLevelMap);
+      //console.log('Mapa de roles actualizado:', this.roleLevelMap);
     } catch (error) {
       console.error('Error cargando roles:', error);
       this.showAlertMessage('error', 'Error al cargar roles');
@@ -327,12 +327,13 @@ export class UsersComponent implements OnInit {
   canManageUser(targetUser: Usuario): boolean {
     if (!this.currentUser || !targetUser) return false;
 
+    /*
     console.log(
       'Current user level:',
       this.currentUser.role,
       'Target user level:',
       targetUser.role
-    );
+    );*/
 
     // Verificar auto-eliminación
     if (this.currentUser.id === targetUser.id) return false;
@@ -349,7 +350,7 @@ export class UsersComponent implements OnInit {
   }
 
   delete() {
-    console.log('Mostrando modal de eliminación');
+    //console.log('Mostrando modal de eliminación');
 
     this.showDeleteModal = true;
   }
