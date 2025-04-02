@@ -8,6 +8,8 @@ import { RoleResponse } from '../../types/RoleResponse';
 import { lastValueFrom } from 'rxjs';
 import { AuthService } from '../../services/Auth.service';
 import { HostListener } from '@angular/core';
+
+import { trigger, transition, style, animate, keyframes } from '@angular/animations';
 //alertas
 
 @Component({
@@ -15,6 +17,24 @@ import { HostListener } from '@angular/core';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './users.component.html',
+  animations: [
+  trigger('modalAnimation', [
+    transition(':enter', [
+      style({ opacity: 0, transform: 'scale(0.1)' }),
+      animate('800ms ease-out', keyframes([
+        style({ opacity: 0.5, transform: 'scale(1.4)', offset: 0.6 }),
+        style({ opacity: 1, transform: 'scale(1)', offset: 1 })
+      ]))
+    ]),
+    transition(':leave', [
+      animate('700ms ease-in', keyframes([
+        style({ opacity: 1, transform: 'scale(1)', offset: 0.2 }),
+        style({ opacity: 0.3, transform: 'scale(1.3)', offset: 0.6 }),
+        style({ opacity: 0, transform: 'scale(0.1)', offset: 1 })
+      ]))
+    ])
+  ])
+]
 })
 export class UsersComponent implements OnInit {
   Math = Math;

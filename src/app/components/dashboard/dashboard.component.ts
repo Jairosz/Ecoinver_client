@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
 import { NgModel } from '@angular/forms';
 import { FormsModule } from '@angular/forms'; // <-- Importa FormsModule
+import { ComercialServiceService, Comercial } from '../../services/Comercial.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,12 +12,12 @@ import { FormsModule } from '@angular/forms'; // <-- Importa FormsModule
   templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnInit {
+
+  constructor(private comercialServicio: ComercialServiceService) {}
   data: any;
   options: any;
 
-  constructor(){
-    
-  }
+ 
 
   teoricaData: any;
 realData: any;
@@ -37,13 +38,44 @@ selectedProduct: string = 'cereales';
     { value: 'tuberculos', label: 'Tubérculos' }
   ];
 
+  //objeto de tipo necesidad comercial
+  comercial: Comercial ={
+    id: 0,
+    clientCode: 0,
+    clientName: "",
+    startDate: new Date(),
+    endDate: new Date(),
+    kgs: 0
+  }
+
+  //array de objetos comercial
+  comNeeds: Comercial[] = [];
+
 onProductChange() {
   // Lógica para actualizar los datos según el producto seleccionado
   console.log('Producto seleccionado:', this.selectedProduct);
   // Aquí deberías implementar la actualización de los datos de los gráficos
 }
 
+
   ngOnInit(): void {
+    
+    //Obtenemos los registros de los datos de la base de datos
+    this.comercialServicio.getComercial().subscribe(
+      (data) => {
+        this.comNeeds = data;
+        //this.filteredData = this.paginatedData; estas variables son de la lógica usada por moha en el componente de Comercial
+        //this.updatePagination();
+        console.log(this.comNeeds);
+      },
+      (error) => {
+        console.error('Error: ' + error);
+      }
+
+    );
+    
+
+    //-----------------------------------------------------------------------------------//
     
     this.combinedOptions = {
       responsive: true,
@@ -96,7 +128,7 @@ onProductChange() {
       }
     };
     this.data = {
-      labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+      labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
       datasets: [
         {
           label: 'Dataset 1',

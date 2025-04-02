@@ -14,5 +14,6 @@ export interface Cultive {
     produccionEstimada?: number; // Opcional
     fechaSiembra?: Date;         // Opcional
     fechaFin?: Date;             // Opcional
+    latitud?:number; 
+    longitud?:number;
   }
-  
