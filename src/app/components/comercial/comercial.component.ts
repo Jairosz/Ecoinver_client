@@ -7,6 +7,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CreateComercial } from '../../types/createComercial';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Client } from '../../types/Client';
+import { GenderService } from '../../services/Gender.service';
+import { Gender } from '../../types/gender';
 
 
 export interface Comercial {
@@ -15,12 +17,11 @@ export interface Comercial {
   clientName: string;
   startDate: Date;
   endDate: Date;
-
+  generoId: number;
+  generoNombre: string;
   kgs: number;
 }
-interface Window {
-  Flowbite: any;
-}
+
 
 @Component({
   selector: 'app-comercial',
@@ -45,33 +46,38 @@ export class ComercialComponent implements OnInit {
     clientName: '',
     startDate: undefined,
     endDate: undefined,
+    generoId: 0,
+    generoNombre:'',
+
     kgs: 0
   };
   clientErp: Client[] = [];//Array para la base de datos del Erp
   showDeleteModal: boolean = false;
   showCreateModal: boolean = false;
   showEditModal: boolean = false;
+  genderArray: Gender[] = []//Variable donde se guardan los generos
+  constructor(private comercialServicio: ComercialServiceService, private ruta: Router, private fb: FormBuilder, private gender: GenderService) {
 
-  constructor(private comercialServicio: ComercialServiceService, private ruta: Router, private fb: FormBuilder) {
-
-    this.miFormulario = this.fb.group(
+    this.miFormulario = this.fb.group(//Un validador del formulario para el edit
       {
         clientCode: ['', Validators.required],
         clientName: ['', Validators.required],
         startDate: ['', Validators.required],
         endDate: ['', Validators.required],
-        
+        genero: ['', Validators.required],
+        generoNombre:['',Validators.required],
         kgs: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
 
 
       });
-    this.miFormulario2 = this.fb.group(
+    this.miFormulario2 = this.fb.group(//Otro validador del formulario para el create
       {
         clientCode2: ['', Validators.required],
         clientName2: ['', Validators.required],
         startDate2: ['', Validators.required],
         endDate2: ['', Validators.required],
-      
+        genero2: ['', Validators.required],
+        generoNombre2:['',Validators.required],
         kgs2: ['', [Validators.required, Validators.pattern('^[0-9]+$')]]
 
       });
@@ -99,6 +105,7 @@ export class ComercialComponent implements OnInit {
       (data) => {
         this.paginatedData = data;
         this.filteredData = this.paginatedData;
+
         this.updatePagination();
 
       },
@@ -108,9 +115,8 @@ export class ComercialComponent implements OnInit {
 
     );
 
-   
-    
-    this.comercialServicio.getCliente().subscribe(
+
+    this.comercialServicio.getCliente().subscribe(//Obtenemos los clientes.
       (data) => {
         this.clientErp = data;
 
@@ -121,7 +127,16 @@ export class ComercialComponent implements OnInit {
 
     );
 
+    this.gender.get().subscribe(//Obtenemos el genero
+      (data) => {
+        this.genderArray = data;
 
+      },
+      (error) => {
+        console.error('Error ' + error);
+      }
+
+    );
 
   }
 
@@ -156,7 +171,6 @@ export class ComercialComponent implements OnInit {
 
       this.currentPage = 1;  // Restablecer la página a la primera
     }
-    console.log(this.filteredData);
     // Actualizar la paginación para reflejar los datos filtrados
 
   }
@@ -201,6 +215,9 @@ export class ComercialComponent implements OnInit {
       clientName: formulario.clientName2,
       startDate: formulario.startDate2,
       endDate: formulario.endDate2,
+
+      generoId: formulario.genero2,
+      generoNombre:formulario.generoNombre2,
       kgs: formulario.kgs2
     };
 
@@ -227,8 +244,9 @@ export class ComercialComponent implements OnInit {
       }, 0); //Cambiamos la variable para que el usuario pueda volver a darle al botón
       return;
     }
+    console.log(this.clientData);
     this.comercialServicio.createComercial(this.clientData).subscribe(
-
+     
       (data) => {
         this.paginatedData = data;
         window.location.reload();
@@ -237,8 +255,6 @@ export class ComercialComponent implements OnInit {
         console.error('Error al crear el cliente ', error);
       }
     );
-
-
 
   }
 
@@ -251,8 +267,9 @@ export class ComercialComponent implements OnInit {
       clientCode: formulario.clientCode,
       clientName: formulario.clientName,
       startDate: formulario.startDate,
+      generoId: formulario.genero,
+      generoNombre:formulario.generoNombre,
       endDate: formulario.endDate,
-     
       kgs: formulario.kgs
     };
     //Comprobación de la fecha fechaInicio>fechaFin
@@ -302,8 +319,6 @@ export class ComercialComponent implements OnInit {
       }
 
     );
-
-
   }
 
   selectRow(item: Comercial) {//Al comerical asignado en HTML, guardamos su ID en la variable numId
@@ -323,22 +338,35 @@ export class ComercialComponent implements OnInit {
     this.miFormulario.get('kgs')?.setValue(this.selectedComercial.kgs);
   }
 
-  buscarComercial(evento: Client) {
+  buscarComercial(evento: Client) {//Asignación input del nombre del comercial en el edit.
     const selectedComercial = this.clientErp.find(item => item.clientId == evento.clientId);
     this.miFormulario.get('clientName')?.setValue(selectedComercial?.name);
 
   }
-  buscarComercial2(evento: Client) {
+  buscarComercial2(evento: Client) {//Asignación input del nombre del género en el create.
     const selectedComercial = this.clientErp.find(item => item.clientId == evento.clientId);
     this.miFormulario2.get('clientName2')?.setValue(selectedComercial?.name);
 
   }
-
-  search(nombre: string, cliente: Client) {
+  buscarGenero(genero:Gender){//Asignación input del nombre del género en el edit.
+    const selectedGenero=this.genderArray.find(item=> item.idGenero==genero.idGenero);
+    this.miFormulario.get('generoNombre')?.setValue(selectedGenero?.nombreGenero);
+  }
+  buscarGenero2(genero:Gender){//Asignación input del nombre del género en el create.
+    const selectedGenero = this.genderArray.find(item => item.idGenero == genero.idGenero);
+    this.miFormulario2.get('generoNombre2')?.setValue(selectedGenero?.nombreGenero);
+  }
+  search(nombre: string, cliente: Client) {//Búsqueda del comercial
     nombre = nombre.toLowerCase();
     return cliente.clientId.toString().toLowerCase().includes(nombre) || cliente.name.toLowerCase().includes(nombre);
 
   }
+  searchGenero(nombre: string, genero: Gender) {//Búsqueda del géenero
+    nombre = nombre.toLowerCase();
+    return genero.idGenero.toString().toLowerCase().includes(nombre) || genero.nombreGenero.toLowerCase().includes(nombre);
+  }
+
+  //Manejo de los modales
   openDeleteModal() {
     this.showDeleteModal = true;
   }
