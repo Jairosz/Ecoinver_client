@@ -29,7 +29,8 @@
     </div>
 
     <!-- Modal para borrar -->
-    <div *ngIf="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-xs">
+    <div *ngIf="showDeleteModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-xs">
       <div class="relative p-4 w-full max-w-md max-h-full">
         <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
           <button type="button" (click)="closeDeleteModal()"
@@ -61,7 +62,8 @@
     </div>
 
     <!-- Modal para crear -->
-    <div *ngIf="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-xs">
+    <div *ngIf="showCreateModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-xs">
       <div class="relative p-4 w-full max-w-md max-h-full">
         <!-- Modal content -->
         <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
@@ -116,8 +118,34 @@
                 <small class="text-red-500 text-xs">Error, el campo nombre es obligatorio(Solo letras)</small>
                 }
               </div>
+              <div class="col-span-2">
+                <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Selecciona el
+                  género
+                </label>
+                <ng-select
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                  [items]="genderArray" bindLabel="nombreGenero" bindValue="idGenero" placeholder="Selecciona un género"
+                  [searchable]="true" [searchFn]="searchGenero" formControlName="genero2" (change)="buscarGenero2($event)">
+
+                  <ng-template ng-option-tmp let-item="item">
+                    {{ item.idGenero }} - {{ item.nombreGenero || 'Sin Nombre' }}
+                  </ng-template>
+
+                  <!-- Template para el valor seleccionado (la etiqueta) -->
+                  <ng-template ng-label-tmp let-item="item">
+                    {{ item.idGenero }}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="col-span-2">
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre Género</label>
+                <input type="text" formControlName="generoNombre2"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="Nombre genero" required="">
+              </div>
               <div class="col-span-2 sm:col-span-1">
                 <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha de
+
                   inicio</label>
                 <input type="date" name="fechI" formControlName="startDate2"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -160,7 +188,7 @@
                   d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                   clip-rule="evenodd"></path>
               </svg>
-              Añadir
+              Añadir{{miFormulario2.invalid}}{{validarFechas}}
             </button>
           </form>
         </div>
@@ -168,7 +196,8 @@
     </div>
 
     <!--Modal para editar-->
-    <div *ngIf="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-xs">
+    <div *ngIf="showEditModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-xs">
       <div class="relative p-4 w-full max-w-md max-h-full">
         <!-- Modal content -->
         <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
@@ -221,6 +250,31 @@
                 @if(miFormulario.get('clientName')?.touched && miFormulario.get('clientName')?.invalid){
                 <small class="text-red-500 text-xs">Error, el campo nombre es obligatorio(Solo letras)</small>
                 }
+              </div>
+              <div class="col-span-2">
+                <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Selecciona el
+                  género
+                </label>
+                <ng-select
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                  [items]="genderArray" bindLabel="nombreGenero" bindValue="idGenero" placeholder="Selecciona un género"
+                  [searchable]="true" [searchFn]="searchGenero" (change)="buscarGenero($event)" formControlName="genero">
+
+                  <ng-template ng-option-tmp let-item="item">
+                    {{ item.idGenero }} - {{ item.nombreGenero || 'Sin Nombre' }}
+                  </ng-template>
+
+                  <!-- Template para el valor seleccionado (la etiqueta) -->
+                  <ng-template ng-label-tmp let-item="item">
+                    {{ item.idGenero }}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="col-span-2">
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre Género</label>
+                <input type="text" formControlName="generoNombre"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="Nombre genero" required="">
               </div>
               <div class="col-span-2 sm:col-span-1">
                 <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha de
@@ -298,6 +352,8 @@
           <th scope="col" class="px-4 py-3">Nombre Cliente</th>
           <th scope="col" class="px-4 py-3">Fecha inicio</th>
           <th scope="col" class="px-4 py-3">Fecha Fin</th>
+          <th scope="col" class="px-4 py-3">Id Género</th>
+          <th scope="col" class="px-4 py-3">Nombre del Género</th>
           <th scope="col" class="px-4 py-3">Kilogramos</th>
         </tr>
       </thead>
@@ -311,6 +367,8 @@
           <td class="px-4 py-3">{{ item.clientName }}</td>
           <td class="px-4 py-3">{{ item.startDate | date: 'dd-MM-yyyy' }}</td>
           <td class="px-4 py-3">{{ item.endDate | date: 'dd-MM-yyyy' }}</td>
+          <td class="px-4 py-3">{{ item.generoId}}</td>
+          <td class="px-4 py-3">{{ item.generoNombre}}</td>
           <td class="px-4 py-3">{{ item.kgs }}</td>
         </tr>
       </tbody>

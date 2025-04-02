@@ -13,8 +13,8 @@ interface Cultivo {
   nombreFinca: string;
   idNave: number;
   nombreNave: string;
-  idGenero: number;
-  nombreGenero: string;
+  generoId: number;
+  generoName: string;
   nombreVariedad: string;
   superficie: number;
   produccionEstimada: number;
@@ -48,8 +48,8 @@ export class CultiveComponent implements OnInit {
     { name: 'nombreAgricultor', label: 'Agricultor', isDate: false },
     { name: 'nombreFinca', label: 'Finca', isDate: false },
     { name: 'nombreNave', label: 'Nave', isDate: false },
-    { name: 'idGenero', label: 'ID Género', isDate: false },
-    { name: 'nombreGenero', label: 'Género', isDate: false },
+    { name: 'generoId', label: 'ID Género', isDate: false },
+    { name: 'generoName', label: 'Género', isDate: false },
     { name: 'nombreVariedad', label: 'Variedad', isDate: false },
     { name: 'superficie', label: 'Superficie', isDate: false },
     { name: 'produccionEstimada', label: 'Producción Estimada', isDate: false },
@@ -113,8 +113,8 @@ export class CultiveComponent implements OnInit {
           item.nombreFinca.toLowerCase().includes(query) ||
           item.idNave.toString().includes(query) ||
           item.nombreNave.toLowerCase().includes(query) ||
-          item.idGenero.toString().includes(query) ||
-          item.nombreGenero.toLowerCase().includes(query) ||
+          item.generoId.toString().includes(query) ||
+          item.generoName.toLowerCase().includes(query) ||
           item.nombreVariedad.toLowerCase().includes(query) ||
           item.superficie.toString().includes(query) ||
           item.produccionEstimada.toString().includes(query) ||
