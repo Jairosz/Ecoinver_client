@@ -59,7 +59,6 @@ export class CultiveDetailsComponent implements AfterViewInit, OnDestroy, OnInit
 
   // Indicador para mostrar el estado de carga de las coordenadas
   showCoordinatesLoading: boolean = false;
-  showWeatherLoading: boolean = false;
 
 
   //mapping y tiempo
@@ -105,16 +104,13 @@ export class CultiveDetailsComponent implements AfterViewInit, OnDestroy, OnInit
 
   // se cargan los datos necesarios, id, latitud altitud
   async ngOnInit() {
+    // Obtener ID del cultivo de la URL
     const id = this.route.snapshot.paramMap.get('id');
+    console.log(this.route.snapshot.paramMap);
     if (id) {
       await this.loadCultivo(id);
-      
-      // Verificar coordenadas antes de obtener el clima
-      if (this.getLatitud() !== 0 && this.getLongitud() !== 0) {
-        this.weatherData = await this.getWeather(this.getLatitud(), this.getLongitud());
-      } else {
-        this.error = 'Coordenadas no especificadas';
-      }
+      // Obtener datos meteorológicos usando las coordenadas del cultivo
+      this.weatherData = await this.getWeather(this.getLatitud(), this.getLongitud());
     } else {
       this.error = 'ID de cultivo no especificado';
       this.loading = false;
@@ -331,19 +327,10 @@ addRectangleMarker(lat: number, lng: number): void {
   }
   
   async getWeather(lat: number, lng: number) {
-    // Verificar primero si las coordenadas son válidas
-    this.showWeatherLoading = true;
-    this.error = null;
-    
-    // Simular carga mínima para mejor UX
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
     try {
-      if (lat === 0 || lng === 0) {
-        throw new Error('Coordenadas no especificadas');
-      }
-  
-      const response = await fetch(`...`);
+      const response = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`
+      );
       const data = await response.json();
       
       // Procesar pronóstico de 7 días
@@ -365,8 +352,7 @@ addRectangleMarker(lat: number, lng: number): void {
       };
     } catch (error) {
       console.error('Error obteniendo el clima:', error);
-      this.error = 'Error al obtener el pronóstico meteorológico';
-      return null;
+      return { temp: 0, wind: 0, condition: 'Desconocido' };
     }
   }
   
