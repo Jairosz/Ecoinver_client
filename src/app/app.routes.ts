@@ -28,9 +28,7 @@ export const routes: Routes = [
       { path: 'users', component: UsersComponent},
       { path: 'cultive-planning', component: CultivePlanningComponent},
       { path: 'roles', component: RolesComponent},
-      { path: 'cultive/:idCultivo', component: CultiveDetailsComponent },
-
-
+      {path: 'cultive/:id', component: CultiveDetailsComponent},
       {path:'comercial-planning', component:ComercialPlanningComponent},
 
 

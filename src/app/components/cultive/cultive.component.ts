@@ -140,11 +140,11 @@ export class CultiveComponent implements OnInit {
     this.selectedCultivo = item;
   
     // Abre la información detallada en una nueva pestaña o ventana
-    const url = `/cultive/${item.idCultivo}`;
+    const url = `/cultive/${item.id}`;
     window.open(url, '_blank');
   }
   
-
+  //crud
   create(): void {
     console.log('Crear cultivo');
   }
@@ -161,6 +161,7 @@ export class CultiveComponent implements OnInit {
     }
   }
 
+  //paginacion
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;

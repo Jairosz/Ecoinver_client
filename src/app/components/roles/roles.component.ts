@@ -17,6 +17,7 @@ export class RolesComponent implements OnInit {
   Math = Math;
   loading = true;
   errorMessage = '';
+
   
   data: Rol[] = [];
   searchQuery = '';
@@ -55,7 +56,7 @@ export class RolesComponent implements OnInit {
   ngOnInit(): void {
     this.loadRoles();
     this.currentUser = this.authService.getCurrentUser();
-
+    console.log("prueba");
   }
 
   private loadRoles(): void {
