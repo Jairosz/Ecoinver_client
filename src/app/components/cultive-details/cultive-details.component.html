@@ -392,16 +392,54 @@
     </div>
 
     <!-- Insights -->
-    <div
-      [class.hidden]="activeTab !== 'Insights'"
-      class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800"
-    >
-      <p class="text-sm text-gray-500 dark:text-gray-400">
-        Contenido de la pestaña
-        <strong class="font-medium text-gray-800 dark:text-white"
-          >Insights</strong
-        >
-      </p>
+    <!-- Insights -->
+<div [class.hidden]="activeTab !== 'Insights'" class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+  <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 mb-6">
+    <!-- Gráfico principal -->
+    <div class="w-full lg:w-[65%] xl:w-[70%] bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+      <p-chart 
+        type="line" 
+        [data]="data" 
+        [options]="options" 
+        class="h-[300px] md:h-[350px]"
+      ></p-chart>
     </div>
+
+    <!-- Cuadro de información lateral -->
+    <div class="w-full lg:w-[35%] xl:w-[30%] bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+      <h3 class="text-lg font-semibold mb-4 dark:text-gray-200">Estadísticas Clave</h3>
+      <div class="space-y-4">
+        <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+          <p class="text-sm text-gray-600 dark:text-gray-300">Crecimiento Semanal</p>
+          <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">+12.5%</p>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+          <p class="text-sm text-gray-600 dark:text-gray-300">Salud del Cultivo</p>
+          <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">Óptima</p>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+          <p class="text-sm text-gray-600 dark:text-gray-300">Rendimiento vs Estimado</p>
+          <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">98.2%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección adicional debajo -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Temperatura Promedio</p>
+      <p class="text-2xl font-bold text-gray-800 dark:text-white">24.5°C</p>
+    </div>
+    <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Humedad del Suelo</p>
+      <p class="text-2xl font-bold text-gray-800 dark:text-white">65%</p>
+    </div>
+    <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Horas de Luz Diarias</p>
+      <p class="text-2xl font-bold text-gray-800 dark:text-white">14.2h</p>
+    </div>
+  </div>
+</div>
   </div>
 </div>

@@ -9,6 +9,8 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environment/environment';
 
+import { ChartModule } from 'primeng/chart';
+
 interface Cultivo {
   id: number;
   idCultivo: number;
@@ -40,7 +42,7 @@ interface WeatherForecast {
 @Component({
   selector: 'app-cultive-details',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, ChartModule],
   templateUrl: './cultive-details.component.html',
 })
 export class CultiveDetailsComponent
@@ -62,6 +64,9 @@ export class CultiveDetailsComponent
   // Indicador para mostrar el estado de carga de las coordenadas
   showCoordinatesLoading: boolean = false;
 
+  // Añadir estas nuevas propiedades para el gráfico
+  data: any;
+  options: any;
 
   //barra progresiva
   progressPercentage: number = 0;
@@ -114,13 +119,14 @@ export class CultiveDetailsComponent
 
   // se cargan los datos necesarios, id, latitud altitud
   async ngOnInit() {
+    this.initializeChart();
     // Obtener ID del cultivo de la URL
     const id = this.route.snapshot.paramMap.get('id');
     this.actualizarProgreso(); // Calcular el valor inicial
     // actualizar el progreso cada minuto:
     this.progressInterval = setInterval(() => {
       this.actualizarProgreso();
-    }, 300000); // 60000 milisegundos = 1 minuto
+    }, 1000); // 60000 milisegundos = 1 minuto
     //console.log(this.route.snapshot.paramMap);
     if (id) {
       await this.loadCultivo(id);
@@ -133,7 +139,6 @@ export class CultiveDetailsComponent
       this.error = 'ID de cultivo no especificado';
       this.loading = false;
     }
-    
   }
 
   private loadCultivo(id: string): Promise<void> {
@@ -276,55 +281,65 @@ export class CultiveDetailsComponent
   addRectangleMarker(lat: number, lng: number): void {
     if (!this.map) return;
 
-  // Eliminar la forma previa si existe
-  if (this.shape) {
-    this.shape.remove();
-  }
-
-  if (this.cultivo && this.cultivo.superficie && this.cultivo.superficie > 0) {
-    // Calcular el radio a partir del área (radio en metros)
-    const radius = Math.sqrt(this.cultivo.superficie / Math.PI);
-
-    this.shape = L.circle([lat, lng], {
-      radius: radius,
-      color: '#437d3f',
-      weight: 1,
-      fillColor: '#437d3f',
-      fillOpacity: 0.3,
-    })
-      .addTo(this.map)
-      .bindPopup(
-        `Cultivo: <br><strong>${this.cultivo.nombreGenero} ${this.cultivo.nombreVariedad}</strong><br>Ubicación: <strong>${lat.toFixed(6)}, ${lng.toFixed(6)}</strong>`
-      )
-      .openPopup();
-
-    if ((this.shape as any).getBounds) {
-      this.map.fitBounds((this.shape as any).getBounds());
+    // Eliminar la forma previa si existe
+    if (this.shape) {
+      this.shape.remove();
     }
-  } else {
-    // Si no se dispone de datos de superficie, se utiliza un radio por defecto (por ejemplo, 500 m)
-    const defaultRadius = 500;
-    this.shape = L.circle([lat, lng], {
-      radius: defaultRadius,
-      color: '#437d3f',
-      weight: 1,
-      fillColor: '#437d3f',
-      fillOpacity: 0.3,
-    })
-      .addTo(this.map)
-      .bindPopup(
-        `Cultivo: <br><strong>${
-          this.cultivo?.nombreGenero || 'Desconocido'
-        } ${this.cultivo?.nombreVariedad || ''}</strong><br>Ubicación: <strong>${lat.toFixed(
-          6
-        )}, ${lng.toFixed(6)}</strong>`
-      )
-      .openPopup();
 
-    if ((this.shape as any).getBounds) {
-      this.map.fitBounds((this.shape as any).getBounds());
+    if (
+      this.cultivo &&
+      this.cultivo.superficie &&
+      this.cultivo.superficie > 0
+    ) {
+      // Calcular el radio a partir del área (radio en metros)
+      const radius = Math.sqrt(this.cultivo.superficie / Math.PI);
+
+      this.shape = L.circle([lat, lng], {
+        radius: radius,
+        color: '#437d3f',
+        weight: 1,
+        fillColor: '#437d3f',
+        fillOpacity: 0.3,
+      })
+        .addTo(this.map)
+        .bindPopup(
+          `Cultivo: <br><strong>${this.cultivo.nombreGenero} ${
+            this.cultivo.nombreVariedad
+          }</strong><br>Ubicación: <strong>${lat.toFixed(6)}, ${lng.toFixed(
+            6
+          )}</strong>`
+        )
+        .openPopup();
+
+      if ((this.shape as any).getBounds) {
+        this.map.fitBounds((this.shape as any).getBounds());
+      }
+    } else {
+      // Si no se dispone de datos de superficie, se utiliza un radio por defecto (por ejemplo, 500 m)
+      const defaultRadius = 500;
+      this.shape = L.circle([lat, lng], {
+        radius: defaultRadius,
+        color: '#437d3f',
+        weight: 1,
+        fillColor: '#437d3f',
+        fillOpacity: 0.3,
+      })
+        .addTo(this.map)
+        .bindPopup(
+          `Cultivo: <br><strong>${
+            this.cultivo?.nombreGenero || 'Desconocido'
+          } ${
+            this.cultivo?.nombreVariedad || ''
+          }</strong><br>Ubicación: <strong>${lat.toFixed(6)}, ${lng.toFixed(
+            6
+          )}</strong>`
+        )
+        .openPopup();
+
+      if ((this.shape as any).getBounds) {
+        this.map.fitBounds((this.shape as any).getBounds());
+      }
     }
-  }
   }
 
   // 📌 Método para agregar un polígono que marca una zona
@@ -440,6 +455,64 @@ export class CultiveDetailsComponent
     // Si la fecha actual es posterior o igual a la fecha fin, el cultivo se considera finalizado
     return now >= end ? 'Finalizado' : 'Activo';
   }
+
+  //grafico:
+  private initializeChart(): void {
+    this.data = {
+      labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+      datasets: [
+        {
+          label: 'Rendimiento',
+          data: [65, 59, 80, 81, 56, 55],
+          borderColor: '#437d3f',
+          tension: 0.4,
+          fill: false
+        },
+        {
+          label: 'Producción Estimada',
+          data: [28, 48, 40, 19, 86, 27],
+          borderColor: '#65b15f',
+          tension: 0.4,
+          fill: false
+        }
+      ]
+    };
+
+    this.options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            color: '#6b7280'
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: '#e5e7eb'
+          },
+          ticks: {
+            color: '#6b7280'
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: '#6b7280'
+          }
+        }
+      }
+    };
+  }
+
+
+
 
   ngOnDestroy(): void {
     if (this.map) {
