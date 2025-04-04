@@ -1,0 +1,201 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 mt-8">
+    <header class="bg-white dark:bg-gray-800 shadow rounded-lg">
+      <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Variables de Cultivo</h1>
+        <div class="flex items-center space-x-4">
+          <button type="button"
+            class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
+            Exportar Datos
+          </button>
+        </div>
+      </div>
+    </header>
+  
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <div class="p-4 mb-8 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Resumen de Producción</h2>
+            <p class="text-gray-500 dark:text-gray-400">Impacto de las variables en la producción total</p>
+          </div>
+          <div class="text-right">
+            <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ effectiveProduction.toFixed(1) }} ton</div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">de {{ totalProduction }} ton potenciales</div>
+          </div>
+        </div>
+  
+        <!-- Barra de progreso -->
+        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mb-4">
+          <div class="bg-blue-600 h-2.5 rounded-full" [style.width.%]="(effectiveProduction / totalProduction) * 100"></div>
+        </div>
+  
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div *ngFor="let variable of variables"
+            class="flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white">
+            <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-600">
+              <fa-icon [icon]="getIconForType(variable.type)" class="text-gray-500 dark:text-gray-400"></fa-icon>
+            </span>
+            <div class="ml-3">
+              <div class="font-medium">{{ variable.name }}</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">
+                <i class="fa-solid fa-arrow-trend-down text-red-500 mr-1"></i>
+                {{ (variable.reductionFactor * (variable.value / 100)).toFixed(1) }}% reducción
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Pestañas -->
+      <div class="border-b border-gray-200 dark:border-gray-700 mb-8">
+        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
+          <li class="mr-2">
+            <a [class]="activeTab === 'dashboard' ? 'inline-flex items-center justify-center p-4 text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500 group' : 'inline-flex items-center justify-center p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group'"
+              (click)="setActiveTab('dashboard')" href="javascript:void(0)">
+              <i class="fa-solid fa-gauge-high mr-2"></i>
+              Panel de Control
+            </a>
+          </li>
+          <li class="mr-2">
+            <a [class]="activeTab === 'create' ? 'inline-flex items-center justify-center p-4 text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500 group' : 'inline-flex items-center justify-center p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group'"
+              (click)="setActiveTab('create')" href="javascript:void(0)">
+              <i class="fa-solid fa-plus mr-2"></i>
+              Crear Variable
+            </a>
+          </li>
+        </ul>
+      </div>
+  
+      <!-- Pestaña: Dashboard -->
+      <div *ngIf="activeTab === 'dashboard'" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div *ngFor="let variable of variables"
+          class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+          <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center">
+              <span class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
+                <fa-icon [icon]="getIconForType(variable.type)" class="text-gray-500 dark:text-gray-400 text-xl"></fa-icon>
+              </span>
+              <h5 class="ml-3 text-xl font-bold tracking-tight text-gray-900 dark:text-white">{{ variable.name }}</h5>
+            </div>
+            <div class="flex space-x-2">
+              <button type="button" class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button type="button" class="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500"
+                (click)="deleteVariable(variable.id)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+  
+          <div class="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+            {{ variable.value }} {{ variable.unit }}
+          </div>
+  
+          <span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+            <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+            Factor de reducción: {{ variable.reductionFactor }}%
+          </span>
+  
+          <div class="mt-3 flex items-center">
+            <div [ngClass]="{
+                'bg-green-500': getReductionSeverity(variable.reductionFactor).color === 'bg-green-500',
+                'bg-yellow-500': getReductionSeverity(variable.reductionFactor).color === 'bg-yellow-500',
+                'bg-orange-500': getReductionSeverity(variable.reductionFactor).color === 'bg-orange-500',
+                'bg-red-500': getReductionSeverity(variable.reductionFactor).color === 'bg-red-500'
+              }"
+              class="h-2.5 w-2.5 rounded-full mr-2"></div>
+            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Impacto {{ getReductionSeverity(variable.reductionFactor).label }}
+            </span>
+          </div>
+  
+          <div class="mt-4">
+            <label for="variable-slider-{{variable.id}}"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ajustar valor</label>
+            <input id="variable-slider-{{variable.id}}" type="range"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+              min="0" max="100" step="1" [value]="variable.value"
+              (input)="updateValue(variable.id, $any($event.target).value)">
+          </div>
+        </div>
+      </div>
+  
+      <!-- Pestaña: Crear Variable -->
+      <div *ngIf="activeTab === 'create'"
+        class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+        <h3 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Crear Nueva Variable</h3>
+        <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">Añade una nueva variable para monitorear en tu cultivo</p>
+  
+        <form>
+          <div class="grid gap-6 mb-6 md:grid-cols-2">
+            <div>
+              <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre de la Variable</label>
+              <input type="text" id="name" [(ngModel)]="newVariable.name" name="name"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Ej: Lluvia Mensual">
+            </div>
+  
+            <div>
+              <label for="type" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipo de Variable</label>
+              <select id="type" [(ngModel)]="newVariable.type" name="type"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <option value="" disabled selected>Selecciona un tipo</option>
+                <option *ngFor="let type of variableTypes" [value]="type.value">
+                  {{ type.label }}
+                </option>
+              </select>
+            </div>
+  
+            <div>
+              <label for="value" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Valor Inicial</label>
+              <input type="number" id="value" [(ngModel)]="newVariable.value" name="value"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="0">
+            </div>
+  
+            <div>
+              <label for="unit" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Unidad</label>
+              <input type="text" id="unit" [(ngModel)]="newVariable.unit" name="unit"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Ej: mm, °C, km/h">
+            </div>
+          </div>
+  
+          <div class="mb-6">
+            <label for="reductionFactor" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              Factor de Reducción (%)
+              <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">Cuánto reduce esta variable la producción total</span>
+            </label>
+            <div class="flex items-center gap-4">
+              <input type="range" id="reductionFactor" [(ngModel)]="newVariable.reductionFactor" name="reductionFactor"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                min="0" max="100" step="1">
+              <span class="w-12 text-right text-gray-900 dark:text-white">{{ newVariable.reductionFactor }}%</span>
+            </div>
+  
+            <div class="mt-3" *ngIf="newVariable.reductionFactor > 0">
+              <div class="flex items-center">
+                <div [ngClass]="{
+                    'bg-green-500': getReductionSeverity(newVariable.reductionFactor).color === 'bg-green-500',
+                    'bg-yellow-500': getReductionSeverity(newVariable.reductionFactor).color === 'bg-yellow-500',
+                    'bg-orange-500': getReductionSeverity(newVariable.reductionFactor).color === 'bg-orange-500',
+                    'bg-red-500': getReductionSeverity(newVariable.reductionFactor).color === 'bg-red-500'
+                  }"
+                  class="h-2.5 w-2.5 rounded-full mr-2"></div>
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Impacto {{ getReductionSeverity(newVariable.reductionFactor).label }}
+                </span>
+              </div>
+            </div>
+          </div>
+  
+          <button type="button" (click)="addVariable()"
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            <i class="fa-solid fa-plus mr-2"></i> Añadir Variable
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+  

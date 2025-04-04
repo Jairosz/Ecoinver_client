@@ -67,11 +67,14 @@
     <ul class="space-y-2 font-medium">
       <!-- Dashboard -->
       <li>
-        <a routerLink="/dashboard" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-          <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-               xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
+        <a routerLink="/dashboard"
+          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+          <svg
+            class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
             <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
-            <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+            <path
+              d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
           </svg>
           <span class="ms-3">Dashboard</span>
         </a>
@@ -107,33 +110,36 @@
           <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Comercial</span>
           <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="m1 1 4 4 4-4" />
+              d="m1 1 4 4 4-4" />
           </svg>
         </button>
         <ul id="dropdown-comercial" [ngClass]="{'hidden': !comercialOpen}" class="py-2 space-y-2 pl-8">
           <li>
             <a routerLink="/comercial" (click)="$event.stopPropagation()"
-               class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                   xmlns="http://www.w3.org/2000/svg"
-                   class="shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
-                <path d="M8 3.5C8 4.88071 6.88071 6 5.5 6C4.11929 6 3 4.88071 3 3.5C3 2.11929 4.11929 1 5.5 1C6.88071 1 8 2.11929 8 3.5Z" fill="currentColor" />
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"
+                class="shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
+                <path
+                  d="M8 3.5C8 4.88071 6.88071 6 5.5 6C4.11929 6 3 4.88071 3 3.5C3 2.11929 4.11929 1 5.5 1C6.88071 1 8 2.11929 8 3.5Z"
+                  fill="currentColor" />
                 <path d="M3 8C1.34315 8 0 9.34315 0 11V15H8V8H3Z" fill="currentColor" />
                 <path d="M13 8H10V15H16V11C16 9.34315 14.6569 8 13 8Z" fill="currentColor" />
-                <path d="M12 6C13.1046 6 14 5.10457 14 4C14 2.89543 13.1046 2 12 2C10.8954 2 10 2.89543 10 4C10 5.10457 10.8954 6 12 6Z" fill="currentColor" />
+                <path
+                  d="M12 6C13.1046 6 14 5.10457 14 4C14 2.89543 13.1046 2 12 2C10.8954 2 10 2.89543 10 4C10 5.10457 10.8954 6 12 6Z"
+                  fill="currentColor" />
               </svg>
               <span class="flex-1 ms-3 whitespace-nowrap">Nec. Comerciales</span>
             </a>
           </li>
           <li>
             <a routerLink="/comercial-planning" (click)="$event.stopPropagation()"
-               class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-               <svg xmlns="http://www.w3.org/2000/svg"
-               class="shrink-0 w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-               viewBox="0 0 16 16">
-               <path fill="currentColor" fill-rule="evenodd"
-                 d="M11,1 C11.5523,1 12,1.44772 12,2 L12,3 L13,3 C14.1046,3 15,3.89543 15,5 L15,13 C15,14.1046 14.1046,15 13,15 L3,15 C1.89543,15 1,14.1046 1,13 L1,5 C1,3.89543 1.89543,3 3,3 L4,3 L4,2 C4,1.44772 4.44772,1 5,1 C5.55228,1 6,1.44772 6,2 L6,3 L10,3 L10,2 C10,1.44772 10.4477,1 11,1 Z M4,5 L3,5 L3,13 L13,13 L13,5 L12,5 C12,5.55228 11.5523,6 11,6 C10.4477,6 10,5.55228 10,5 L6,5 C6,5.55228 5.55228,6 5,6 C4.44772,6 4,5.55228 4,5 Z M9.12102,7.29289 C9.51154,6.90237 10.1447,6.90237 10.5352,7.29289 C10.9258,7.68342 10.9258,8.31658 10.5352,8.70711 L7.70711,11.5352 C7.31658,11.9258 6.68342,11.9258 6.29289,11.5352 L5.29289,10.5352 C4.90237,10.1447 4.90237,9.51154 5.29289,9.12102 C5.68342,8.73049 6.31658,8.73049 6.70711,9.12102 L7,9.41391 L9.12102,7.29289 Z" />
-             </svg>
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                class="shrink-0 w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                viewBox="0 0 16 16">
+                <path fill="currentColor" fill-rule="evenodd"
+                  d="M11,1 C11.5523,1 12,1.44772 12,2 L12,3 L13,3 C14.1046,3 15,3.89543 15,5 L15,13 C15,14.1046 14.1046,15 13,15 L3,15 C1.89543,15 1,14.1046 1,13 L1,5 C1,3.89543 1.89543,3 3,3 L4,3 L4,2 C4,1.44772 4.44772,1 5,1 C5.55228,1 6,1.44772 6,2 L6,3 L10,3 L10,2 C10,1.44772 10.4477,1 11,1 Z M4,5 L3,5 L3,13 L13,13 L13,5 L12,5 C12,5.55228 11.5523,6 11,6 C10.4477,6 10,5.55228 10,5 L6,5 C6,5.55228 5.55228,6 5,6 C4.44772,6 4,5.55228 4,5 Z M9.12102,7.29289 C9.51154,6.90237 10.1447,6.90237 10.5352,7.29289 C10.9258,7.68342 10.9258,8.31658 10.5352,8.70711 L7.70711,11.5352 C7.31658,11.9258 6.68342,11.9258 6.29289,11.5352 L5.29289,10.5352 C4.90237,10.1447 4.90237,9.51154 5.29289,9.12102 C5.68342,8.73049 6.31658,8.73049 6.70711,9.12102 L7,9.41391 L9.12102,7.29289 Z" />
+              </svg>
               <span class="flex-1 ms-3 whitespace-nowrap">Planning Comercial</span>
             </a>
           </li>
@@ -145,107 +151,124 @@
         <button type="button" (click)="toggleCampo()"
           class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
           aria-controls="dropdown-campo">
-          <svg class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-               xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M12 1C6.47715 1 2 5.02944 2 10V16H4L4 10.5858L8.29289 6.29288L9.70711 7.70709L6 11.4142V13.9556C11.0533 13.504 15 9.66681 15 5L15 1H12Z" />
+          <svg
+            class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+            <path
+              d="M12 1C6.47715 1 2 5.02944 2 10V16H4L4 10.5858L8.29289 6.29288L9.70711 7.70709L6 11.4142V13.9556C11.0533 13.504 15 9.66681 15 5L15 1H12Z" />
           </svg>
           <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Producción Campo</span>
           <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="m1 1 4 4 4-4" />
+              d="m1 1 4 4 4-4" />
           </svg>
         </button>
         <ul id="dropdown-campo" [ngClass]="{'hidden': !campoOpen}" class="py-2 space-y-2 pl-8">
           <li>
             <a routerLink="/cultive" (click)="$event.stopPropagation()"
-               class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
               <svg xmlns="http://www.w3.org/2000/svg"
-                   class="shrink-0 w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                   viewBox="0 0 24 24">
+                class="shrink-0 w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                viewBox="0 0 24 24">
                 <defs>
                   <style>
-                    .cls-1 { fill: none; stroke: currentColor; stroke-miterlimit: 10; stroke-width: 2px; }
+                    .cls-1 {
+                      fill: none;
+                      stroke: currentColor;
+                      stroke-miterlimit: 10;
+                      stroke-width: 2px;
+                    }
                   </style>
                 </defs>
                 <polyline class="cls-1" points="1 10.5 12 1.5 23 10.5" />
                 <polyline class="cls-1" points="20 7.5 20 22.5 4 22.5 4 7.5" />
                 <line class="cls-1" x1="22" y1="22.5" x2="2" y2="22.5" />
-                <path class="cls-1" d="M7,10.5h.77A4.23,4.23,0,0,1,12,14.73v.77a0,0,0,0,1,0,0h-.77A4.23,4.23,0,0,1,7,11.27V10.5A0,0,0,0,1,7,10.5Z" />
-                <path class="cls-1" d="M16.23,11.5H17a0,0,0,0,1,0,0v.77a4.23,4.23,0,0,1-4.23,4.23H12a0,0,0,0,1,0,0v-.77A4.23,4.23,0,0,1,16.23,11.5Z"
-                      transform="translate(29 28) rotate(180)" />
+                <path class="cls-1"
+                  d="M7,10.5h.77A4.23,4.23,0,0,1,12,14.73v.77a0,0,0,0,1,0,0h-.77A4.23,4.23,0,0,1,7,11.27V10.5A0,0,0,0,1,7,10.5Z" />
+                <path class="cls-1"
+                  d="M16.23,11.5H17a0,0,0,0,1,0,0v.77a4.23,4.23,0,0,1-4.23,4.23H12a0,0,0,0,1,0,0v-.77A4.23,4.23,0,0,1,16.23,11.5Z"
+                  transform="translate(29 28) rotate(180)" />
                 <line class="cls-1" x1="12" y1="21.5" x2="12" y2="14.5" />
               </svg>
               <span class="flex-1 ms-3 whitespace-nowrap">Cultivos</span>
-              <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
+              <span
+                class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
             </a>
           </li>
           <li>
             <a routerLink="/cultive-planning" (click)="$event.stopPropagation()"
-               class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-               <svg xmlns="http://www.w3.org/2000/svg"
-               class="shrink-0 w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-               viewBox="0 0 16 16">
-               <path fill="currentColor" fill-rule="evenodd"
-                 d="M11,1 C11.5523,1 12,1.44772 12,2 L12,3 L13,3 C14.1046,3 15,3.89543 15,5 L15,13 C15,14.1046 14.1046,15 13,15 L3,15 C1.89543,15 1,14.1046 1,13 L1,5 C1,3.89543 1.89543,3 3,3 L4,3 L4,2 C4,1.44772 4.44772,1 5,1 C5.55228,1 6,1.44772 6,2 L6,3 L10,3 L10,2 C10,1.44772 10.4477,1 11,1 Z M4,5 L3,5 L3,13 L13,13 L13,5 L12,5 C12,5.55228 11.5523,6 11,6 C10.4477,6 10,5.55228 10,5 L6,5 C6,5.55228 5.55228,6 5,6 C4.44772,6 4,5.55228 4,5 Z M9.12102,7.29289 C9.51154,6.90237 10.1447,6.90237 10.5352,7.29289 C10.9258,7.68342 10.9258,8.31658 10.5352,8.70711 L7.70711,11.5352 C7.31658,11.9258 6.68342,11.9258 6.29289,11.5352 L5.29289,10.5352 C4.90237,10.1447 4.90237,9.51154 5.29289,9.12102 C5.68342,8.73049 6.31658,8.73049 6.70711,9.12102 L7,9.41391 L9.12102,7.29289 Z" />
-             </svg>
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                class="shrink-0 w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                viewBox="0 0 16 16">
+                <path fill="currentColor" fill-rule="evenodd"
+                  d="M11,1 C11.5523,1 12,1.44772 12,2 L12,3 L13,3 C14.1046,3 15,3.89543 15,5 L15,13 C15,14.1046 14.1046,15 13,15 L3,15 C1.89543,15 1,14.1046 1,13 L1,5 C1,3.89543 1.89543,3 3,3 L4,3 L4,2 C4,1.44772 4.44772,1 5,1 C5.55228,1 6,1.44772 6,2 L6,3 L10,3 L10,2 C10,1.44772 10.4477,1 11,1 Z M4,5 L3,5 L3,13 L13,13 L13,5 L12,5 C12,5.55228 11.5523,6 11,6 C10.4477,6 10,5.55228 10,5 L6,5 C6,5.55228 5.55228,6 5,6 C4.44772,6 4,5.55228 4,5 Z M9.12102,7.29289 C9.51154,6.90237 10.1447,6.90237 10.5352,7.29289 C10.9258,7.68342 10.9258,8.31658 10.5352,8.70711 L7.70711,11.5352 C7.31658,11.9258 6.68342,11.9258 6.29289,11.5352 L5.29289,10.5352 C4.90237,10.1447 4.90237,9.51154 5.29289,9.12102 C5.68342,8.73049 6.31658,8.73049 6.70711,9.12102 L7,9.41391 L9.12102,7.29289 Z" />
+              </svg>
               <span class="flex-1 ms-3 whitespace-nowrap">Planning Campo</span>
+            </a>
+          </li>
+          <!-- Nuevo botón para Variables -->
+          <li>
+            <a routerLink="/variables" (click)="$event.stopPropagation()"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <svg
+                class="shrink-0 w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M5.03431 2.23431C5.34673 1.9219 5.85327 1.9219 6.16569 2.23431L10.4 6.46863L14.6343 2.23431C14.9467 1.9219 15.4533 1.9219 15.7657 2.23431C16.0781 2.54673 16.0781 3.05327 15.7657 3.36569L10.9657 8.16569C10.6533 8.4781 10.1467 8.4781 9.83432 8.16569L5.6 3.93137L1.36569 8.16569C1.05327 8.4781 0.546734 8.4781 0.234315 8.16569C-0.0781048 7.85327 -0.0781048 7.34673 0.234315 7.03431L5.03431 2.23431ZM1.6 12.6667V11.3333C1.6 10.8915 1.24183 10.5333 0.8 10.5333C0.358172 10.5333 0 10.8915 0 11.3333V14.2667H16V11.3333C16 10.8915 15.6418 10.5333 15.2 10.5333C14.7582 10.5333 14.4 10.8915 14.4 11.3333V12.6667H11.2V11.3333C11.2 10.8915 10.8418 10.5333 10.4 10.5333C9.95817 10.5333 9.6 10.8915 9.6 11.3333V12.6667H6.4V11.3333C6.4 10.8915 6.04183 10.5333 5.6 10.5333C5.15817 10.5333 4.8 10.8915 4.8 11.3333V12.6667H1.6Z"
+                  fill="currentColor" />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Variables</span>
+            </a>
+          </li>
+
+        </ul>
+      </li>
+      <!-- Dropdown Administración -->
+      <li>
+        <button type="button" (click)="toggleAdministracion()"
+          class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+          aria-controls="dropdown-administracion">
+          <svg
+            class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 dark:group-hover:text-white group-hover:text-gray-900"
+            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M6.50001 0H9.50001L10.0939 2.37548C10.7276 2.6115 11.3107 2.95155 11.8223 3.37488L14.1782 2.70096L15.6782 5.29904L13.9173 7.00166C13.9717 7.32634 14 7.65987 14 8C14 8.34013 13.9717 8.67366 13.9173 8.99834L15.6782 10.701L14.1782 13.299L11.8223 12.6251C11.3107 13.0484 10.7276 13.3885 10.0939 13.6245L9.50001 16H6.50001L5.90614 13.6245C5.27242 13.3885 4.68934 13.0484 4.17768 12.6251L1.82181 13.299L0.321808 10.701L2.08269 8.99834C2.02831 8.67366 2.00001 8.34013 2.00001 8C2.00001 7.65987 2.02831 7.32634 2.08269 7.00166L0.321808 5.29904L1.82181 2.70096L4.17768 3.37488C4.68934 2.95155 5.27241 2.6115 5.90614 2.37548L6.50001 0ZM8.00001 10C9.10458 10 10 9.10457 10 8C10 6.89543 9.10458 6 8.00001 6C6.89544 6 6.00001 6.89543 6.00001 8C6.00001 9.10457 6.89544 10 8.00001 10Z"
+              fill="#6B7280" />
+          </svg>
+          <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Administración</span>
+          <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="m1 1 4 4 4-4" />
+          </svg>
+        </button>
+        <ul id="dropdown-administracion" [ngClass]="{'hidden': !administracionOpen}" class="py-2 space-y-2 pl-8">
+          <li>
+            <a routerLink="/users" (click)="$event.stopPropagation()"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <svg
+                class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                <path
+                  d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z" />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Usuarios</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/roles" (click)="$event.stopPropagation()"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <svg
+                class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M8 16L4.35 13.39C2.25 11.89 1 9.47 1 6.88V3L8 0l7 3v3.88c0 2.58-1.25 5-3.35 6.39L8 16ZM12.2 5.71l-1.41-1.42L7 8.09 5.2 6.29 3.79 7.71 7 10.91 12.2 5.71Z" />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Roles</span>
             </a>
           </li>
         </ul>
       </li>
-    
-<!-- Dropdown Administración -->
-<li>
-  <button type="button"
-    (click)="toggleAdministracion()"
-    class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-    aria-controls="dropdown-administracion">
-    <svg
-      class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 dark:group-hover:text-white group-hover:text-gray-900"
-      xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-      <path fill-rule="evenodd" clip-rule="evenodd"
-        d="M6.50001 0H9.50001L10.0939 2.37548C10.7276 2.6115 11.3107 2.95155 11.8223 3.37488L14.1782 2.70096L15.6782 5.29904L13.9173 7.00166C13.9717 7.32634 14 7.65987 14 8C14 8.34013 13.9717 8.67366 13.9173 8.99834L15.6782 10.701L14.1782 13.299L11.8223 12.6251C11.3107 13.0484 10.7276 13.3885 10.0939 13.6245L9.50001 16H6.50001L5.90614 13.6245C5.27242 13.3885 4.68934 13.0484 4.17768 12.6251L1.82181 13.299L0.321808 10.701L2.08269 8.99834C2.02831 8.67366 2.00001 8.34013 2.00001 8C2.00001 7.65987 2.02831 7.32634 2.08269 7.00166L0.321808 5.29904L1.82181 2.70096L4.17768 3.37488C4.68934 2.95155 5.27241 2.6115 5.90614 2.37548L6.50001 0ZM8.00001 10C9.10458 10 10 9.10457 10 8C10 6.89543 9.10458 6 8.00001 6C6.89544 6 6.00001 6.89543 6.00001 8C6.00001 9.10457 6.89544 10 8.00001 10Z"
-        fill="#6B7280" />
-    </svg>
-    <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Administración</span>
-    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="m1 1 4 4 4-4" />
-    </svg>
-  </button>
-  <!-- Usamos binding para agregar o quitar la clase 'hidden' -->
-  <ul id="dropdown-administracion" [ngClass]="{'hidden': !administracionOpen}" class="py-2 space-y-2 pl-8">
-    <li>
-      <!-- Usamos routerLink para la navegación y detenemos la propagación para evitar cerrar el dropdown -->
-      <a routerLink="/users"
-         (click)="$event.stopPropagation()"
-         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-        <svg
-          class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-          xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
-          <path
-            d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z" />
-        </svg>
-        <span class="flex-1 ms-3 whitespace-nowrap">Usuarios</span>
-      </a>
-    </li>
-    <li>
-      <a routerLink="/roles"
-         (click)="$event.stopPropagation()"
-         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-        <svg
-          class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-          xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-            d="M8 16L4.35 13.39C2.25 11.89 1 9.47 1 6.88V3L8 0l7 3v3.88c0 2.58-1.25 5-3.35 6.39L8 16ZM12.2 5.71l-1.41-1.42L7 8.09 5.2 6.29 3.79 7.71 7 10.91 12.2 5.71Z" />
-        </svg>
-        <span class="flex-1 ms-3 whitespace-nowrap">Roles</span>
-      </a>
-    </li>
-  </ul>
-</li>
-
-
     </ul>
   </div>
 </aside>
