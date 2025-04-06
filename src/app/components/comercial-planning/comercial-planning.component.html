@@ -1,48 +1,195 @@
-<div class="container mx-auto p-4 bg-gray-100 dark:bg-gray-900 min-h-screen">
-  <h1 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Crear Planificación</h1>
-
-  <!-- Selección del número de partes -->
-  <div class="mb-4">
-    <label for="numCards" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-      Necesidad Comercial
-    </label>
-    <ng-select
-      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-      [items]="comercial" bindLabel="clientName" bindValue="clientCode" placeholder="Selecciona un código"
-      [searchFn]="search" (change)="calcularSemanas($event)">
-      <ng-template ng-option-tmp let-item="item">
-        {{ item.clientCode }} - {{ item.clientName }} - {{item.startDate | date:'dd/MM/yyyy'}} - {{item.endDate |
-        date:'dd/MM/yyyy'}} - {{item.kgs}} Kgs
-      </ng-template>
-
-      <!-- Template para el valor seleccionado (la etiqueta) -->
-      <ng-template ng-label-tmp let-item="item">
-        {{ item.clientCode}} - {{item.clientName}}
-      </ng-template>
-
-    </ng-select>
-  </div>
-
-  <!-- Grid o flex para organizar las cards -->
-  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-    <!-- Repetimos una card por cada parte -->
-
-    @for(indice of semanas; track $index){
-
-    <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm 
-               dark:bg-gray-800 dark:border-gray-700">
-      <div class="p-5">
-        <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-          Semana {{indice}}
-        </h3>
-        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-          KG:
-        </label>
-        <input type="number" placeholder="Ingresa el valor" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-                   rounded-lg focus:ring-blue-500 focus:border-blue-500 
-                   block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 
-                   dark:placeholder-gray-400 dark:text-white" />
+<div class="container mx-auto p-6 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+  <h1 class="text-3xl font-semibold mb-8 text-gray-800 dark:text-white tracking-tight">Crear Planificación</h1>
+  
+  <!-- Formulario principal con diseño mejorado -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Primera tarjeta: Selección y detalles de necesidad comercial -->
+    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
+      <div class="p-6">
+        <h2 class="text-lg font-medium text-gray-700 dark:text-gray-200 mb-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          Necesidad Comercial
+        </h2>
+        
+        <div class="mb-6">
+          <label for="comercialNeed" class="block mb-2 text-sm text-gray-600 dark:text-gray-400">
+            Selecciona un código de necesidad
+          </label>
+          <ng-select
+            id="comercialNeed"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            [items]="comercial" 
+            bindLabel="clientName" 
+            bindValue="clientCode" 
+            placeholder="Buscar por código o nombre de cliente"
+            [searchFn]="search" 
+            (change)="calcularSemanas($event)">
+            <ng-template ng-option-tmp let-item="item">
+              <div class="flex flex-col py-1">
+                <span class="font-medium">{{ item.clientCode }} - {{ item.clientName }}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{item.startDate | date:'dd/MM/yyyy'}} - {{item.endDate | date:'dd/MM/yyyy'}} - {{item.kgs}} Kgs</span>
+              </div>
+            </ng-template>
+            
+            <ng-template ng-label-tmp let-item="item">
+              {{ item.clientCode}} - {{item.clientName}}
+            </ng-template>
+          </ng-select>
+        </div>
+        
+        <!-- Detalles de la necesidad comercial seleccionada -->
+        <div *ngIf="selectedComercial.id!=0" class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Detalles de la necesidad</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Cliente</p>
+              <p class="text-sm font-medium text-gray-800 dark:text-gray-200">{{selectedComercial.clientName}}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Código</p>
+              <p class="text-sm font-medium text-gray-800 dark:text-gray-200">{{selectedComercial.clientCode}}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Período</p>
+              <p class="text-sm font-medium text-gray-800 dark:text-gray-200">
+                {{selectedComercial.startDate | date:'dd/MM/yyyy'}} - {{selectedComercial.endDate| date:'dd/MM/yyyy'}}
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Kilogramos totales</p>
+              <p class="text-sm font-medium text-gray-800 dark:text-gray-200">{{selectedComercial.kgs}} Kgs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+        <button 
+          type="button" 
+          
+          class="px-5 py-2 bg-[#437d3f] hover:bg-[#274925] text-white text-sm font-medium rounded-lg transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+          Guardar Planificación
+        </button>
       </div>
     </div>
+    
+    <!-- Segunda tarjeta: Resumen de distribución -->
+    <div  class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
+      <div class="p-6">
+        <h2 class="text-lg font-medium text-gray-700 dark:text-gray-200 mb-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Resumen
+        </h2>
+        
+        <div *ngIf="selectedComercial.clientCode!=0" class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Total a distribuir:</span>
+            <span class="text-lg font-medium text-gray-800 dark:text-gray-200">{{selectedComercial.kgs}} Kgs</span>
+          </div>
+          
+          <div class="flex justify-between items-center">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Distribuido:</span>
+            <span class="text-lg font-medium text-green-600 dark:text-green-500">{{distribuido}} Kgs</span>
+          </div>
+          
+          <div class="flex justify-between items-center">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Pendiente:</span>
+            <span class="text-lg font-medium text-red-600 dark:text-red-500">{{pendiente}} Kgs</span>
+          </div>
+          
+          <div class="pt-4 mt-4 border-t border-gray-100 dark:border-gray-700">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Progreso:</span>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-2">
+              <div class="bg-indigo-600 h-2.5 rounded-full"  [style.width.%]="calcularPorcentaje"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="selectedComercial.clientCode==0" class="flex flex-col items-center justify-center py-8 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300 dark:text-gray-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Seleccione una necesidad comercial para ver el resumen</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Título de sección de semanas con contador -->
+  <div class="flex justify-between items-center mb-6" *ngIf="semanas?.length">
+    <h2 class="text-xl font-medium text-gray-800 dark:text-white flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      Distribución por Semanas
+    </h2>
+    <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full dark:bg-indigo-900 dark:text-indigo-300">
+      {{semanas.length}} semanas
+    </span>
+  </div>
+  
+  <!-- Grid para las cards de semanas con diseño mejorado -->
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    @for(indice of semanas; track indice.semana){
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
+        <div class="p-5">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Semana {{indice.semana}} 
+            </h3>
+            <div class="text-right">
+            <span class="text-xs text-gray-400 dark:text-gray-500">
+              {{indice.fecha}}
+              
+            </span>
+          </div>
+          </div>
+          
+          <div>
+            <label class="block mb-2 text-sm text-gray-600 dark:text-gray-300">
+              Kilogramos a planificar
+            </label>
+            <div class="relative">
+              <input 
+                type="number" 
+                placeholder="0" 
+                (input)="resumen()"
+                class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg w-full p-2.5 pr-12 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-800 dark:focus:border-indigo-700" />
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <span class="text-gray-500 dark:text-gray-400 text-xs">Kgs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-5 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+          <button 
+            type="button" 
+            class="px-3 py-1.5 bg-indigo-50 text-indigo-700 text-sm font-medium rounded-lg hover:bg-indigo-100 transition-colors dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50">
+            Guardar
+          </button>
+        </div>
+      </div>
     }
   </div>
+  
+  <!-- Mensaje cuando no hay semanas - más atractivo -->
+  <div *ngIf="!semanas?.length" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center">
+    <div class="flex flex-col items-center max-w-md mx-auto">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-2">No hay semanas disponibles</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Seleccione una necesidad comercial para ver las semanas disponibles y comenzar la planificación</p>
+    </div>
+  </div>
+</div>
+
