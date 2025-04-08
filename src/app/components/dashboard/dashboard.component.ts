@@ -1,8 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
-import { NgModel } from '@angular/forms';
-import { FormsModule } from '@angular/forms'; // <-- Importa FormsModule
+import { FormsModule } from '@angular/forms';
 import { ComercialServiceService, Comercial } from '../../services/Comercial.service';
 
 @Component({
@@ -14,22 +13,20 @@ import { ComercialServiceService, Comercial } from '../../services/Comercial.ser
 export class DashboardComponent implements OnInit {
 
   constructor(private comercialServicio: ComercialServiceService) {}
+  
+  // Propiedades para los gráficos
   data: any;
   options: any;
-
- 
-
   teoricaData: any;
-realData: any;
+  realData: any;
   teoricaOptions: any;
-realOptions: any;
-
-//graficas superpuestas
-showCombined = false;
-combinedData: any;
-combinedOptions: any;
-//ejemplo de genero
-selectedProduct: string = 'cereales';
+  realOptions: any;
+  showCombined = false;
+  combinedData: any;
+  combinedOptions: any;
+  
+  // Selector de género
+  selectedProduct: string = 'cereales';
   products = [
     { value: 'cereales', label: 'Cereales' },
     { value: 'hortalizas', label: 'Hortalizas' },
@@ -38,8 +35,8 @@ selectedProduct: string = 'cereales';
     { value: 'tuberculos', label: 'Tubérculos' }
   ];
 
-  //objeto de tipo necesidad comercial
-  comercial: Comercial ={
+  // Objeto comercial
+  comercial: Comercial = {
     id: 0,
     clientCode: 0,
     clientName: "",
@@ -50,73 +47,65 @@ selectedProduct: string = 'cereales';
     kgs: 0
   }
 
-  //array de objetos comercial
+  // Array de objetos comercial
   comNeeds: Comercial[] = [];
-
-onProductChange() {
-  // Lógica para actualizar los datos según el producto seleccionado
-  console.log('Producto seleccionado:', this.selectedProduct);
-  // Aquí deberías implementar la actualización de los datos de los gráficos
-}
-
+  
+  // Propiedades adicionales para el nuevo diseño
+  // Arrays para manejar los filtros de géneros y necesidades
+  genders: any[] = [];
+  selectedGenderIds: number[] = [];
+  selectedComNeedIds: number[] = [];
+  filteredComNeeds: Comercial[] = [];
+  
+  // Métricas del dashboard
+  dashboardMetrics = {
+    totalRegistros: 0,
+    variacionMensual: '+12%', // Valor de ejemplo
+    plazoMedio: '28 días',    // Valor de ejemplo
+    ultimaActualizacion: '24/06/2024'
+  };
 
   ngOnInit(): void {
-    
-    //Obtenemos los registros de los datos de la base de datos
+    // Obtenemos los registros de los datos de la base de datos
     this.comercialServicio.getComercial().subscribe(
       (data) => {
         this.comNeeds = data;
-        //this.filteredData = this.paginatedData; estas variables son de la lógica usada por moha en el componente de Comercial
-        //this.updatePagination();
+        this.filteredComNeeds = [...this.comNeeds]; // Inicialmente mostramos todos
+        this.dashboardMetrics.totalRegistros = this.comNeeds.length;
+        
+        // Extraer géneros únicos de los datos comerciales
+        this.extractGenders();
+        
         console.log(this.comNeeds);
       },
       (error) => {
-        console.error('Error: ' + error);
+        console.error('Error al cargar datos: ' + error);
       }
-
     );
     
-
-    //-----------------------------------------------------------------------------------//
+    // Configuración inicial de gráficos
+    this.initializeCharts();
+  }
+  
+  // Método para extraer géneros únicos de los datos comerciales
+  extractGenders() {
+    const uniqueGeneros = new Map();
     
-    this.combinedOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      // Añadir estas configuraciones adicionales
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top',
-          labels: {
-            boxWidth: 20,
-            font: {
-              size: window.innerWidth < 768 ? 12 : 14
-            }
-          }
-        }
-      },
-      scales: {
-        y: {
-          ticks: {
-            font: {
-              size: window.innerWidth < 768 ? 10 : 12
-            }
-          }
-        },
-        x: {
-          ticks: {
-            font: {
-              size: window.innerWidth < 768 ? 10 : 12
-            }
-          }
-        }
+    this.comNeeds.forEach(need => {
+      if (need.idGenero && !uniqueGeneros.has(need.idGenero)) {
+        uniqueGeneros.set(need.idGenero, {
+          idGenero: need.idGenero,
+          nombreGenero: need.nombreGenero || `Género ${need.idGenero}`
+        });
       }
-    };
-
-
-
-
-    // Ejemplo de gráfico de líneas
+    });
+    
+    this.genders = Array.from(uniqueGeneros.values());
+  }
+  
+  // Inicializar las configuraciones de los gráficos
+  initializeCharts() {
+    // Configuraciones para gráficos de barra
     const barOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -124,25 +113,49 @@ onProductChange() {
         y: {
           beginAtZero: true,
           ticks: {
-            stepSize: 20
+            stepSize: 20,
+            color: '#64748b'
+          },
+          grid: {
+            color: '#e2e8f0'
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: '#64748b'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: '#334155',
+            font: {
+              weight: '500'
+            }
           }
         }
       }
     };
+    
+    // Gráfico principal
     this.data = {
       labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
       datasets: [
         {
           label: 'Dataset 1',
           data: [65, 59, 80, 81, 56, 55, 40],
-          borderColor: '#42A5F5',
+          borderColor: '#4f46e5', // Color indigo para Tailwind
           tension: 0.4,
           yAxisID: 'y'
         },
         {
           label: 'Dataset 2',
           data: [28, 48, 40, 19, 86, 27, 90],
-          borderColor: '#FFA726',
+          borderColor: '#10b981', // Color emerald para Tailwind
           tension: 0.4,
           yAxisID: 'y1'
         }
@@ -158,10 +171,12 @@ onProductChange() {
           display: true,
           position: 'left',
           ticks: {
-            stepSize: 10
+            stepSize: 10,
+            color: '#64748b'
           },
           grid: {
-            drawOnChartArea: true
+            drawOnChartArea: true,
+            color: '#e2e8f0'
           }
         },
         y1: {
@@ -169,7 +184,8 @@ onProductChange() {
           display: true,
           position: 'right',
           ticks: {
-            stepSize: 10
+            stepSize: 10,
+            color: '#64748b'
           },
           grid: {
             drawOnChartArea: false
@@ -178,18 +194,32 @@ onProductChange() {
         x: {
           grid: {
             display: false
+          },
+          ticks: {
+            color: '#64748b'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: '#334155'
           }
         }
       }
     };
 
+    // Gráficos teórica y real
     this.teoricaData = {
       labels: ['Q1', 'Q2', 'Q3', 'Q4'],
       datasets: [
         {
           label: 'Teórica',
           data: [65, 59, 80, 81],
-          backgroundColor: '#4F46E5'
+          backgroundColor: '#4f46e5',
+          borderColor: '#4f46e5',
+          tension: 0.4,
+          fill: false
         }
       ]
     };
@@ -200,7 +230,10 @@ onProductChange() {
         {
           label: 'Real',
           data: [28, 48, 40, 19],
-          backgroundColor: '#10B981'
+          backgroundColor: '#10b981',
+          borderColor: '#10b981',
+          tension: 0.4,
+          fill: false
         }
       ]
     };
@@ -208,15 +241,14 @@ onProductChange() {
     this.teoricaOptions = { ...barOptions };
     this.realOptions = { ...barOptions };
 
-
-    // Configuración de la gráfica combinada
+    // Configuración gráfica combinada
     this.combinedData = {
       labels: ['Q1', 'Q2', 'Q3', 'Q4'],
       datasets: [
         {
           label: 'Teórica',
           data: [65, 59, 80, 81],
-          borderColor: '#4F46E5',
+          borderColor: '#4f46e5',
           tension: 0.4,
           fill: false,
           borderWidth: 2
@@ -224,7 +256,7 @@ onProductChange() {
         {
           label: 'Real',
           data: [28, 48, 40, 19],
-          borderColor: '#10B981',
+          borderColor: '#10b981',
           tension: 0.4,
           fill: false,
           borderWidth: 2,
@@ -240,16 +272,26 @@ onProductChange() {
         y: {
           beginAtZero: true,
           ticks: {
-            stepSize: 20
+            stepSize: 20,
+            color: '#64748b',
+            font: {
+              size: window.innerWidth < 768 ? 10 : 12
+            }
           },
           grid: {
-            color: '#e5e7eb',
+            color: '#e2e8f0',
             drawOnChartArea: true
           }
         },
         x: {
           grid: {
             display: false
+          },
+          ticks: {
+            color: '#64748b',
+            font: {
+              size: window.innerWidth < 768 ? 10 : 12
+            }
           }
         }
       },
@@ -257,63 +299,174 @@ onProductChange() {
         legend: {
           position: 'top',
           labels: {
-            color: '#6b7280'
+            color: '#64748b',
+            font: {
+              size: window.innerWidth < 768 ? 12 : 14
+            }
           }
         }
       }
     };
+    
+    // Forzar actualizaciones iniciales
+    this.updateChartOptions();
   }
 
+  // Cambio de producto seleccionado
+  onProductChange() {
+    console.log('Producto seleccionado:', this.selectedProduct);
+    
+    // Simulación de filtrado por género seleccionado
+    const generoId = this.products.findIndex(p => p.value === this.selectedProduct) + 1;
+    this.filteredComNeeds = this.comNeeds.filter(need => 
+      need.idGenero === generoId || this.selectedProduct === 'todos'
+    );
+    
+    // Actualizar métricas
+    this.dashboardMetrics.totalRegistros = this.filteredComNeeds.length;
+    
+    // Actualizar gráficos con datos filtrados
+    this.updateChartWithFilteredData();
+  }
+  
+  // Método para actualizar gráficos con los datos filtrados
+  updateChartWithFilteredData() {
+    // Simular valores diferentes para gráficos basados en el producto seleccionado
+    const multiplier = (Math.random() * 0.5) + 0.75; // Factor entre 0.75 y 1.25
+    
+    const updatedTeoricaData = this.teoricaData.datasets[0].data.map((val: number) => 
+      Math.round(val * multiplier)
+    );
+    
+    const updatedRealData = this.realData.datasets[0].data.map((val: number) => 
+      Math.round(val * (multiplier * 0.8))
+    );
+    
+    // Actualizar datasets
+    this.teoricaData.datasets[0].data = updatedTeoricaData;
+    this.realData.datasets[0].data = updatedRealData;
+    this.combinedData.datasets[0].data = updatedTeoricaData;
+    this.combinedData.datasets[1].data = updatedRealData;
+    
+    // Forzar actualización de los gráficos
+    this.teoricaData = {...this.teoricaData};
+    this.realData = {...this.realData};
+    this.combinedData = {...this.combinedData};
+  }
+
+  // Alternar vista de gráficos
   toggleView() {
     this.showCombined = !this.showCombined;
   }
   
-
-
-
-  //graficas responsive:
-  // Añadir en el componente
-@HostListener('window:resize', ['$event'])
-onResize(event: Event) {
-  this.updateChartOptions();
-}
-
-updateChartOptions() {
-  const isMobile = window.innerWidth < 768;
-  const baseSize = isMobile ? 10 : 12;
+  // Métodos para manejar los nuevos checkboxes de selección
+  toggleAllGenders(event: any) {
+    if (event.target.checked) {
+      this.selectedGenderIds = this.genders.map(g => g.idGenero);
+    } else {
+      this.selectedGenderIds = [];
+    }
+    this.updateFilteredData();
+  }
   
-  this.combinedOptions = {
-    ...this.combinedOptions,
-    plugins: {
-      legend: {
-        labels: {
-          font: {
-            size: isMobile ? 12 : 14
-          }
-        }
-      }
-    },
-    scales: {
-      y: {
-        ticks: {
-          font: {
-            size: baseSize
+  toggleAllComNeeds(event: any) {
+    if (event.target.checked) {
+      this.selectedComNeedIds = this.comNeeds.map(n => n.id);
+    } else {
+      this.selectedComNeedIds = [];
+    }
+    this.updateFilteredData();
+  }
+  
+  toggleGenderSelection(generoId: number) {
+    const index = this.selectedGenderIds.indexOf(generoId);
+    if (index > -1) {
+      this.selectedGenderIds.splice(index, 1);
+    } else {
+      this.selectedGenderIds.push(generoId);
+    }
+    this.updateFilteredData();
+  }
+  
+  toggleComNeedSelection(needId: number) {
+    const index = this.selectedComNeedIds.indexOf(needId);
+    if (index > -1) {
+      this.selectedComNeedIds.splice(index, 1);
+    } else {
+      this.selectedComNeedIds.push(needId);
+    }
+    this.updateFilteredData();
+  }
+  
+  // Actualizar datos filtrados basados en selecciones
+  updateFilteredData() {
+    this.filteredComNeeds = this.comNeeds.filter(need => {
+      // Si no hay filtros de género, mostramos todos
+      const generoMatch = this.selectedGenderIds.length === 0 || this.selectedGenderIds.includes(need.idGenero);
+      
+      // Si no hay filtros de necesidades, mostramos todos
+      const needMatch = this.selectedComNeedIds.length === 0 || this.selectedComNeedIds.includes(need.id);
+      
+      return generoMatch && needMatch;
+    });
+    
+    // Actualizar métricas y gráficos
+    this.dashboardMetrics.totalRegistros = this.filteredComNeeds.length;
+    this.updateChartWithFilteredData();
+  }
+  
+  // Calcular total de KGs (para el panel de información)
+  getTotalKgs(): number {
+    return this.filteredComNeeds.reduce((total, need) => total + (need.kgs || 0), 0);
+  }
+
+  // Actualizar opciones de gráficos para responsive
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.updateChartOptions();
+  }
+
+  updateChartOptions() {
+    const isMobile = window.innerWidth < 768;
+    const baseSize = isMobile ? 10 : 12;
+    
+    this.combinedOptions = {
+      ...this.combinedOptions,
+      plugins: {
+        legend: {
+          labels: {
+            font: {
+              size: isMobile ? 12 : 14
+            }
           }
         }
       },
-      x: {
-        ticks: {
-          font: {
-            size: baseSize
+      scales: {
+        y: {
+          ticks: {
+            font: {
+              size: baseSize
+            }
+          }
+        },
+        x: {
+          ticks: {
+            font: {
+              size: baseSize
+            }
           }
         }
       }
-    }
-  };
-  
-  // Forzar actualización de las gráficas
-  this.data = {...this.data};
-  this.combinedData = {...this.combinedData};
-}
-  
+    };
+    
+    // Actualizar también opciones de otros gráficos
+    this.teoricaOptions.plugins.legend.labels.font = { size: isMobile ? 12 : 14 };
+    this.realOptions.plugins.legend.labels.font = { size: isMobile ? 12 : 14 };
+    
+    // Forzar actualización de las gráficas
+    this.data = {...this.data};
+    this.combinedData = {...this.combinedData};
+    this.teoricaData = {...this.teoricaData};
+    this.realData = {...this.realData};
+  }
 }

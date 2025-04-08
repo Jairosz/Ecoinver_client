@@ -702,6 +702,7 @@ openCultivoModal(): void {
   closeCultivoModal(): void {
     this.showCultivoModal = false;
   }
+  //aaaa<
 
   // Modificar el método de añadir cultivos seleccionados
 // Método para añadir cultivos seleccionados con corrección de tipos
