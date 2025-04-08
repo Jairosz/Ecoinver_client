@@ -1,5 +1,4 @@
-export interface ComercialPlanning {
-    id:number;
+export interface ComercialPlanningPost {
     idCommercialNeed:number;
     weekNumber:number;
     kgs:number;

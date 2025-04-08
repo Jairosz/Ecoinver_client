@@ -45,8 +45,8 @@ selectedProduct: string = 'cereales';
     clientName: "",
     startDate: new Date(),
     endDate: new Date(),
-    generoId: 0,
-    generoNombre: "",
+    idGenero: 0,
+    nombreGenero: "",
     kgs: 0
   }
 

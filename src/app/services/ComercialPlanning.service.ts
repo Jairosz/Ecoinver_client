@@ -3,6 +3,8 @@ import { environment } from '../environment/environment';
 import { Observable } from 'rxjs';
 import { ComercialPlanning } from '../types/ComercialPlanning';
 import { HttpClient } from '@angular/common/http';
+import { ComercialPlanningPost } from '../types/ComercialPlanningPost';
+
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +17,7 @@ export class ComercialPlanningService {
   get():Observable<ComercialPlanning[]>{
     return this.http.get<ComercialPlanning[]>(this.baseUrl);
   }
-  post(planning:ComercialPlanning){
-    return this.http.post(this.baseUrl,planning);
+  post(planning:ComercialPlanningPost):Observable<{message:string,entity:ComercialPlanning}>{
+    return this.http.post<{ message: string, entity: ComercialPlanning }>(this.baseUrl,planning);
   }
 }

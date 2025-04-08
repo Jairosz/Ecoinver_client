@@ -12,8 +12,8 @@ export interface Comercial {
   clientName: string;
   startDate: Date;
   endDate: Date;
-  generoId:number;
-  generoNombre:string;
+  idGenero:number;
+  nombreGenero:string;
   kgs: number;
 }
 

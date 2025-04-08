@@ -17,8 +17,8 @@ export interface Comercial {
   clientName: string;
   startDate: Date;
   endDate: Date;
-  generoId: number;
-  generoNombre: string;
+  idGenero: number;
+  nombreGenero: string;
   kgs: number;
 }
 
@@ -46,8 +46,8 @@ export class ComercialComponent implements OnInit {
     clientName: '',
     startDate: undefined,
     endDate: undefined,
-    generoId: 0,
-    generoNombre:'',
+    idGenero: 0,
+    nombreGenero:'',
 
     kgs: 0
   };
@@ -105,7 +105,7 @@ export class ComercialComponent implements OnInit {
       (data) => {
         this.paginatedData = data;
         this.filteredData = this.paginatedData;
-
+        console.log(this.paginatedData);
         this.updatePagination();
 
       },
@@ -216,8 +216,8 @@ export class ComercialComponent implements OnInit {
       startDate: formulario.startDate2,
       endDate: formulario.endDate2,
 
-      generoId: formulario.genero2,
-      generoNombre:formulario.generoNombre2,
+      idGenero: formulario.genero2,
+      nombreGenero:formulario.generoNombre2,
       kgs: formulario.kgs2
     };
 
@@ -267,8 +267,8 @@ export class ComercialComponent implements OnInit {
       clientCode: formulario.clientCode,
       clientName: formulario.clientName,
       startDate: formulario.startDate,
-      generoId: formulario.genero,
-      generoNombre:formulario.generoNombre,
+      idGenero: formulario.genero,
+      nombreGenero:formulario.generoNombre,
       endDate: formulario.endDate,
       kgs: formulario.kgs
     };

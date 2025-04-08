@@ -188,7 +188,7 @@
                   d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                   clip-rule="evenodd"></path>
               </svg>
-              Añadir{{miFormulario2.invalid}}{{validarFechas}}
+              Añadir
             </button>
           </form>
         </div>
@@ -367,8 +367,8 @@
           <td class="px-4 py-3">{{ item.clientName }}</td>
           <td class="px-4 py-3">{{ item.startDate | date: 'dd-MM-yyyy' }}</td>
           <td class="px-4 py-3">{{ item.endDate | date: 'dd-MM-yyyy' }}</td>
-          <td class="px-4 py-3">{{ item.generoId}}</td>
-          <td class="px-4 py-3">{{ item.generoNombre}}</td>
+          <td class="px-4 py-3">{{ item.idGenero}}</td>
+          <td class="px-4 py-3">{{ item.nombreGenero}}</td>
           <td class="px-4 py-3">{{ item.kgs }}</td>
         </tr>
       </tbody>
