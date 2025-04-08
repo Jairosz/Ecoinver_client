@@ -97,26 +97,35 @@
             Selecciona un código de necesidad
           </label>
           <ng-select
-            id="comercialNeed"
-            
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            [items]="comercial" 
-            bindLabel="clientName" 
-            bindValue="clientCode" 
-            placeholder="Buscar por código o nombre de cliente"
-            [searchFn]="search" 
-            (change)="calcularSemanas($event)">
-            <ng-template ng-option-tmp let-item="item">
-              <div class="flex flex-col py-1">
-                <span class="font-medium">{{ item.clientCode }} - {{ item.clientName }}</span>
-                <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{item.startDate | date:'dd/MM/yyyy'}} - {{item.endDate | date:'dd/MM/yyyy'}} - {{item.kgs}} Kgs</span>
-              </div>
-            </ng-template>
-            
-            <ng-template ng-label-tmp let-item="item">
-              {{ item.clientCode}} - {{item.clientName}}
-            </ng-template>
-          </ng-select>
+          id="comercialNeed"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 
+                 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 
+                 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+          [items]="comercial" 
+          bindLabel="clientName" 
+          bindValue="clientCode" 
+          placeholder="Buscar por código o nombre de cliente"
+          [searchFn]="search" 
+          (change)="calcularSemanas($event)"
+          [appendTo]="'body'">
+          
+          <ng-template ng-option-tmp let-item="item">
+            <div class="flex flex-col py-1">
+              <span class="font-medium">{{ item.clientCode }} - {{ item.clientName }}</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {{ item.startDate | date:'dd/MM/yyyy' }} - 
+                {{ item.endDate | date:'dd/MM/yyyy' }} - 
+                {{ item.kgs }} Kgs
+              </span>
+            </div>
+          </ng-template>
+          
+          <ng-template ng-label-tmp let-item="item">
+            {{ item.clientCode }} - {{ item.clientName }}
+          </ng-template>
+          
+        </ng-select>
         </div>
         
         <!-- Detalles de la necesidad comercial seleccionada -->
