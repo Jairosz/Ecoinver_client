@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../environment/environment';
 import { Observable } from 'rxjs';
 import { Gender } from '../types/gender';
-
+//gender.service.ts
 @Injectable({
   providedIn: 'root'
 })

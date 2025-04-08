@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { DatePipe } from '@angular/common';
 import { WeatherIconsService } from '../../services/WeatherIcons.service';
+import { trigger, transition, style, query, group, animate } from '@angular/animations';
 //imports para el manejo de cultivo
 
 import { ActivatedRoute } from '@angular/router';
@@ -462,7 +463,7 @@ export class CultiveDetailsComponent
       labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
       datasets: [
         {
-          label: 'Rendimiento',
+          label: 'Producción Real',
           data: [65, 59, 80, 81, 56, 55],
           borderColor: '#437d3f',
           tension: 0.4,

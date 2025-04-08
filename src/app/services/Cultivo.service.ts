@@ -10,7 +10,7 @@ import { Cultive } from '../types/Cultive';
 })
 export class CultivoService {
   // Combinas la baseUrl con tu endpoint (p.ej. /Cultives, /Cultivos, etc.)
-  private baseUrl = environment.baseUrl + '/Erp/cultives';
+  private baseUrl = environment.baseUrl + '/cultives';
 
   constructor(private http: HttpClient) { }
 
@@ -18,6 +18,9 @@ export class CultivoService {
     return this.http.get<Cultive[]>(this.baseUrl);
   }
   
-
-  // Podrías agregar más métodos: create, update, delete, etc.
+  getById(id: number | string): Observable<Cultive> {
+    const url = `${this.baseUrl}/${id}`;
+    return this.http.get<Cultive>(url);
+  }
+  
 }

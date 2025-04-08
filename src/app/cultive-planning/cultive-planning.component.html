@@ -1,76 +1,300 @@
-<!-- Contenedor principal con fondo distinto (dark:bg-gray-900) -->
-<div class="container mx-auto p-4 bg-gray-100 dark:bg-gray-900 min-h-screen">
-    <h1 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Crear Planificación</h1>
-  
-    <!-- Selección del número de partes -->
-    <div class="mb-4">
-      <label 
-        for="numCards" 
-        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-      >
-        Número de partes:
-      </label>
-      <select 
-        id="numCards"
-        [(ngModel)]="numCards" 
-        (change)="updateCards()"
-        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-               rounded-lg focus:ring-blue-500 focus:border-blue-500 
-               block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 
-               dark:placeholder-gray-400 dark:text-white"
-      >
-        <option *ngFor="let n of numbers" [value]="n">{{ n }}</option>
-      </select>
-    </div>
-  
-    <!-- Grid o flex para organizar las cards -->
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      <!-- Repetimos una card por cada parte -->
-      <div 
-        *ngFor="let card of cards; let i = index"
-        class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm 
-               dark:bg-gray-800 dark:border-gray-700"
-      >
-        <div class="p-5">
-          <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Parte {{ i + 1 }}
-          </h3>
-          <label 
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            KG/Metro Cuadrado:
-          </label>
-          <input 
-            type="number"
-            [(ngModel)]="card.value"
-            placeholder="Ingresa el valor"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-                   rounded-lg focus:ring-blue-500 focus:border-blue-500 
-                   block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 
-                   dark:placeholder-gray-400 dark:text-white"
-          />
-        </div>
-      </div>
-    </div>
-  
-    <!-- Card para la sección de cultivos (opcionalmente, igual estilo de Flowbite) -->
-    <div 
-      class="max-w-sm mt-6 bg-white border border-gray-200 rounded-lg shadow-sm 
-             dark:bg-gray-800 dark:border-gray-700 p-5"
-    >
-      <h2 class="mb-2 text-xl font-semibold text-gray-900 dark:text-white">Asignar Cultivos</h2>
-      <select
-        multiple
-        [(ngModel)]="selectedCultivos"
-        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-               rounded-lg focus:ring-blue-500 focus:border-blue-500 
-               block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 
-               dark:placeholder-gray-400 dark:text-white"
-      >
-        <option *ngFor="let cultivo of cultivos" [value]="cultivo">
-          {{ cultivo }}
-        </option>
-      </select>
+<div class="container mx-auto p-6 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+  <h1 class="text-3xl font-semibold mb-8 text-gray-800 dark:text-white tracking-tight">Crear Planificación</h1>
+
+  <!-- Mensaje de éxito -->
+  <div *ngIf="successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-6 rounded-lg shadow-sm dark:bg-green-900/30 dark:border-green-800 dark:text-green-400 transition-all" role="alert">
+    <div class="flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      <span>{{ successMessage }}</span>
     </div>
   </div>
   
+  <!-- Formulario principal con diseño mejorado -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Primera tarjeta: Selección de planificación existente y detalles -->
+    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
+      <div class="p-6">
+        <h2 class="text-lg font-medium text-gray-700 dark:text-gray-200 mb-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          Planificación
+        </h2>
+        
+        <!-- Selector de planificación existente -->
+        <div class="mb-6">
+          <label for="planificacionSelect" class="block mb-2 text-sm text-gray-600 dark:text-gray-400">
+            Seleccionar Planificación
+          </label>
+          <select 
+            id="planificacionSelect"
+            [(ngModel)]="selectedPlanificacion" 
+            (change)="cargarPlanificacion()"
+            class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg w-full p-2.5 focus:ring-2 focus:ring-[#437d3f] focus:border-[#437d3f] dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-[#437d3f] dark:focus:border-[#437d3f]"
+          >
+            <option value="nueva">Nueva planificación</option>
+            <option *ngFor="let plan of planificaciones" [value]="plan.id">{{ plan.nombre }}</option>
+          </select>
+        </div>
+        
+        <!-- Nombre de la planificación -->
+        <div class="mb-6">
+          <label for="nombrePlanificacion" class="block mb-2 text-sm text-gray-600 dark:text-gray-400">
+            Nombre de la Planificación
+          </label>
+          <input
+            type="text"
+            id="nombrePlanificacion"
+            [(ngModel)]="nuevaPlanificacionNombre"
+            placeholder="Ej: Planificación Primavera 2025"
+            class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg w-full p-2.5 focus:ring-2 focus:ring-[#437d3f] focus:border-[#437d3f] dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-[#437d3f] dark:focus:border-[#437d3f]"
+          >
+        </div>
+      </div>
+      
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+        <button 
+          type="button" 
+          (click)="guardar()" 
+          class="px-5 py-2 bg-[#437d3f] hover:bg-[#274925] text-white text-sm font-medium rounded-lg transition-colors focus:ring-2 focus:ring-[#437d3f] focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Guardar Planificación
+        </button>
+      </div>
+    </div>
+    
+    <!-- Segunda tarjeta: Asignación y Resumen de Cultivos -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
+      <div class="p-6">
+        <h2 class="text-lg font-medium text-gray-700 dark:text-gray-200 mb-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Asignar Cultivos
+        </h2>
+        
+        <!-- Selector de género de cultivo -->
+        <div class="mb-4">
+          <label for="genreSelect" class="block mb-2 text-sm text-gray-600 dark:text-gray-400">
+            Seleccionar Género
+          </label>
+          <select 
+            id="genreSelect"
+            [(ngModel)]="selectedGenre" 
+            (change)="onGenreChange()"
+            class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg w-full p-2.5 focus:ring-2 focus:ring-[#437d3f] focus:border-[#437d3f] dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-[#437d3f] dark:focus:border-[#437d3f]"
+          >
+            <option value="">Todos los géneros</option>
+            <option *ngFor="let genero of generos" [value]="genero">{{ genero }}</option>
+          </select>
+          
+          <!-- Mensaje de carga o error de géneros -->
+          <div *ngIf="isLoadingCultivos" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Cargando géneros desde la API...
+          </div>
+          <div *ngIf="loadError" class="mt-2 text-sm text-red-500 dark:text-red-400">
+            {{ loadError }}
+          </div>
+        </div>
+        
+        <!-- Lista de cultivos seleccionados -->
+        <div class="space-y-4">
+          <div *ngIf="selectedCultivos.length > 0" class="flex justify-between items-center mb-2">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Cultivos seleccionados:</span>
+            <span class="text-lg font-medium text-gray-800 dark:text-gray-200">{{ selectedCultivos.length }}</span>
+          </div>
+          
+          <div class="space-y-2 max-h-60 overflow-y-auto">
+            <div 
+              *ngFor="let cultivo of selectedCultivos; let i = index" 
+              class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
+            >
+              <span class="text-sm text-gray-800 dark:text-gray-200">{{ cultivo }}</span>
+              <button 
+                (click)="removeCultivo(i)" 
+                class="text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Botón para añadir nuevo cultivo -->
+          <button 
+            (click)="openCultivoModal()"
+            [disabled]="isLoadingCultivos" 
+            class="flex items-center justify-center w-full p-2 mt-2 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            {{ isLoadingCultivos ? 'Cargando cultivos...' : 'Añadir Cultivo' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Título de sección de tramos con contador -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-xl font-medium text-gray-800 dark:text-white flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      Tramos de Cultivo
+    </h2>
+    <span class="bg-[#437d3f]/20 text-[#437d3f] text-xs font-medium px-2.5 py-1 rounded-full dark:bg-[#437d3f]/30 dark:text-[#8bc986]">
+      {{numTramos}} tramos
+    </span>
+  </div>
+  
+  <!-- Grid para las cards de tramos con diseño mejorado -->
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div 
+      *ngFor="let card of cards; let i = index"
+      class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md"
+    >
+      <div class="p-5">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Tramo {{i + 1}}
+          </h3>
+        </div>
+        
+        <!-- Fecha de inicio -->
+        <div class="mb-3">
+          <label class="block mb-2 text-sm text-gray-600 dark:text-gray-300">
+            Fecha de inicio
+          </label>
+          <div class="relative">
+            <input 
+              type="date"
+              [(ngModel)]="card.startDate"
+              (change)="validateDates(i)"
+              class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg w-full p-2.5 focus:ring-2 focus:ring-[#437d3f] focus:border-[#437d3f] dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-[#437d3f] dark:focus:border-[#437d3f]" />
+          </div>
+        </div>
+        
+        <!-- Fecha de fin -->
+        <div class="mb-3">
+          <label class="block mb-2 text-sm text-gray-600 dark:text-gray-300">
+            Fecha de fin
+          </label>
+          <div class="relative">
+            <input 
+              type="date"
+              [(ngModel)]="card.endDate"
+              [min]="card.startDate"
+              (change)="validateDates(i)"
+              class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg w-full p-2.5 focus:ring-2 focus:ring-[#437d3f] focus:border-[#437d3f] dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-[#437d3f] dark:focus:border-[#437d3f]" />
+          </div>
+        </div>
+        
+        <!-- KG/Metro Cuadrado -->
+        <div>
+          <label class="block mb-2 text-sm text-gray-600 dark:text-gray-300">
+            Kilogramos estimados
+          </label>
+          <div class="relative">
+            <input 
+              type="number"
+              [(ngModel)]="card.value"
+              placeholder="0" 
+              min="0"
+              class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg w-full p-2.5 pr-12 focus:ring-2 focus:ring-[#437d3f] focus:border-[#437d3f] dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-[#437d3f] dark:focus:border-[#437d3f]" />
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <span class="text-gray-500 dark:text-gray-400 text-xs">Kg</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para añadir cultivos - Versión mejorada -->
+<div 
+  *ngIf="showCultivoModal"
+  class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm flex items-center justify-center z-50"
+>
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-2xl mx-4 my-8">
+    <div class="p-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+      <h3 class="text-xl font-medium text-gray-700 dark:text-gray-200">
+        {{ selectedGenre ? 'Seleccionar Cultivos de ' + selectedGenre : 'Seleccionar Cultivos' }}
+      </h3>
+      <button (click)="closeCultivoModal()" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+    <div class="p-6">
+      <div class="mb-6">
+        <label class="block mb-3 text-sm font-medium text-gray-600 dark:text-gray-400">
+          {{ selectedGenre ? 'Cultivos de ' + selectedGenre + ' disponibles' : 'Cultivos Disponibles' }}
+        </label>
+        
+        <!-- Estado de carga -->
+        <div *ngIf="isLoadingCultivos" class="text-center py-6">
+          <svg class="animate-spin h-8 w-8 text-[#437d3f] mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p class="mt-3 text-base text-gray-600 dark:text-gray-400">Cargando cultivos desde la API...</p>
+        </div>
+        
+        <!-- Mensaje de error -->
+        <div *ngIf="loadError" class="text-center py-3 mb-4">
+          <p class="text-sm text-red-500 dark:text-red-400">{{ loadError }}</p>
+        </div>
+        
+        <!-- Select para cultivos filtrados por género con información detallada -->
+        <select
+          multiple
+          [(ngModel)]="tempSelectedCultivos"
+          class="bg-gray-50 border border-gray-200 text-gray-800 text-base rounded-lg w-full p-3 max-h-80 focus:ring-2 focus:ring-[#437d3f] focus:border-[#437d3f] dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-[#437d3f] dark:focus:border-[#437d3f]"
+          [disabled]="isLoadingCultivos"
+          size="12"
+        >
+          <option *ngFor="let cultivo of filteredCultivos" [value]="cultivo.id.toString()" class="py-2 px-1">
+            {{ cultivo.nombreAgricultor }} - {{ cultivo.nombreGenero }} - {{ cultivo.nombreVariedad }}
+          </option>
+        </select>
+        
+        <!-- Mensaje si no hay cultivos disponibles -->
+        <p *ngIf="!isLoadingCultivos && (!filteredCultivos || filteredCultivos.length === 0)" class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+          {{ selectedGenre ? 'No hay cultivos disponibles para el género ' + selectedGenre + ' en la API.' : 'No hay cultivos disponibles en la API en este momento.' }}
+        </p>
+
+        <!-- Descripción de ayuda -->
+        <p class="mt-4 text-xs text-gray-500 dark:text-gray-400">
+          <span class="font-medium">Consejo:</span> Puedes seleccionar múltiples cultivos manteniendo presionada la tecla Ctrl (o Cmd en Mac) mientras haces clic en las opciones.
+        </p>
+      </div>
+      
+      <div class="flex justify-end gap-4 mt-6">
+        <button 
+          (click)="closeCultivoModal()" 
+          class="px-5 py-2.5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 rounded-lg text-sm font-medium transition-colors dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
+        >
+          Cancelar
+        </button>
+        <button 
+          (click)="addSelectedCultivos()" 
+          [disabled]="isLoadingCultivos || !tempSelectedCultivos || tempSelectedCultivos.length === 0"
+          class="px-5 py-2.5 bg-[#437d3f] hover:bg-[#274925] text-white rounded-lg text-sm font-medium transition-colors focus:ring-2 focus:ring-[#437d3f] focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Añadir {{ tempSelectedCultivos?.length ? '(' + tempSelectedCultivos.length + ')' : '' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,74 +1,361 @@
-
-
-<div class="p-4">
-  <div class="max-w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 p-6">
-    <!-- Encabezado con título y selector -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
-      <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
-      
-      <!-- Selector de género -->
-      <div class="w-full md:w-64">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Seleccionar Género</label>
-        <select 
-          [(ngModel)]="selectedProduct" 
-          class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 
-                 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-200 
-                 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          (change)="onProductChange()">
-          <option *ngFor="let product of products" [value]="product.value">
-            {{ product.label }}
-          </option>
-        </select>
-      </div>
-    </div>
-
-    
-
-    <!-- Fila superior: Gráfico principal + Cuadro de información -->
-    <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 mb-6">
-      <!-- Gráfico principal -->
-      <div class="w-full lg:w-[65%] xl:w-[70%] card">
-        <p-chart type="line" [data]="data" [options]="options" class="h-[20rem] md:h-[25rem] lg:h-[30rem]" />
-      </div>
-
-      <!-- Cuadro de información lateral -->
-      <div class="w-full lg:w-[35%] xl:w-[30%] bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-        <h3 class="text-base md:text-lg font-semibold mb-3 md:mb-4 dark:text-gray-300">Información Adicional</h3>
-        <div class="space-y-2 md:space-y-3 text-sm md:text-base text-gray-600 dark:text-gray-400">
-          <p>• Última actualización: 24/06/2024</p>
-          <p>• Total registros: 1,234</p>
-          <p>• Variación mensual: +12%</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Fila inferior: Gráficas combinadas/separadas -->
-    <div class="flex flex-col gap-4 lg:gap-6">
-      <!-- Controles y gráfica combinada -->
-      <div class="w-full bg-white dark:bg-gray-800 p-3 md:p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-3 md:mb-4">
-          <h3 class="text-base md:text-lg font-semibold dark:text-gray-300 mb-2 md:mb-0">Comparativa Teórica vs Real</h3>
-          <button 
-            (click)="toggleView()"
-            class="w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 text-sm md:text-base text-white rounded-lg bg-blue-500  hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors"
-          >
-            {{ showCombined ? 'Separar' : 'Comparar' }}
-          </button>
+<!-- dashboard.component.html - usando solo clases de Tailwind CSS (Parte 1) -->
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-6">
+  <div class="max-w-7xl mx-auto space-y-6">
+    <!-- Header con logo y título -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div class="flex items-center gap-3">
+          <div class="flex-shrink-0 w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
+            <svg class="w-7 h-7 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 13.125C3 12.504 3.504 12 4.125 12H6.375C6.996 12 7.5 12.504 7.5 13.125V19.875C7.5 20.496 6.996 21 6.375 21H4.125C3.504 21 3 20.496 3 19.875V13.125Z" fill="currentColor"/>
+              <path d="M9.75 8.625C9.75 8.004 10.254 7.5 10.875 7.5H13.125C13.746 7.5 14.25 8.004 14.25 8.625V19.875C14.25 20.496 13.746 21 13.125 21H10.875C10.254 21 9.75 20.496 9.75 19.875V8.625Z" fill="currentColor"/>
+              <path d="M16.5 4.125C16.5 3.504 17.004 3 17.625 3H19.875C20.496 3 21 3.504 21 4.125V19.875C21 20.496 20.496 21 19.875 21H17.625C17.004 21 16.5 20.496 16.5 19.875V4.125Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Monitoreo de rendimiento y proyecciones</p>
+          </div>
         </div>
         
+        <div class="flex items-center gap-2">
+          <button class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-indigo-100 hover:text-indigo-600 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+          <button class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-indigo-100 hover:text-indigo-600 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-4-4 4m0 0-4-4m4 4V4"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros (Géneros y Necesidades Comerciales) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Panel de Géneros -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white">Géneros</h2>
+          </div>
+          <div class="flex items-center">
+            <label class="inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                id="selectAllGenders"
+                (change)="toggleAllGenders($event)"
+                class="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+              />
+              <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Seleccionar todo</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="px-6 py-4 max-h-48 overflow-y-auto">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div *ngFor="let gender of genders" class="flex items-center">
+              <input 
+                type="checkbox" 
+                [id]="'gender_' + gender.idGenero" 
+                [checked]="selectedGenderIds.includes(gender.idGenero)"
+                (change)="toggleGenderSelection(gender.idGenero)"
+                class="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+              />
+              <label [for]="'gender_' + gender.idGenero" class="ml-2 text-sm text-gray-700 dark:text-gray-300 truncate">
+                {{ gender.nombreGenero }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Panel de Necesidades Comerciales -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white">Necesidades Comerciales</h2>
+          </div>
+          <div class="flex items-center">
+            <label class="inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                id="selectAllComNeeds"
+                (change)="toggleAllComNeeds($event)"
+                class="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+              />
+              <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Seleccionar todo</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="px-6 py-4 max-h-48 overflow-y-auto">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div *ngFor="let need of comNeeds" class="flex items-center">
+              <input 
+                type="checkbox" 
+                [id]="'need_' + need.id" 
+                [checked]="selectedComNeedIds.includes(need.id)"
+                (change)="toggleComNeedSelection(need.id)"
+                class="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+              />
+              <label [for]="'need_' + need.id" class="ml-2 text-sm text-gray-700 dark:text-gray-300 truncate">
+                {{ need.clientName || 'Cliente ' + need.clientCode }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Métricas -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Métrica 1: Géneros seleccionados -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 flex items-center gap-4 transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <div class="flex-shrink-0 bg-indigo-100 dark:bg-indigo-900/30 w-12 h-12 rounded-lg flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Géneros seleccionados</p>
+          <p class="text-xl font-bold text-gray-900 dark:text-white">{{ selectedGenderIds.length || 'Todos' }}</p>
+        </div>
+      </div>
+      
+      <!-- Métrica 2: Necesidades seleccionadas -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 flex items-center gap-4 transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <div class="flex-shrink-0 bg-emerald-100 dark:bg-emerald-900/30 w-12 h-12 rounded-lg flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Necesidades seleccionadas</p>
+          <p class="text-xl font-bold text-gray-900 dark:text-white">{{ selectedComNeedIds.length || 'Todas' }}</p>
+        </div>
+      </div>
+      
+      <!-- Métrica 3: Total registros -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 flex items-center gap-4 transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <div class="flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 w-12 h-12 rounded-lg flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
+            <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total registros</p>
+          <p class="text-xl font-bold text-gray-900 dark:text-white">{{ filteredComNeeds.length }}</p>
+        </div>
+      </div>
+      
+      <!-- Métrica 4: Total KGs -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 flex items-center gap-4 transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <div class="flex-shrink-0 bg-amber-100 dark:bg-amber-900/30 w-12 h-12 rounded-lg flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total KGs</p>
+          <p class="text-xl font-bold text-gray-900 dark:text-white">{{ getTotalKgs() | number:'1.0-0' }}</p>
+        </div>
+      </div>
+    </div>
+    <!-- dashboard.component.html - usando solo clases de Tailwind CSS (Parte 2) -->
+
+    <!-- Gráfico principal y panel de información -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Gráfico principal -->
+      <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex flex-wrap justify-between items-center gap-4">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="20" x2="12" y2="10"></line>
+              <line x1="18" y1="20" x2="18" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="16"></line>
+            </svg>
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white">Evolución General</h2>
+          </div>
+          <div class="inline-flex p-0.5 bg-gray-100 dark:bg-gray-700 rounded-lg">
+            <button class="py-1.5 px-3 text-xs font-medium rounded-md bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 shadow-sm">Día</button>
+            <button class="py-1.5 px-3 text-xs font-medium text-gray-700 dark:text-gray-300">Semana</button>
+            <button class="py-1.5 px-3 text-xs font-medium text-gray-700 dark:text-gray-300">Mes</button>
+            <button class="py-1.5 px-3 text-xs font-medium text-gray-700 dark:text-gray-300">Año</button>
+          </div>
+        </div>
+        <div class="p-6 h-80">
+          <p-chart type="line" [data]="data" [options]="options" class="h-full w-full" />
+        </div>
+      </div>
+
+      <!-- Panel informativo -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col transition-all duration-200 hover:shadow-md">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <h2 class="text-base font-semibold text-gray-900 dark:text-white">Información de Filtros</h2>
+        </div>
+        
+        <div class="flex-1 p-6 space-y-4">
+          <!-- Item 1 -->
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0 w-9 h-9 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 6a3 3 0 100 6h.01a3 3 0 100-6H9z" />
+                <path d="M2 9.5A3.5 3.5 0 005.5 13H9v2.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 15.586V13h2.5a4.5 4.5 0 10-.616-8.958 4.002 4.002 0 10-7.753 1.977A3.5 3.5 0 002 9.5zm9 3.5H9V8a1 1 0 012 0v5z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Géneros seleccionados</p>
+              <p class="text-base font-semibold text-indigo-600 dark:text-indigo-400">{{ selectedGenderIds.length || 'Todos' }}</p>
+            </div>
+          </div>
+          
+          <!-- Item 2 -->
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0 w-9 h-9 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Necesidades seleccionadas</p>
+              <p class="text-base font-semibold text-emerald-600 dark:text-emerald-400">{{ selectedComNeedIds.length || 'Todas' }}</p>
+            </div>
+          </div>
+          
+          <!-- Item 3 -->
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0 w-9 h-9 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total KGs</p>
+              <p class="text-base font-semibold text-amber-600 dark:text-amber-400">{{ getTotalKgs() | number:'1.0-0' }}</p>
+            </div>
+          </div>
+          
+          <!-- Item 4 -->
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0 w-9 h-9 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total registros</p>
+              <p class="text-base font-semibold text-blue-600 dark:text-blue-400">{{ filteredComNeeds.length }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+          <button class="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Exportar datos
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparativa Teórica vs Real -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+          <h2 class="text-base font-semibold text-gray-900 dark:text-white">Comparativa Teórica vs Real</h2>
+        </div>
+        <button 
+          (click)="toggleView()"
+          class="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-800/40 font-medium rounded-lg transition-colors flex items-center gap-2"
+        >
+          <svg *ngIf="showCombined" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="12" y1="3" x2="12" y2="21"></line>
+          </svg>
+          <svg *ngIf="!showCombined" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="21" y1="10" x2="3" y2="10"></line>
+            <line x1="21" y1="6" x2="3" y2="6"></line>
+            <line x1="21" y1="14" x2="3" y2="14"></line>
+            <line x1="21" y1="18" x2="3" y2="18"></line>
+          </svg>
+          {{ showCombined ? 'Separar Gráficas' : 'Comparar Gráficas' }}
+        </button>
+      </div>
+      
+      <div class="p-6">
         <div *ngIf="showCombined; else separateCharts">
-          <p-chart type="line" [data]="combinedData" [options]="combinedOptions" class="h-[16rem] md:h-[18rem] lg:h-[20rem]" />
+          <p-chart type="line" [data]="combinedData" [options]="combinedOptions" class="h-80" />
         </div>
 
         <ng-template #separateCharts>
-          <div class="flex flex-col md:flex-row gap-3 md:gap-4">
-            <div class="w-full md:w-1/2">
-              <h4 class="text-sm md:text-base font-medium mb-1 md:mb-2 dark:text-gray-300">Teórica</h4>
-              <p-chart type="line" [data]="teoricaData" [options]="teoricaOptions" class="h-[14rem] md:h-[16rem]" />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div class="px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white">Teórica</h3>
+                <div class="flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-medium rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                    <polyline points="17 6 23 6 23 12"></polyline>
+                  </svg>
+                  <span>+4.5%</span>
+                </div>
+              </div>
+              <div class="p-4">
+                <p-chart type="line" [data]="teoricaData" [options]="teoricaOptions" class="h-60" />
+              </div>
             </div>
-            <div class="w-full md:w-1/2">
-              <h4 class="text-sm md:text-base font-medium mb-1 md:mb-2 dark:text-gray-300">Real</h4>
-              <p-chart type="line" [data]="realData" [options]="realOptions" class="h-[14rem] md:h-[16rem]" />
+            
+            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div class="px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white">Real</h3>
+                <div class="flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-medium rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                    <polyline points="17 18 23 18 23 12"></polyline>
+                  </svg>
+                  <span>-2.1%</span>
+                </div>
+              </div>
+              <div class="p-4">
+                <p-chart type="line" [data]="realData" [options]="realOptions" class="h-60" />
+              </div>
             </div>
           </div>
         </ng-template>

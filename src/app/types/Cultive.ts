@@ -8,7 +8,7 @@ export interface Cultive {
     idNave?: number;             // Opcional
     nombreNave: string;
     generoId?: number;           // Opcional
-    generoName: string;
+    nombreGenero: string;
     nombreVariedad: string;
     superficie?: number;         // Opcional
     produccionEstimada?: number; // Opcional
