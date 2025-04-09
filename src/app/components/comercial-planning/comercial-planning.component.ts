@@ -53,8 +53,9 @@ export class ComercialPlanningComponent {
     nombreGenero: '',
     kgs: 0
   };
-  editarPlanning:boolean=false;
+  editarPlanning: boolean = false;
   formulario: FormGroup;
+  validForm: boolean = false;//Para validar el formualarrio
 
   constructor(private comercialServicio: ComercialServiceService, private comercialPlanning: ComercialPlanningService, private comercialDetails: ComercialPlanningDetailsService, private fb: FormBuilder) {
     this.formulario = this.fb.group({
@@ -94,7 +95,7 @@ export class ComercialPlanningComponent {
     this.distribuido = 0;
     this.pendiente = 0;
     this.planningEditar = [];
-    this.validar=null;
+    this.validar = null;
 
 
     if (evento) {
@@ -102,10 +103,10 @@ export class ComercialPlanningComponent {
       this.comercialDetails.get().subscribe(
         (data) => {
           this.plannigDetails = data;
-          console.log(this.plannigDetails)
+
           if (this.planning.find(item => item.idCommercialNeed == evento.id)) {
             const edit = this.planning.find(item => item.idCommercialNeed == evento.id);
-    
+
             for (let i = 0; i < this.plannigDetails.length; i++) {
               if (this.plannigDetails[i].idCommercialNeedsPlanning == edit?.id) {
                 this.planningEditar.push({
@@ -116,20 +117,22 @@ export class ComercialPlanningComponent {
                   fechaDesde: this.plannigDetails[i].fechaDesde,
                   fechaHasta: this.plannigDetails[i].fechaHasta
                 });
-              
+
                 this.distribuido += this.plannigDetails[i].kilos;
               }
             }
-    
+
           }
+
+
+          this.pendiente = evento.kgs - this.distribuido;
+
         },
         (error) => {
           console.log('Error ' + error);
         }
 
       );
-
-     
 
 
       this.selectedComercial = {//El comercial seleccionado en el ngSelect.
@@ -143,7 +146,6 @@ export class ComercialPlanningComponent {
         kgs: evento.kgs
       };
 
-      this.pendiente = this.selectedComercial.kgs - this.distribuido;
 
 
       const startDate = new Date(evento.startDate);
@@ -227,7 +229,7 @@ export class ComercialPlanningComponent {
           (data) => {
             console.log('Se han insertado los datos correctamente');
             this.planning.push(data.entity);
-            console.log(data.entity.idCommercialNeed);
+
 
           },
           (error) => {
@@ -247,8 +249,8 @@ export class ComercialPlanningComponent {
     const input = document.querySelectorAll('input[type="number"]') as NodeListOf<HTMLInputElement>;
     for (let i = 0; i < input.length; i++) {
       this.distribuido += Number(input[i].value);
-      if(this.planningEditar[i]){
-        this.planningEditar[i].kilos= Number(input[i].value);
+      if (this.planningEditar[i]) {
+        this.planningEditar[i].kilos = Number(input[i].value);
       }
 
     }
@@ -266,44 +268,57 @@ export class ComercialPlanningComponent {
   async guardar() {
     this.validar = null;
 
-    
+
     const id = this.planning.find(item => item.idCommercialNeed == this.selectedComercial.id);
-   
-    console.log(this.planning);
+
+
     if (this.plannigDetails.find(item => item.idCommercialNeedsPlanning == id?.id)) {
 
       this.validar = 'Esta necesidad comercial ya existe en el sistema';
       this.modal = false;
-     return;
-     
-    }
-    if(this.formulario.get('kilos')?.invalid){
-      console.log('Error');
-      return;
-    }
+      setTimeout(() => {
+        this.validar = null;
+        return;
+      }, 2000);
 
-    const input = document.querySelectorAll('input[type="number"]') as NodeListOf<HTMLInputElement>;
-    this.modal = true;
-    for (let i = 0; i < input.length; i++) {
-      this.guardarPlanning = {
-        idCommercialNeedsPlanning: id?.id || 0,
-        kilos: Number(input[i].value),
-        fechaDesde: this.rangoSemana[i].inicio,
-        fechaHasta: this.rangoSemana[i].fin,
-        numeroSemana: i + 1
-      };
-      console.log(this.guardarPlanning);
-      try {
-        const resultado = await this.comercialDetails.post(this.guardarPlanning).toPromise();
-      
-        console.log('Datos insertados correctamente');
 
-      } catch (error) {
-        console.log('Error al guardar los datos ' + error);
-        this.modal = false;
+    }
+    else {
+      if (this.formulario.get('kilos')?.invalid) {
+
+        this.validForm = true;
+        console.log('Error');
+        setTimeout(() => {
+          this.validForm = false;
+          return;
+        }, 2000)
+
       }
+      else {
+        const input = document.querySelectorAll('input[type="number"]') as NodeListOf<HTMLInputElement>;
+        this.modal = true;
+        for (let i = 0; i < input.length; i++) {
+          this.guardarPlanning = {
+            idCommercialNeedsPlanning: id?.id || 0,
+            kilos: Number(input[i].value),
+            fechaDesde: this.rangoSemana[i].inicio,
+            fechaHasta: this.rangoSemana[i].fin,
+            numeroSemana: i + 1
+          };
+          console.log(this.guardarPlanning);
+          try {
+            const resultado = await this.comercialDetails.post(this.guardarPlanning).toPromise();
+
+            console.log('Datos insertados correctamente');
+
+          } catch (error) {
+            console.log('Error al guardar los datos ' + error);
+            this.modal = false;
+          }
 
 
+        }
+      }
     }
 
   }
@@ -333,8 +348,8 @@ export class ComercialPlanningComponent {
         (data) => {
           console.log('Se ha editado correctamente');
           alert(editar.kilos);
-          this.editarPlanning=true;
-          this.validar=null;
+          this.editarPlanning = true;
+          this.validar = null;
         },
         (error) => {
           console.log('Error al editar');
@@ -345,8 +360,8 @@ export class ComercialPlanningComponent {
 
   }
 
-  modalEditar(){
-    this.editarPlanning=false;
+  modalEditar() {
+    this.editarPlanning = false;
   }
 
 }

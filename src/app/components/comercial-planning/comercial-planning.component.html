@@ -1,6 +1,29 @@
-<div class="container mx-auto p-6 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+<div class="mt-8 rounded-lg container mx-auto p-6 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
   <h1 class="text-3xl font-semibold mb-8 text-gray-800 dark:text-white tracking-tight">Crear Planificación</h1>
+
+  <!-- Mensaje de error relacionado con los cards con animación -->
+  @if(formulario.get('kilos')?.invalid && validForm){
+
+  <div 
+  class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 
+         bg-red-100 border border-red-400 text-red-700 px-4 py-3 
+         rounded-lg shadow-sm dark:bg-red-900/30 dark:border-red-800 
+         dark:text-red-400 
+         transition-all duration-300 ease-out opacity-100 translate-y-0
+         animate-slideDown"
+  role="alert">
+  <div class="flex items-center">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+  </svg>
+  <span>Las planificacones no deben estar vacías o ser menor que 0</span>
+  </div>
+  </div>
+
+}
+
  <!-- Mensaje de error fijo con animación -->
+
  <div *ngIf="validar"
  class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 
         bg-red-100 border border-red-400 text-red-700 px-4 py-3 
@@ -219,7 +242,7 @@
       </svg>
       Distribución por Semanas
     </h2>
-    <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full dark:bg-indigo-900 dark:text-indigo-300">
+    <span class="bg-[#437d3f]/20 text-[#437d3f] text-md font-medium px-2.5 py-1 rounded-full dark:bg-[#437d3f]/30 dark:text-[#8bc986]">
       {{semanas.length}} semanas
     </span>
   </div>
