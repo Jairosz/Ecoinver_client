@@ -3,6 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
 import { FormsModule } from '@angular/forms';
 import { ComercialServiceService, Comercial } from '../../services/Comercial.service';
+import { GenderService } from '../../services/Gender.service';
+import { ComercialPlanningService } from '../../services/ComercialPlanning.service';
+import { ComercialPlanning } from '../../types/ComercialPlanning';
+import { CultivePlanningDetailsService } from '../../services/CultivePlanningDetails.service';
+import { ComercialPlanningDetailsService, ComercialPlanningDetailsWithId } from '../../services/ComercialPlanningDetails.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,8 +17,8 @@ import { ComercialServiceService, Comercial } from '../../services/Comercial.ser
 })
 export class DashboardComponent implements OnInit {
 
-  constructor(private comercialServicio: ComercialServiceService) {}
-  
+  constructor(private comercialServicio: ComercialServiceService, private generoServicio: GenderService,private planingComercial:ComercialPlanningService,private plannigSemanas:ComercialPlanningDetailsService) { }
+
   // Propiedades para los gráficos
   data: any;
   options: any;
@@ -24,16 +29,8 @@ export class DashboardComponent implements OnInit {
   showCombined = false;
   combinedData: any;
   combinedOptions: any;
+
   
-  // Selector de género
-  selectedProduct: string = 'cereales';
-  products = [
-    { value: 'cereales', label: 'Cereales' },
-    { value: 'hortalizas', label: 'Hortalizas' },
-    { value: 'frutales', label: 'Frutales' },
-    { value: 'leguminosas', label: 'Leguminosas' },
-    { value: 'tuberculos', label: 'Tubérculos' }
-  ];
 
   // Objeto comercial
   comercial: Comercial = {
@@ -48,15 +45,18 @@ export class DashboardComponent implements OnInit {
   }
 
   // Array de objetos comercial
-  comNeeds: Comercial[] = [];
-  
+    comNeeds: Comercial[] = [];
+    planning:ComercialPlanning[]=[];
+    planingDetails:ComercialPlanningDetailsWithId[]=[];
   // Propiedades adicionales para el nuevo diseño
   // Arrays para manejar los filtros de géneros y necesidades
   genders: any[] = [];
   selectedGenderIds: number[] = [];
   selectedComNeedIds: number[] = [];
   filteredComNeeds: Comercial[] = [];
-  
+  family: { familia: string, nombreGenero: string[] }[] = [];
+  texto: string = '';
+  familiaSeleccionada: string = '';
   // Métricas del dashboard
   dashboardMetrics = {
     totalRegistros: 0,
@@ -64,6 +64,8 @@ export class DashboardComponent implements OnInit {
     plazoMedio: '28 días',    // Valor de ejemplo
     ultimaActualizacion: '24/06/2024'
   };
+  seleccionados: number = 0;
+
 
   ngOnInit(): void {
     // Obtenemos los registros de los datos de la base de datos
@@ -72,39 +74,114 @@ export class DashboardComponent implements OnInit {
         this.comNeeds = data;
         this.filteredComNeeds = [...this.comNeeds]; // Inicialmente mostramos todos
         this.dashboardMetrics.totalRegistros = this.comNeeds.length;
-        
+
         // Extraer géneros únicos de los datos comerciales
-        this.extractGenders();
-        
+
+
         console.log(this.comNeeds);
       },
       (error) => {
         console.error('Error al cargar datos: ' + error);
       }
     );
+    this.generoServicio.get().subscribe(
+      (data) => {
+        this.genders = data;
+
+        this.extractGenders();
+      },
+      (error) => {
+        console.log(error);
+      }
+
+    );
+    this.planingComercial.get().subscribe(
+      (data)=>{
+        this.planning=data;
+        console.log(this.planning);
+      },
+      (error)=>{
+        console.log(error);
+      }
     
-    // Configuración inicial de gráficos
-    this.initializeCharts();
+
+    );
+    this.plannigSemanas.get().subscribe(
+      (data)=>{ 
+        this.planingDetails=data;
+      },
+      (error)=>{
+        console.log(error);
+      }
+    )
+    
   }
-  
+
   // Método para extraer géneros únicos de los datos comerciales
   extractGenders() {
-    const uniqueGeneros = new Map();
-    
-    this.comNeeds.forEach(need => {
-      if (need.idGenero && !uniqueGeneros.has(need.idGenero)) {
-        uniqueGeneros.set(need.idGenero, {
-          idGenero: need.idGenero,
-          nombreGenero: need.nombreGenero || `Género ${need.idGenero}`
+
+
+    for (let i = 0; i < this.genders.length; i++) {
+      // Buscamos el objeto correspondiente al idGenero actual
+      const generoEncontrado = this.genders[i];
+
+
+      // Buscamos si ya existe un objeto en "this.family" para la familia encontrada
+      const familiaExistente = this.family.find(f =>
+        f.familia === generoEncontrado.nombreFamilia
+      );
+
+      if (familiaExistente) {
+        // Si ya existe la familia, verificamos que el nombre de género no se haya agregado previamente.
+        if (!familiaExistente.nombreGenero.includes(generoEncontrado.nombreGenero)) {
+          familiaExistente.nombreGenero.push(generoEncontrado.nombreGenero);
+        }
+      } else {
+        // Si no existe, creamos un nuevo objeto para esta familia con el nombre de género en un arreglo.
+        this.family.push({
+          familia: generoEncontrado.nombreFamilia,
+          nombreGenero: [generoEncontrado.nombreGenero]
         });
       }
-    });
-    
-    this.genders = Array.from(uniqueGeneros.values());
+
+    }
+    console.log(this.family);
+
+
   }
-  
+
   // Inicializar las configuraciones de los gráficos
   initializeCharts() {
+    let genero:string;
+    const checkboxes = document.querySelectorAll('input[type="radio"]');
+    for (let i = 0; i < checkboxes.length; i++) {
+      const checkbox = checkboxes[i] as HTMLInputElement;
+
+      if (checkbox.checked) {
+        genero = checkbox.value;
+
+      }
+    }
+
+    const generosSeleccionados = this.comNeeds.filter(item => item.nombreGenero == genero);//Obtenemos las necesidades con el nombre de género especificado
+    let plannig:ComercialPlanning[]=[];
+    let planningDetails:ComercialPlanningDetailsWithId[]=[];
+    for (let i = 0; i < generosSeleccionados.length; i++) {
+      const encontrado= this.planning.find(item=>item.idCommercialNeed==generosSeleccionados[i].id);
+      if(encontrado){
+        plannig.push(encontrado);
+        
+      }
+    }
+    for(let i=0;i<plannig.length;i++){
+      this.planingDetails.filter(item=>item.idCommercialNeedsPlanning==this.planning[i].id);
+
+     if(this.planingDetails.filter(item=>item.idCommercialNeedsPlanning==this.planning[i].id)){
+      planningDetails=this.planingDetails.filter(item=>item.idCommercialNeedsPlanning==this.planning[i].id);
+      console.log(planningDetails);
+     }
+    }
+
     // Configuraciones para gráficos de barra
     const barOptions = {
       responsive: true,
@@ -140,7 +217,7 @@ export class DashboardComponent implements OnInit {
         }
       }
     };
-    
+
     // Gráfico principal
     this.data = {
       labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
@@ -154,7 +231,7 @@ export class DashboardComponent implements OnInit {
         },
         {
           label: 'Dataset 2',
-          data: [28, 48, 40, 19, 86, 27, 90],
+          data: [0, 48, 40, 19, 86, 27, 90],
           borderColor: '#10b981', // Color emerald para Tailwind
           tension: 0.4,
           yAxisID: 'y1'
@@ -223,7 +300,7 @@ export class DashboardComponent implements OnInit {
         }
       ]
     };
-  
+
     this.realData = {
       labels: ['Q1', 'Q2', 'Q3', 'Q4'],
       datasets: [
@@ -237,7 +314,7 @@ export class DashboardComponent implements OnInit {
         }
       ]
     };
-  
+
     this.teoricaOptions = { ...barOptions };
     this.realOptions = { ...barOptions };
 
@@ -307,58 +384,43 @@ export class DashboardComponent implements OnInit {
         }
       }
     };
-    
+
     // Forzar actualizaciones iniciales
     this.updateChartOptions();
   }
 
-  // Cambio de producto seleccionado
-  onProductChange() {
-    console.log('Producto seleccionado:', this.selectedProduct);
-    
-    // Simulación de filtrado por género seleccionado
-    const generoId = this.products.findIndex(p => p.value === this.selectedProduct) + 1;
-    this.filteredComNeeds = this.comNeeds.filter(need => 
-      need.idGenero === generoId || this.selectedProduct === 'todos'
-    );
-    
-    // Actualizar métricas
-    this.dashboardMetrics.totalRegistros = this.filteredComNeeds.length;
-    
-    // Actualizar gráficos con datos filtrados
-    this.updateChartWithFilteredData();
-  }
   
+
   // Método para actualizar gráficos con los datos filtrados
   updateChartWithFilteredData() {
     // Simular valores diferentes para gráficos basados en el producto seleccionado
     const multiplier = (Math.random() * 0.5) + 0.75; // Factor entre 0.75 y 1.25
-    
-    const updatedTeoricaData = this.teoricaData.datasets[0].data.map((val: number) => 
+
+    const updatedTeoricaData = this.teoricaData.datasets[0].data.map((val: number) =>
       Math.round(val * multiplier)
     );
-    
-    const updatedRealData = this.realData.datasets[0].data.map((val: number) => 
+
+    const updatedRealData = this.realData.datasets[0].data.map((val: number) =>
       Math.round(val * (multiplier * 0.8))
     );
-    
+
     // Actualizar datasets
     this.teoricaData.datasets[0].data = updatedTeoricaData;
     this.realData.datasets[0].data = updatedRealData;
     this.combinedData.datasets[0].data = updatedTeoricaData;
     this.combinedData.datasets[1].data = updatedRealData;
-    
+
     // Forzar actualización de los gráficos
-    this.teoricaData = {...this.teoricaData};
-    this.realData = {...this.realData};
-    this.combinedData = {...this.combinedData};
+    this.teoricaData = { ...this.teoricaData };
+    this.realData = { ...this.realData };
+    this.combinedData = { ...this.combinedData };
   }
 
   // Alternar vista de gráficos
   toggleView() {
     this.showCombined = !this.showCombined;
   }
-  
+
   // Métodos para manejar los nuevos checkboxes de selección
   toggleAllGenders(event: any) {
     if (event.target.checked) {
@@ -366,18 +428,18 @@ export class DashboardComponent implements OnInit {
     } else {
       this.selectedGenderIds = [];
     }
-    this.updateFilteredData();
+
   }
-  
+
   toggleAllComNeeds(event: any) {
     if (event.target.checked) {
       this.selectedComNeedIds = this.comNeeds.map(n => n.id);
     } else {
       this.selectedComNeedIds = [];
     }
-    this.updateFilteredData();
+
   }
-  
+
   toggleGenderSelection(generoId: number) {
     const index = this.selectedGenderIds.indexOf(generoId);
     if (index > -1) {
@@ -385,9 +447,9 @@ export class DashboardComponent implements OnInit {
     } else {
       this.selectedGenderIds.push(generoId);
     }
-    this.updateFilteredData();
+
   }
-  
+
   toggleComNeedSelection(needId: number) {
     const index = this.selectedComNeedIds.indexOf(needId);
     if (index > -1) {
@@ -395,29 +457,32 @@ export class DashboardComponent implements OnInit {
     } else {
       this.selectedComNeedIds.push(needId);
     }
-    this.updateFilteredData();
+
   }
-  
+
   // Actualizar datos filtrados basados en selecciones
-  updateFilteredData() {
-    this.filteredComNeeds = this.comNeeds.filter(need => {
-      // Si no hay filtros de género, mostramos todos
-      const generoMatch = this.selectedGenderIds.length === 0 || this.selectedGenderIds.includes(need.idGenero);
-      
-      // Si no hay filtros de necesidades, mostramos todos
-      const needMatch = this.selectedComNeedIds.length === 0 || this.selectedComNeedIds.includes(need.id);
-      
-      return generoMatch && needMatch;
-    });
-    
-    // Actualizar métricas y gráficos
-    this.dashboardMetrics.totalRegistros = this.filteredComNeeds.length;
-    this.updateChartWithFilteredData();
-  }
-  
+
+
   // Calcular total de KGs (para el panel de información)
   getTotalKgs(): number {
-    return this.filteredComNeeds.reduce((total, need) => total + (need.kgs || 0), 0);
+    let genero = '';
+    const checkboxes = document.querySelectorAll('input[type="radio"]');
+    for (let i = 0; i < checkboxes.length; i++) {
+      const checkbox = checkboxes[i] as HTMLInputElement;
+
+      if (checkbox.checked) {
+        genero = checkbox.value;
+
+      }
+    }
+
+    const generosSeleccionados = this.comNeeds.filter(item => item.nombreGenero == genero);
+    let suma = 0;
+    for (let i = 0; i < generosSeleccionados.length; i++) {
+      suma += generosSeleccionados[i].kgs;
+    }
+   
+    return suma;
   }
 
   // Actualizar opciones de gráficos para responsive
@@ -429,7 +494,7 @@ export class DashboardComponent implements OnInit {
   updateChartOptions() {
     const isMobile = window.innerWidth < 768;
     const baseSize = isMobile ? 10 : 12;
-    
+
     this.combinedOptions = {
       ...this.combinedOptions,
       plugins: {
@@ -458,15 +523,57 @@ export class DashboardComponent implements OnInit {
         }
       }
     };
-    
+
     // Actualizar también opciones de otros gráficos
-    this.teoricaOptions.plugins.legend.labels.font = { size: isMobile ? 12 : 14 };
-    this.realOptions.plugins.legend.labels.font = { size: isMobile ? 12 : 14 };
-    
+    //this.teoricaOptions.plugins.legend.labels.font = { size: isMobile ? 12 : 14 };
+    //this.realOptions.plugins.legend.labels.font = { size: isMobile ? 12 : 14 };
+
     // Forzar actualización de las gráficas
-    this.data = {...this.data};
-    this.combinedData = {...this.combinedData};
-    this.teoricaData = {...this.teoricaData};
-    this.realData = {...this.realData};
+    this.data = { ...this.data };
+    this.combinedData = { ...this.combinedData };
+    this.teoricaData = { ...this.teoricaData };
+    this.realData = { ...this.realData };
+  }
+  get busquedaFamilia() {
+    const familia = this.familiaSeleccionada.toLowerCase().trim();
+    if (!this.texto && familia === 'todas') {
+      return this.family;
+    }
+    if (!this.texto && familia != 'todas') {
+      return this.family.filter(item =>
+        item.familia.toLowerCase().includes(familia)
+      );
+    }
+    const termino = this.texto.toLowerCase();
+
+    return this.family.filter(item =>
+      item.familia.toLowerCase().includes(termino) ||
+      item.nombreGenero.some(nombre => nombre.toLowerCase().includes(termino))
+    );
+
+  }
+  borrarFiltros() {
+    this.texto = '';
+    this.familiaSeleccionada = '';
+    const checkboxes = document.querySelectorAll('input[type="radio"]');
+    for (let i = 0; i < checkboxes.length; i++) {
+      let checkbox = checkboxes[i] as HTMLInputElement;
+      checkbox.checked = false;
+    }
+    this.seleccionados = 0;
+  }
+
+  contarSeleccionados() {//Para contar los géneros seleccionados
+    this.seleccionados = 0;
+    const checkboxes = document.querySelectorAll('input[type="radio"]');
+    for (let i = 0; i < checkboxes.length; i++) {
+      const checkbox = checkboxes[i] as HTMLInputElement;
+
+      if (checkbox.checked) {
+        this.seleccionados++;
+      }
+    }
+    // Configuración inicial de gráficos
+    this.initializeCharts();
   }
 }
