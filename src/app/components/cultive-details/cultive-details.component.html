@@ -1,19 +1,17 @@
-
 <!-- En el head de index.html -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
   integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
   crossorigin="anonymous" referrerpolicy="no-referrer" />
 <div class="mb-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
   <!-- Lista de pestañas -->
-  <!-- Lista de pestañas -->
   <ul class="flex flex-wrap -mb-px text-sm font-medium text-center">
     <li class="me-2" role="presentation">
       <button (click)="setActiveTab('Datos de cultivo')" [class.active-tab]="activeTab === 'Datos de cultivo'"
         class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg dark:text-white hover:text-[#437d3f] dark:hover:text-[#65b15f] hover:border-[#437d3f] dark:hover:border-[#65b15f] transition-all"
         [ngClass]="{
-        'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
-          activeTab === 'Datos de cultivo'
-      }">
+          'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
+            activeTab === 'Datos de cultivo'
+        }">
         <i class="fas fa-seedling mr-2"></i>Datos de cultivo
       </button>
     </li>
@@ -21,9 +19,9 @@
       <button (click)="setActiveTab('Mapping')" [class.active-tab]="activeTab === 'Mapping'"
         class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg dark:text-white hover:text-[#437d3f] dark:hover:text-[#65b15f] hover:border-[#437d3f] dark:hover:border-[#65b15f] transition-all"
         [ngClass]="{
-        'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
-          activeTab === 'Mapping'
-      }">
+          'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
+            activeTab === 'Mapping'
+        }">
         <i class="fas fa-map-marker-alt mr-2"></i>Mapping
       </button>
     </li>
@@ -31,20 +29,20 @@
       <button (click)="setActiveTab('Insights')" [class.active-tab]="activeTab === 'Insights'"
         class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg dark:text-white hover:text-[#437d3f] dark:hover:text-[#65b15f] hover:border-[#437d3f] dark:hover:border-[#65b15f] transition-all"
         [ngClass]="{
-        'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
-          activeTab === 'Insights'
-      }">
+          'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
+            activeTab === 'Insights'
+        }">
         <i class="fas fa-chart-line mr-2"></i>Insights
       </button>
     </li>
     <!-- Nueva pestaña nerfs -->
     <li class="me-2" role="presentation">
-      <button  [class.active-tab]="activeTab === 'nerfs'"
+      <button (click)="setActiveTab('nerfs')" [class.active-tab]="activeTab === 'nerfs'"
         class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg dark:text-white hover:text-[#437d3f] dark:hover:text-[#65b15f] hover:border-[#437d3f] dark:hover:border-[#65b15f] transition-all"
         [ngClass]="{
-        'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
-          activeTab === 'nerfs'
-      }">
+          'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
+            activeTab === 'nerfs'
+        }">
         <i class="fas fa-hammer mr-2"></i>Variables
       </button>
     </li>
@@ -85,7 +83,6 @@
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
           <!-- Fila 1: Agricultor - Finca -->
           <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
             <p class="text-xs text-gray-500 dark:text-gray-400">Agricultor</p>
@@ -278,13 +275,8 @@
               <div *ngFor="let day of weatherForecast"
                 class="p-2 md:p-3 bg-gray-50 dark:bg-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors">
                 <div class="flex items-center justify-between mb-2">
-                  <p class="text-sm md:text-base font-medium text-gray-800 dark:text-white capitalize">
-
-
-
-                    
-
-
+                  <p class="text-sm md:text-base font-medium text-gray-800 dark:text-white capitalize">{{
+                    getDiaEnEspanol(day.date) }} {{ day.date | date : "d" }}
                   </p>
                   <div [innerHTML]="
                       weatherIcons.getIcon(getWeatherIcon(day.weatherCode))
@@ -335,19 +327,33 @@
 
         <!-- Cuadro de información lateral -->
         <div class="w-full lg:w-[35%] xl:w-[30%] bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
-          <h3 class="text-lg font-semibold mb-4 dark:text-gray-200">Estadísticas Clave</h3>
+          <h3 class="text-lg font-semibold mb-4 dark:text-gray-200">
+            Estadísticas Clave
+          </h3>
           <div class="space-y-4">
             <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
-              <p class="text-sm text-gray-600 dark:text-gray-300">Crecimiento Semanal</p>
-              <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">Ejemplo</p>
+              <p class="text-sm text-gray-600 dark:text-gray-300">
+                Crecimiento Semanal
+              </p>
+              <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">
+                Ejemplo
+              </p>
             </div>
             <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
-              <p class="text-sm text-gray-600 dark:text-gray-300">Salud del Cultivo</p>
-              <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">Ejemplo</p>
+              <p class="text-sm text-gray-600 dark:text-gray-300">
+                Salud del Cultivo
+              </p>
+              <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">
+                Ejemplo
+              </p>
             </div>
             <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
-              <p class="text-sm text-gray-600 dark:text-gray-300">Rendimiento vs Estimado</p>
-              <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">Ejemplo</p>
+              <p class="text-sm text-gray-600 dark:text-gray-300">
+                Rendimiento vs Estimado
+              </p>
+              <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">
+                Ejemplo
+              </p>
             </div>
           </div>
         </div>
@@ -356,19 +362,30 @@
       <!-- Sección adicional debajo -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
-          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Temperatura Promedio</p>
-          <p class="text-2xl font-bold text-gray-800 dark:text-white">Ejemplo</p>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+            Temperatura Promedio
+          </p>
+          <p class="text-2xl font-bold text-gray-800 dark:text-white">
+            Ejemplo
+          </p>
         </div>
         <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
-          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Humedad del Suelo</p>
-          <p class="text-2xl font-bold text-gray-800 dark:text-white">Ejemplo</p>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+            Humedad del Suelo
+          </p>
+          <p class="text-2xl font-bold text-gray-800 dark:text-white">
+            Ejemplo
+          </p>
         </div>
         <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
-          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Horas de Luz Diarias</p>
-          <p class="text-2xl font-bold text-gray-800 dark:text-white">Ejemplo</p>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+            Horas de Luz Diarias
+          </p>
+          <p class="text-2xl font-bold text-gray-800 dark:text-white">
+            Ejemplo
+          </p>
         </div>
       </div>
     </div>
   </div>
 </div>
-
