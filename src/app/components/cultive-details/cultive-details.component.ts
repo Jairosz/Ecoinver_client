@@ -49,7 +49,7 @@ interface WeatherForecast {
 export class CultiveDetailsComponent
   implements AfterViewInit, OnDestroy, OnInit
 {
-  activeTab: 'Datos de cultivo' | 'Mapping' | 'Insights' = 'Datos de cultivo';
+  activeTab: 'Datos de cultivo' | 'Mapping' | 'Insights' | 'Variables' = 'Datos de cultivo';
   private map: L.Map | null = null;
   private shape: L.Layer | null = null; // Puede ser un círculo, rectángulo o polígono
 
