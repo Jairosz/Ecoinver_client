@@ -27,6 +27,7 @@ export interface ComercialPlanningDetailsWithId {
 })
 export class ComercialPlanningComponent {
   modal = false;
+  editarBoton:boolean=false;
   validar: string | null = null//Para el botón guardar planificación
   semanas: { semana: number, fecha: string }[] = [];//Array que contendrá la semana y fecha de los cards
   rangoSemana: { inicio: Date, fin: Date }[] = [];
@@ -84,8 +85,7 @@ export class ComercialPlanningComponent {
       }
 
     );
-
-
+   
   }
 
   calcularSemanas(evento: Comercial) {//Calculo del rengo de las fechas para generar los Cards
@@ -123,8 +123,7 @@ export class ComercialPlanningComponent {
             }
 
           }
-
-
+          
           this.pendiente = evento.kgs - this.distribuido;
 
         },
@@ -304,11 +303,12 @@ export class ComercialPlanningComponent {
             fechaDesde: this.rangoSemana[i].inicio,
             fechaHasta: this.rangoSemana[i].fin,
             numeroSemana: i + 1
+            
           };
           console.log(this.guardarPlanning);
           try {
             const resultado = await this.comercialDetails.post(this.guardarPlanning).toPromise();
-
+            
             console.log('Datos insertados correctamente');
 
           } catch (error) {
@@ -347,7 +347,7 @@ export class ComercialPlanningComponent {
       this.comercialDetails.put(editar.id, editar).subscribe(
         (data) => {
           console.log('Se ha editado correctamente');
-          alert(editar.kilos);
+
           this.editarPlanning = true;
           this.validar = null;
         },
@@ -364,4 +364,15 @@ export class ComercialPlanningComponent {
     this.editarPlanning = false;
   }
 
+  habilitarBoton(){
+    if(this.editarBoton==false){
+      this.editarBoton=true;
+    }
+
+    else{
+      this.editarBoton=false;
+    }
+    
+  }
+ 
 }
