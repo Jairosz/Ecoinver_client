@@ -278,7 +278,9 @@
                 class="p-2 md:p-3 bg-gray-50 dark:bg-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors">
                 <div class="flex items-center justify-between mb-2">
                   <p class="text-sm md:text-base font-medium text-gray-800 dark:text-white capitalize">
-                    {{ day.date | date : "EEE d" | titlecase }}
+
+                    {{ getDiaEnEspanol(day.date) }} {{ day.date | date : "d" }}
+
                   </p>
                   <div [innerHTML]="
                       weatherIcons.getIcon(getWeatherIcon(day.weatherCode))

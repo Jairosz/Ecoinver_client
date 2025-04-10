@@ -1,5 +1,4 @@
 export interface ComercialPlanningDetails {
-    
     idCommercialNeedsPlanning:number;
     kilos:number;
     fechaDesde:Date;

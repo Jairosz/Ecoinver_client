@@ -167,6 +167,26 @@ export class CultiveDetailsComponent
     });
   }
 
+// Método para traducir los días de la semana a español
+getDiaEnEspanol(fecha: Date): string {
+  const diasSemana: { [key: string]: string } = {
+    'Sun': 'Dom',
+    'Mon': 'Lun',
+    'Tue': 'Mar',
+    'Wed': 'Mié',
+    'Thu': 'Jue',
+    'Fri': 'Vie',
+    'Sat': 'Sáb'
+  };
+  
+  // Obtener la abreviatura del día en inglés
+  const diaIngles = new Date(fecha).toLocaleDateString('en-US', {weekday: 'short'});
+  const key = diaIngles.substring(0, 3);
+  
+  // Devolver el día traducido o el original si no se encuentra
+  return diasSemana[key] || diaIngles;
+}
+
   // Añade este método para traducir códigos del clima
   private getWeatherCondition(code: number): string {
     const weatherCodes: { [key: number]: string } = {
