@@ -47,8 +47,7 @@ interface WeatherForecast {
   templateUrl: './cultive-details.component.html',
 })
 export class CultiveDetailsComponent
-  implements AfterViewInit, OnDestroy, OnInit
-{
+  implements AfterViewInit, OnDestroy, OnInit {
   activeTab: 'Datos de cultivo' | 'Mapping' | 'Insights' | 'nerfs' = 'Datos de cultivo';
   private map: L.Map | null = null;
   private shape: L.Layer | null = null; // Puede ser un círculo, rectángulo o polígono
@@ -83,14 +82,19 @@ export class CultiveDetailsComponent
     public weatherIcons: WeatherIconsService,
     private route: ActivatedRoute,
     private http: HttpClient
-  ) {}
+  ) { }
 
-  setActiveTab(tab: 'Datos de cultivo' | 'Mapping' | 'Insights'): void {
+  // Antes
+  // setActiveTab(tab: 'Datos de cultivo' | 'Mapping' | 'Insights'): void {
+
+  // Después
+  setActiveTab(tab: 'Datos de cultivo' | 'Mapping' | 'Insights' | 'nerfs'): void {
     this.activeTab = tab;
     if (tab === 'Mapping') {
-      setTimeout(() => this.initMap(), 0); // Pequeño delay para asegurar la renderización
+      setTimeout(() => this.initMap(), 0); // Pequeño delay
     }
   }
+
 
   ngAfterViewInit(): void {
     if (this.activeTab === 'Mapping') {
@@ -167,25 +171,25 @@ export class CultiveDetailsComponent
     });
   }
 
-// Método para traducir los días de la semana a español
-getDiaEnEspanol(fecha: Date): string {
-  const diasSemana: { [key: string]: string } = {
-    'Sun': 'Dom',
-    'Mon': 'Lun',
-    'Tue': 'Mar',
-    'Wed': 'Mié',
-    'Thu': 'Jue',
-    'Fri': 'Vie',
-    'Sat': 'Sáb'
-  };
-  
-  // Obtener la abreviatura del día en inglés
-  const diaIngles = new Date(fecha).toLocaleDateString('en-US', {weekday: 'short'});
-  const key = diaIngles.substring(0, 3);
-  
-  // Devolver el día traducido o el original si no se encuentra
-  return diasSemana[key] || diaIngles;
-}
+  // Método para traducir los días de la semana a español
+  getDiaEnEspanol(fecha: Date): string {
+    const diasSemana: { [key: string]: string } = {
+      'Sun': 'Dom',
+      'Mon': 'Lun',
+      'Tue': 'Mar',
+      'Wed': 'Mié',
+      'Thu': 'Jue',
+      'Fri': 'Vie',
+      'Sat': 'Sáb'
+    };
+
+    // Obtener la abreviatura del día en inglés
+    const diaIngles = new Date(fecha).toLocaleDateString('en-US', { weekday: 'short' });
+    const key = diaIngles.substring(0, 3);
+
+    // Devolver el día traducido o el original si no se encuentra
+    return diasSemana[key] || diaIngles;
+  }
 
   // Añade este método para traducir códigos del clima
   private getWeatherCondition(code: number): string {
@@ -324,8 +328,7 @@ getDiaEnEspanol(fecha: Date): string {
       })
         .addTo(this.map)
         .bindPopup(
-          `Cultivo: <br><strong>${this.cultivo.nombreGenero} ${
-            this.cultivo.nombreVariedad
+          `Cultivo: <br><strong>${this.cultivo.nombreGenero} ${this.cultivo.nombreVariedad
           }</strong><br>Ubicación: <strong>${lat.toFixed(6)}, ${lng.toFixed(
             6
           )}</strong>`
@@ -347,10 +350,8 @@ getDiaEnEspanol(fecha: Date): string {
       })
         .addTo(this.map)
         .bindPopup(
-          `Cultivo: <br><strong>${
-            this.cultivo?.nombreGenero || 'Desconocido'
-          } ${
-            this.cultivo?.nombreVariedad || ''
+          `Cultivo: <br><strong>${this.cultivo?.nombreGenero || 'Desconocido'
+          } ${this.cultivo?.nombreVariedad || ''
           }</strong><br>Ubicación: <strong>${lat.toFixed(6)}, ${lng.toFixed(
             6
           )}</strong>`
@@ -389,8 +390,7 @@ getDiaEnEspanol(fecha: Date): string {
     })
       .addTo(this.map)
       .bindPopup(
-        `Cultivo: <br><strong>${this.cultivo?.nombreGenero} ${
-          this.cultivo?.nombreVariedad
+        `Cultivo: <br><strong>${this.cultivo?.nombreGenero} ${this.cultivo?.nombreVariedad
         }</strong><br>Ubicación: <strong>${lat.toFixed(6)}, ${lng.toFixed(
           6
         )}</strong>`
@@ -417,7 +417,7 @@ getDiaEnEspanol(fecha: Date): string {
             temp: Math.round(
               (data.daily.temperature_2m_max[index] +
                 data.daily.temperature_2m_min[index]) /
-                2
+              2
             ),
             condition: this.getWeatherCondition(data.daily.weathercode[index]),
             precipitation: data.daily.precipitation_sum[index],
