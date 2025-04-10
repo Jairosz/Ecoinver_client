@@ -1,0 +1,374 @@
+
+<!-- En el head de index.html -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+  integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+  crossorigin="anonymous" referrerpolicy="no-referrer" />
+<div class="mb-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+  <!-- Lista de pestañas -->
+  <!-- Lista de pestañas -->
+  <ul class="flex flex-wrap -mb-px text-sm font-medium text-center">
+    <li class="me-2" role="presentation">
+      <button (click)="setActiveTab('Datos de cultivo')" [class.active-tab]="activeTab === 'Datos de cultivo'"
+        class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg dark:text-white hover:text-[#437d3f] dark:hover:text-[#65b15f] hover:border-[#437d3f] dark:hover:border-[#65b15f] transition-all"
+        [ngClass]="{
+        'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
+          activeTab === 'Datos de cultivo'
+      }">
+        <i class="fas fa-seedling mr-2"></i>Datos de cultivo
+      </button>
+    </li>
+    <li class="me-2" role="presentation">
+      <button (click)="setActiveTab('Mapping')" [class.active-tab]="activeTab === 'Mapping'"
+        class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg dark:text-white hover:text-[#437d3f] dark:hover:text-[#65b15f] hover:border-[#437d3f] dark:hover:border-[#65b15f] transition-all"
+        [ngClass]="{
+        'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
+          activeTab === 'Mapping'
+      }">
+        <i class="fas fa-map-marker-alt mr-2"></i>Mapping
+      </button>
+    </li>
+    <li class="me-2" role="presentation">
+      <button (click)="setActiveTab('Insights')" [class.active-tab]="activeTab === 'Insights'"
+        class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg dark:text-white hover:text-[#437d3f] dark:hover:text-[#65b15f] hover:border-[#437d3f] dark:hover:border-[#65b15f] transition-all"
+        [ngClass]="{
+        'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
+          activeTab === 'Insights'
+      }">
+        <i class="fas fa-chart-line mr-2"></i>Insights
+      </button>
+    </li>
+    <!-- Nueva pestaña nerfs -->
+    <li class="me-2" role="presentation">
+      <button  [class.active-tab]="activeTab === 'nerfs'"
+        class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg dark:text-white hover:text-[#437d3f] dark:hover:text-[#65b15f] hover:border-[#437d3f] dark:hover:border-[#65b15f] transition-all"
+        [ngClass]="{
+        'border-[#437d3f] dark:border-[#65b15f] text-[#437d3f] dark:text-[#65b15f]':
+          activeTab === 'nerfs'
+      }">
+        <i class="fas fa-hammer mr-2"></i>Variables
+      </button>
+    </li>
+  </ul>
+
+  <!-- Cartelito a la derecha que muestra información del cultivo -->
+  <div class="bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded-lg shadow">
+    <p class="text-sm font-medium">
+      {{ cultivo?.nombreAgricultor }} - {{ cultivo?.nombreGenero }} -
+      {{ cultivo?.nombreVariedad }}
+    </p>
+  </div>
+</div>
+
+<div id="tab-content">
+  <div id="tab-content">
+    <!-- Datos de cultivo -->
+    <div [class.hidden]="activeTab !== 'Datos de cultivo'" class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+      <!-- Estado de carga y error -->
+      <div *ngIf="loading" class="text-center p-4">
+        <div class="animate-spin inline-block w-8 h-8 border-4 border-[#437d3f] rounded-full border-t-transparent">
+        </div>
+        <p class="mt-2 text-gray-600 dark:text-gray-300">
+          Cargando datos de cultivo...
+        </p>
+      </div>
+      <div *ngIf="error" class="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
+        <p class="text-red-600 dark:text-red-300">
+          <i class="fas fa-exclamation-circle mr-2"></i>{{ error }}
+        </p>
+      </div>
+
+      <!-- Mostrar datos cuando estén disponibles -->
+      <div *ngIf="!loading && cultivo" class="bg-white dark:bg-gray-700 rounded-lg shadow p-4 md:p-6">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center">
+          <i class="fas fa-seedling text-[#437d3f] mr-2"></i>Detalles del
+          Cultivo
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <!-- Fila 1: Agricultor - Finca -->
+          <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+            <p class="text-xs text-gray-500 dark:text-gray-400">Agricultor</p>
+            <p class="text-base font-medium text-gray-800 dark:text-white">
+              {{ cultivo.nombreAgricultor }}
+            </p>
+          </div>
+
+          <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+            <p class="text-xs text-gray-500 dark:text-gray-400">Finca</p>
+            <p class="text-base font-medium text-gray-800 dark:text-white">
+              {{ cultivo.nombreFinca }}
+            </p>
+          </div>
+
+          <!-- Fila 2: Género - Variedad -->
+          <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+            <p class="text-xs text-gray-500 dark:text-gray-400">Género</p>
+            <p class="text-base font-medium text-gray-800 dark:text-white">
+              {{ cultivo.nombreGenero }}
+            </p>
+          </div>
+
+          <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+            <p class="text-xs text-gray-500 dark:text-gray-400">Variedad</p>
+            <p class="text-base font-medium text-gray-800 dark:text-white">
+              {{ cultivo.nombreVariedad }}
+            </p>
+          </div>
+
+          <!-- Fila 3: Nave - Superficie y producción -->
+          <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+            <p class="text-xs text-gray-500 dark:text-gray-400">Nave</p>
+            <p class="text-base font-medium text-gray-800 dark:text-white">
+              {{ cultivo.nombreNave }}
+            </p>
+          </div>
+
+          <div class="flex gap-3">
+            <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg flex-1">
+              <p class="text-xs text-gray-500 dark:text-gray-400">Superficie</p>
+              <p class="text-base font-medium text-gray-800 dark:text-white">
+                {{ cultivo.superficie }} ha
+              </p>
+            </div>
+
+            <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg flex-1">
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                Producción Est.
+              </p>
+              <p class="text-base font-medium text-gray-800 dark:text-white">
+                {{ cultivo.produccionEstimada }} t
+              </p>
+            </div>
+          </div>
+
+          <!-- Fila 4: Fecha inicio - Fecha fin -->
+          <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              Fecha de Siembra
+            </p>
+            <p class="text-base font-medium text-gray-800 dark:text-white">
+              <i class="far fa-calendar-alt mr-1 text-[#437d3f]"></i>
+              {{
+              cultivo.fechaSiembra
+              ? (cultivo.fechaSiembra | date : "dd/MM/yyyy")
+              : "No especificada"
+              }}
+            </p>
+          </div>
+
+          <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+            <p class="text-xs text-gray-500 dark:text-gray-400">Fecha Fin</p>
+            <p class="text-base font-medium text-gray-800 dark:text-white">
+              <i class="far fa-calendar-check mr-1 text-[#437d3f]"></i>
+              {{
+              cultivo.fechaFin
+              ? (cultivo.fechaFin | date : "dd/MM/yyyy")
+              : "No especificada"
+              }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Estado del cultivo -->
+        <div class="mt-4 p-3 bg-[#eef7ed] dark:bg-[#1e3b1d] rounded-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Estado del cultivo
+            </span>
+            <span class="px-2 py-1 text-xs font-medium rounded-full" [ngClass]="{
+                'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300':
+                  getCultivoState() === 'Activo',
+                'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300':
+                  getCultivoState() === 'Finalizado'
+              }">
+              {{ getCultivoState() }}
+            </span>
+          </div>
+          <!-- Resto de la barra de progreso -->
+          <div class="mt-2 relative pt-1">
+            <div class="overflow-hidden h-2 text-xs flex rounded bg-gray-200 dark:bg-gray-600">
+              <div [style.width.%]="progressPercentage"
+                class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-[#437d3f]">
+              </div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mt-1">
+              <span>Trasplante</span>
+              <span>Progreso</span>
+              <span>Fin de cultivo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mapping -->
+    <div [class.hidden]="activeTab !== 'Mapping'" class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
+        <!-- Mapa Responsive -->
+        <div
+          class="h-[400px] md:h-[500px] lg:h-[698px] rounded-lg shadow-lg overflow-hidden order-2 xl:order-1 relative">
+          <!-- Mensaje de error -->
+          <div *ngIf="error && activeTab === 'Mapping'"
+            class="absolute inset-0 bg-gray-100 dark:bg-gray-700 flex flex-col items-center justify-center p-4 text-center">
+            <i class="fas fa-exclamation-triangle text-3xl text-yellow-500 mb-3"></i>
+            <p class="text-gray-600 dark:text-gray-300 font-medium mb-2">
+              No se puede mostrar el mapa
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {{ error }}
+            </p>
+          </div>
+
+          <!-- Loading de coordenadas -->
+          <div *ngIf="showCoordinatesLoading && activeTab === 'Mapping'"
+            class="absolute inset-0 bg-gray-100 dark:bg-gray-700 flex flex-col items-center justify-center">
+            <div class="animate-spin inline-block w-8 h-8 border-4 border-[#437d3f] rounded-full border-t-transparent">
+            </div>
+            <p class="mt-3 text-gray-600 dark:text-gray-300 text-sm">
+              Cargando coordenadas...
+            </p>
+          </div>
+
+          <!-- Mapa (solo visible sin errores) -->
+          <div id="map" class="h-full w-full" [class.invisible]="error || showCoordinatesLoading"></div>
+        </div>
+
+        <!-- Sección meteorológica -->
+        <div class="space-y-4 md:space-y-6 order-1 xl:order-2">
+          <!-- Condiciones actuales -->
+          <div *ngIf="!error && weatherData" class="bg-white dark:bg-gray-700 p-4 md:p-6 rounded-lg shadow">
+            <h3 class="text-lg md:text-xl font-bold text-gray-200 mb-3 md:mb-4">
+              Condiciones Actuales
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div class="text-center p-3 md:p-4 bg-gray-50 dark:bg-gray-600 rounded-lg">
+                <p class="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                  Temperatura
+                </p>
+                <p class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
+                  {{ weatherData.temp }}°C
+                </p>
+              </div>
+              <div class="text-center p-3 md:p-4 bg-gray-50 dark:bg-gray-600 rounded-lg">
+                <p class="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                  Viento
+                </p>
+                <p class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
+                  {{ weatherData.wind }} km/h
+                </p>
+              </div>
+              <div class="col-span-1 md:col-span-2 p-3 md:p-4 bg-gray-50 dark:bg-gray-600 rounded-lg">
+                <p class="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                  Condición actual
+                </p>
+                <p class="text-base md:text-lg font-semibold text-gray-800 dark:text-white">
+                  {{ weatherData.condition }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pronóstico extendido -->
+          <div *ngIf="!error && weatherData" class="bg-white dark:bg-gray-700 p-4 md:p-6 rounded-lg shadow">
+            <h3 class="text-lg md:text-xl font-bold text-gray-200 mb-3 md:mb-4">
+              Pronóstico 7 días
+            </h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-3">
+              <div *ngFor="let day of weatherForecast"
+                class="p-2 md:p-3 bg-gray-50 dark:bg-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors">
+                <div class="flex items-center justify-between mb-2">
+                  <p class="text-sm md:text-base font-medium text-gray-800 dark:text-white capitalize">
+
+
+
+                    
+
+
+                  </p>
+                  <div [innerHTML]="
+                      weatherIcons.getIcon(getWeatherIcon(day.weatherCode))
+                    " class="w-8 h-8 md:w-10 md:h-10 text-[#437d3f] dark:text-gray-200"></div>
+                </div>
+                <p class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white">
+                  {{ day.temp }}°C
+                </p>
+                <p class="text-xs md:text-sm text-gray-600 dark:text-gray-300 truncate">
+                  {{ day.condition }}
+                </p>
+                <p class="text-xs md:text-sm text-blue-600 dark:text-blue-400 mt-1">
+                  <i class="fas fa-tint mr-1 text-xs md:text-sm"></i>{{ day.precipitation }} mm
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensaje de error para pronóstico -->
+          <div *ngIf="error && activeTab === 'Mapping'" class="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg mt-4">
+            <p class="text-red-600 dark:text-red-300">
+              <i class="fas fa-exclamation-triangle mr-2"></i>
+              {{ error }}
+            </p>
+          </div>
+
+          <!-- Loading state responsive -->
+          <div *ngIf="!weatherData" class="text-center py-6 md:py-8">
+            <div
+              class="animate-spin inline-block w-6 h-6 md:w-8 md:h-8 border-[3px] md:border-4 border-[#437d3f] rounded-full border-t-transparent">
+            </div>
+            <p class="mt-2 text-xs md:text-sm text-gray-500 dark:text-gray-400">
+              Cargando datos meteorológicos...
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insights -->
+    <!-- Insights -->
+    <div [class.hidden]="activeTab !== 'Insights'" class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+      <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 mb-6">
+        <!-- Gráfico principal -->
+        <div class="w-full lg:w-[65%] xl:w-[70%] bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+          <p-chart type="line" [data]="data" [options]="options" class="h-[300px] md:h-[350px]"></p-chart>
+        </div>
+
+        <!-- Cuadro de información lateral -->
+        <div class="w-full lg:w-[35%] xl:w-[30%] bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+          <h3 class="text-lg font-semibold mb-4 dark:text-gray-200">Estadísticas Clave</h3>
+          <div class="space-y-4">
+            <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+              <p class="text-sm text-gray-600 dark:text-gray-300">Crecimiento Semanal</p>
+              <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">Ejemplo</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+              <p class="text-sm text-gray-600 dark:text-gray-300">Salud del Cultivo</p>
+              <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">Ejemplo</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+              <p class="text-sm text-gray-600 dark:text-gray-300">Rendimiento vs Estimado</p>
+              <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">Ejemplo</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección adicional debajo -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Temperatura Promedio</p>
+          <p class="text-2xl font-bold text-gray-800 dark:text-white">Ejemplo</p>
+        </div>
+        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Humedad del Suelo</p>
+          <p class="text-2xl font-bold text-gray-800 dark:text-white">Ejemplo</p>
+        </div>
+        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Horas de Luz Diarias</p>
+          <p class="text-2xl font-bold text-gray-800 dark:text-white">Ejemplo</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
