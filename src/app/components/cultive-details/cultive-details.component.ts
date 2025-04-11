@@ -84,10 +84,7 @@ export class CultiveDetailsComponent
     private http: HttpClient
   ) { }
 
-  // Antes
-  // setActiveTab(tab: 'Datos de cultivo' | 'Mapping' | 'Insights'): void {
-
-  // Después
+  
   setActiveTab(tab: 'Datos de cultivo' | 'Mapping' | 'Insights' | 'nerfs'): void {
     this.activeTab = tab;
     if (tab === 'Mapping') {

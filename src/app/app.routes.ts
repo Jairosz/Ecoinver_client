@@ -5,7 +5,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { CultiveComponent } from './components/cultive/cultive.component';
 import { ComercialComponent } from './components/comercial/comercial.component';
 import { UsersComponent } from './components/users/users.component';
-import { CultivePlanningComponent } from './cultive-planning/cultive-planning.component';
+import { CultivePlanningComponent } from './components/cultive-planning/cultive-planning.component';
 import { RolesComponent } from './components/roles/roles.component';
 import { ComercialPlanningComponent } from './components/comercial-planning/comercial-planning.component';
 import { CultiveDetailsComponent } from './components/cultive-details/cultive-details.component';

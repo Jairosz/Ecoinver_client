@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { CultivoService } from '../services/Cultivo.service';
-import { Cultive } from '../types/Cultive';
+import { CultivoService } from '../../services/Cultivo.service';
+import { Cultive } from '../../types/Cultive';
 import {
   CultivePlanningService,
   CultivePlanning,
-} from '../services/CultivePlanning.service';
-import { CultivePlanningDetailsService } from '../services/CultivePlanningDetails.service';
-import { CultivePlanningDetails } from '../types/CultivePlanningDetails';
+} from '../../services/CultivePlanning.service';
+import { CultivePlanningDetailsService } from '../../services/CultivePlanningDetails.service';
+import { CultivePlanningDetails } from '../../types/CultivePlanningDetails';
 
 // Define el DTO aquí ya que no está exportado desde el servicio
 interface CultivePlanningDTO {
