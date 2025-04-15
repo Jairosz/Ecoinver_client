@@ -5,21 +5,26 @@ import { FormsModule } from "@angular/forms";
 interface Zone {
   id: number;
   name: string;
-  area: number;          // ahora en metros cuadrados
-  availableArea: number; // en metros cuadrados
+  area: number;          // Área en metros cuadrados
+  availableArea: number; // Área disponible en metros cuadrados
 }
 
 interface Technician {
   id: number;
   name: string;
-  assignedArea: number;  // en metros cuadrados
-  maxCapacity: number;   // capacidad en metros cuadrados
+  assignedArea: number;  // Área asignada en metros cuadrados
+  maxCapacity: number;   // Capacidad máxima en metros cuadrados
 }
 
 interface Square {
   id: number;
   zoneId: number | null;
   type: "current" | "needed";
+}
+
+interface Gender {
+  value: string;
+  label: string;
 }
 
 @Component({
@@ -31,34 +36,46 @@ interface Square {
   imports: [CommonModule, FormsModule],
 })
 export class CropDistributionMapComponent implements OnInit {
-  // Datos principales en m² (solo ejemplo)
-  // Antes tenías 1000 hectáreas, ahora podrías usar 1,000 m² o la cantidad que necesites.
-  // Ajusta estos valores a la realidad de tu caso.
-  totalArea = 1000;       // metros cuadrados totales actuales
-  commercialNeed = 1500;  // metros cuadrados necesarios para cubrir la demanda comercial
+  // === Datos principales (en metros cuadrados) ===
+  totalArea = 1000;       // Área total actual en m²
+  commercialNeed = 1500;  // Área requerida para cubrir la demanda comercial
 
   zones: Zone[] = [
-    // Ejemplo en metros cuadrados (antes eran hectáreas).
     { id: 1, name: "Zona Norte", area: 400, availableArea: 200 },
     { id: 2, name: "Zona Sur",   area: 350, availableArea: 150 },
     { id: 3, name: "Zona Este",  area: 250, availableArea: 100 },
   ];
 
-  // Estado del componente
+  // === Estado del componente ===
   selectedZone: number | null = null;
   selectedTechnician: number | null = null;
   areaToAssign = 0;
+
+  // === Cuadrícula de visualización ===
   squares: Square[] = [];
   squareSize = 24;
   zoneSquares: Record<number, number> = {};
 
-  // Getters calculados
+  // === Datos y filtro para un único input (genders) ===
+  searchTerm: string = "";
+
+  genderList: Gender[] = [
+    { value: "US", label: "United States" },
+    { value: "CA", label: "Canada" },
+    { value: "FR", label: "France" },
+    { value: "DE", label: "Germany" },
+    // ... Agrega más géneros si lo deseas
+  ];
+
+  filteredGenders: Gender[] = [];
+
+  // === Getters Calculados ===
   get additionalAreaNeeded(): number {
     return this.commercialNeed - this.totalArea;
   }
 
   get percentComplete(): number {
-    // Redondeamos el porcentaje actual con respecto a la necesidad comercial
+    // Porcentaje redondeado de la meta comercial ya cubierta
     return Math.round((this.totalArea / this.commercialNeed) * 100);
   }
 
@@ -71,41 +88,44 @@ export class CropDistributionMapComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    // Inicializa la cuadrícula
     this.calculateSquares();
+
+    // Inicializa la lista filtrada de géneros
+    this.filteredGenders = [...this.genderList];
   }
 
-  // Métodos para el mapa
+  // === Métodos para filtrar géneros con un único input ===
+  filterGenders(): void {
+    this.filteredGenders = this.genderList.filter((gender) =>
+      gender.label.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  }
+
+  // === Métodos para el Mapa (Cuadrícula) ===
   calculateSquares(): void {
-    // Cantidad total de "cuadritos" que queremos dibujar para reflejar la necesidad
-    const totalSquares = this.commercialNeed;
+    const totalSquares = this.commercialNeed;            // Cantidad total de cuadritos
+    const currentSquares = this.totalArea;               // Cuadritos que representan el área actual
+    const additionalSquares = this.additionalAreaNeeded; // Cuadritos adicionales necesarios
 
-    // Cuántos cuadritos representan el área actual
-    const currentSquares = this.totalArea;
-
-    // Cuántos cuadritos representarían el área adicional
-    const additionalSquares = this.additionalAreaNeeded;
-
-    // Calcula cuántos cuadritos por fila en la cuadrícula (usamos sqrt como ejemplo)
+    // Número de cuadritos por fila aproximado
     const squaresPerRow = Math.ceil(Math.sqrt(totalSquares));
 
-    // Ajusta el tamaño de los cuadritos de forma dinámica
+    // Ajuste dinámico del tamaño de cada cuadrito (mín. 16, máx. 32)
     this.squareSize = Math.max(16, Math.min(32, Math.floor(800 / squaresPerRow)));
 
-    // Creamos un mapa para saber cuántos cuadritos le corresponden a cada zona
+    // Distribuir los cuadritos correspondientes a cada zona
     this.zoneSquares = {};
     this.zones.forEach((zone) => {
-      // Porcentaje del total actual que representa la zona
-      // Si "zone.area" es parte de "this.totalArea", calculamos el número de cuadraditos
-      // que se asignan a la zona según su proporción.
       const zoneSquareCount = Math.floor((zone.area / this.totalArea) * currentSquares);
       this.zoneSquares[zone.id] = zoneSquareCount;
     });
 
-    // Generamos el arreglo de cuadrados
+    // Crear arreglo de cuadritos
     this.squares = [];
     let squareCount = 0;
 
-    // Agregamos primero los cuadrados de área actual por zona
+    // 1) Cuadritos de cada zona (área actual)
     for (const zone of this.zones) {
       const zoneSquareCount = this.zoneSquares[zone.id];
       for (let i = 0; i < zoneSquareCount; i++) {
@@ -117,7 +137,7 @@ export class CropDistributionMapComponent implements OnInit {
       }
     }
 
-    // Luego agregamos los cuadrados de área adicional
+    // 2) Cuadritos que representan el área adicional necesaria
     for (let i = 0; i < additionalSquares; i++) {
       this.squares.push({
         id: squareCount++,
@@ -127,41 +147,44 @@ export class CropDistributionMapComponent implements OnInit {
     }
   }
 
+  // Determina la clase CSS para cada cuadrito según su tipo/zona
   getSquareColor(square: Square): string {
     if (square.type === "needed") {
       return "bg-amber-300 dark:bg-amber-500";
     }
-    // Asignamos un color distinto por zona (tú puedes cambiar estos valores de Tailwind)
     if (square.zoneId === 1) return "bg-green-600 dark:bg-green-500";
     if (square.zoneId === 2) return "bg-green-500 dark:bg-green-400";
     if (square.zoneId === 3) return "bg-green-400 dark:bg-green-300";
+    // Por defecto
     return "bg-green-500 dark:bg-green-400";
   }
 
-  // Ancho máximo para la cuadrícula
+  // Retorna el ancho máximo en px de la cuadrícula en función de squaresPerRow
   getMaxWidth(): string {
     const squaresPerRow = Math.ceil(Math.sqrt(this.commercialNeed));
     return `${squaresPerRow * (this.squareSize + 4)}px`;
   }
 
+  // Clic en un cuadrito: si existe zoneId, seleccionarlo
   onSquareClick(square: Square): void {
     if (square.zoneId !== null) {
       this.selectedZone = square.zoneId;
     }
   }
 
+  // Nombre a mostrar para una zona dada; si es null, "Área adicional necesaria"
   getZoneName(zoneId: number | null): string {
     if (zoneId === null) return "Área adicional necesaria";
     const zone = this.zones.find((z) => z.id === zoneId);
     return zone ? zone.name : "";
   }
 
-  // Métodos para la selección de zonas
+  // Clic en la lista de zonas
   onZoneClick(zoneId: number): void {
     this.selectedZone = zoneId;
   }
 
-  // Métodos para la asignación de técnicos
+  // Métodos para asignar técnicos (opcional)
   onTechnicianChange(event: any): void {
     this.selectedTechnician = Number.parseInt(event.target.value, 10);
   }
@@ -171,9 +194,11 @@ export class CropDistributionMapComponent implements OnInit {
   }
 
   handleAssign(): void {
-    if (!this.selectedZone || !this.selectedTechnician || this.areaToAssign <= 0) return;
+    if (!this.selectedZone || !this.selectedTechnician || this.areaToAssign <= 0) {
+      return;
+    }
 
-    // Actualizar la zona asignada
+    // 1) Actualiza la zona seleccionada
     this.zones = this.zones.map((zone) => {
       if (zone.id === this.selectedZone) {
         return {
@@ -185,17 +210,18 @@ export class CropDistributionMapComponent implements OnInit {
       return zone;
     });
 
-    // Actualizar el total
+    // 2) Actualiza el área total
     this.totalArea += this.areaToAssign;
 
-    // Recalcular la cuadrícula
+    // 3) Recalcula la cuadrícula
     this.calculateSquares();
 
-    // Resetear el formulario
+    // 4) Limpia los campos del formulario
     this.areaToAssign = 0;
     this.selectedTechnician = null;
   }
 
+  // (Ejemplo) Cálculo de porcentaje de capacidad de un técnico
   getCapacityPercentage(technician: Technician): number {
     return (technician.assignedArea / technician.maxCapacity) * 100;
   }
