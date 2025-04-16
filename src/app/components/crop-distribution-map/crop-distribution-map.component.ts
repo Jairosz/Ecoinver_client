@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
+import { NgSelectModule } from "@ng-select/ng-select";
 
 interface Zone {
   id: number;
@@ -9,12 +10,7 @@ interface Zone {
   availableArea: number; // Área disponible en metros cuadrados
 }
 
-interface Technician {
-  id: number;
-  name: string;
-  assignedArea: number;  // Área asignada en metros cuadrados
-  maxCapacity: number;   // Capacidad máxima en metros cuadrados
-}
+
 
 interface Square {
   id: number;
@@ -33,7 +29,7 @@ interface Gender {
   styleUrls: ["./crop-distribution-map.component.css"],
   encapsulation: ViewEncapsulation.None,
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgSelectModule],
 })
 export class CropDistributionMapComponent implements OnInit {
   // === Datos principales (en metros cuadrados) ===
@@ -42,8 +38,8 @@ export class CropDistributionMapComponent implements OnInit {
 
   zones: Zone[] = [
     { id: 1, name: "Zona Norte", area: 400, availableArea: 200 },
-    { id: 2, name: "Zona Sur",   area: 350, availableArea: 150 },
-    { id: 3, name: "Zona Este",  area: 250, availableArea: 100 },
+    { id: 2, name: "Zona Sur", area: 350, availableArea: 150 },
+    { id: 3, name: "Zona Este", area: 250, availableArea: 100 },
   ];
 
   // === Estado del componente ===
@@ -56,18 +52,17 @@ export class CropDistributionMapComponent implements OnInit {
   squareSize = 24;
   zoneSquares: Record<number, number> = {};
 
-  // === Datos y filtro para un único input (genders) ===
-  searchTerm: string = "";
 
   genderList: Gender[] = [
-    { value: "US", label: "United States" },
-    { value: "CA", label: "Canada" },
-    { value: "FR", label: "France" },
-    { value: "DE", label: "Germany" },
+    { value: "A", label: "PEPINO" },
+    { value: "B", label: "BERENJENA" },
+    { value: "C", label: "TOMATE" },
+    { value: "D", label: "PIMIENTO" },
     // ... Agrega más géneros si lo deseas
   ];
 
   filteredGenders: Gender[] = [];
+  selectedGender: string | null = null;
 
   // === Getters Calculados ===
   get additionalAreaNeeded(): number {
@@ -85,48 +80,48 @@ export class CropDistributionMapComponent implements OnInit {
       : null;
   }
 
-  constructor() {}
-
+  constructor() { }
   ngOnInit(): void {
-    // Inicializa la cuadrícula
-    this.calculateSquares();
-
-    // Inicializa la lista filtrada de géneros
+    // Inicializar la lista filtrada
     this.filteredGenders = [...this.genderList];
   }
 
-  // === Métodos para filtrar géneros con un único input ===
-  filterGenders(): void {
-    this.filteredGenders = this.genderList.filter((gender) =>
-      gender.label.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-  }
+    // === Métodos para filtrar géneros con un único input ===
+    filterGenders(term: string): void {
+      if (!term) {
+        this.filteredGenders = [...this.genderList];
+        return;
+      }
+      this.filteredGenders = this.genderList.filter((gender) =>
+        gender.label.toLowerCase().includes(term.toLowerCase())
+      );
+    }
 
-  // === Métodos para el Mapa (Cuadrícula) ===
-  calculateSquares(): void {
-    const totalSquares = this.commercialNeed;            // Cantidad total de cuadritos
-    const currentSquares = this.totalArea;               // Cuadritos que representan el área actual
-    const additionalSquares = this.additionalAreaNeeded; // Cuadritos adicionales necesarios
+    // === Métodos para el Mapa (Cuadrícula) ===
+    calculateSquares(): void {
+      const totalSquares = this.commercialNeed;            // Cantidad total de cuadritos
+      const currentSquares = this.totalArea;               // Cuadritos que representan el área actual
+      const additionalSquares = this.additionalAreaNeeded; // Cuadritos adicionales necesarios
 
-    // Número de cuadritos por fila aproximado
-    const squaresPerRow = Math.ceil(Math.sqrt(totalSquares));
+      // Número de cuadritos por fila (aprox)
+      const squaresPerRow = Math.ceil(Math.sqrt(totalSquares));
 
-    // Ajuste dinámico del tamaño de cada cuadrito (mín. 16, máx. 32)
-    this.squareSize = Math.max(16, Math.min(32, Math.floor(800 / squaresPerRow)));
+      // Ajuste dinámico del tamaño de cada cuadrito (mín. 16, máx. 32)
+      this.squareSize = Math.max(16, Math.min(32, Math.floor(800 / squaresPerRow)));
 
-    // Distribuir los cuadritos correspondientes a cada zona
-    this.zoneSquares = {};
-    this.zones.forEach((zone) => {
-      const zoneSquareCount = Math.floor((zone.area / this.totalArea) * currentSquares);
-      this.zoneSquares[zone.id] = zoneSquareCount;
-    });
+      // Distribuir los cuadritos correspondientes a cada zona
+      this.zoneSquares = {};
+      this.zones.forEach((zone) => {
+        const zoneSquareCount = Math.floor((zone.area / this.totalArea) * currentSquares);
+        this.zoneSquares[zone.id] = zoneSquareCount;
+      });
 
-    // Crear arreglo de cuadritos
-    this.squares = [];
-    let squareCount = 0;
+      // Crear arreglo de cuadritos
+      this.squares = [];
+      let squareCount = 0;
 
-    // 1) Cuadritos de cada zona (área actual)
-    for (const zone of this.zones) {
+      // 1) Cuadritos de cada zona (área actual)
+      for(const zone of this.zones) {
       const zoneSquareCount = this.zoneSquares[zone.id];
       for (let i = 0; i < zoneSquareCount; i++) {
         this.squares.push({
@@ -172,14 +167,14 @@ export class CropDistributionMapComponent implements OnInit {
     }
   }
 
-  // Nombre a mostrar para una zona dada; si es null, "Área adicional necesaria"
+  // Devuelve el nombre de la zona o "Área adicional necesaria" si zoneId es null
   getZoneName(zoneId: number | null): string {
     if (zoneId === null) return "Área adicional necesaria";
     const zone = this.zones.find((z) => z.id === zoneId);
     return zone ? zone.name : "";
   }
 
-  // Clic en la lista de zonas
+  // Métodos para seleccionar zonas
   onZoneClick(zoneId: number): void {
     this.selectedZone = zoneId;
   }
@@ -219,10 +214,5 @@ export class CropDistributionMapComponent implements OnInit {
     // 4) Limpia los campos del formulario
     this.areaToAssign = 0;
     this.selectedTechnician = null;
-  }
-
-  // (Ejemplo) Cálculo de porcentaje de capacidad de un técnico
-  getCapacityPercentage(technician: Technician): number {
-    return (technician.assignedArea / technician.maxCapacity) * 100;
   }
 }

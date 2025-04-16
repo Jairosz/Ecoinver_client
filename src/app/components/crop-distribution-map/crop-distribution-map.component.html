@@ -24,18 +24,12 @@
       <div
         class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700 overflow-auto max-w-full">
         <div class="flex flex-wrap gap-1 justify-center" [style.max-width]="getMaxWidth()">
-          <div
-            *ngFor="let square of squares"
-            [ngClass]="[
+          <div *ngFor="let square of squares" [ngClass]="[
               getSquareColor(square),
               square.zoneId === selectedZone ? 'ring-2 ring-blue-500 dark:ring-blue-400' : '',
               'cursor-pointer transition-all hover:opacity-80'
-            ]"
-            [style.width.px]="squareSize"
-            [style.height.px]="squareSize"
-            (click)="onSquareClick(square)"
-            [title]="getZoneName(square.zoneId)"
-          ></div>
+            ]" [style.width.px]="squareSize" [style.height.px]="squareSize" (click)="onSquareClick(square)"
+            [title]="getZoneName(square.zoneId)"></div>
         </div>
       </div>
 
@@ -48,31 +42,23 @@
 
   <div class="space-y-6">
 
-    <!-- Único campo de búsqueda/selección de géneros -->
-    <form class="max-w-sm mx-auto">
-      <label for="searchGender" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+    <!-- Único campo de búsqueda/selección de géneros usando ng-select -->
+    <div class="max-w-sm mx-auto">
+      <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
         Selecciona o busca un género
       </label>
-      <input
-        id="searchGender"
-        type="text"
-        placeholder="Escribe o selecciona..."
-        [(ngModel)]="searchTerm"
-        (ngModelChange)="filterGenders()"
-        name="searchGender"
-        class="mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-               focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
-               dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
-               dark:focus:ring-blue-500 dark:focus:border-blue-500"
-        list="genderOptions"
-      />
-      <datalist id="genderOptions">
-        <option
-          *ngFor="let gender of filteredGenders"
-          [value]="gender.label"
-        ></option>
-      </datalist>
-    </form>
+
+      <ng-select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 
+                 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 
+                 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" [items]="filteredGenders"
+        bindLabel="label" bindValue="value" placeholder="Escribe o selecciona..." [searchable]="true" [clearable]="true"
+        (search)="filterGenders($event.term)" [(ngModel)]="selectedGender" name="selectedGender">
+      </ng-select>
+
+    </div>
+    <!-- Fin campo ng-select -->
+
     <!-- Fin único campo -->
 
     <!-- Estadísticas de Cultivo -->
@@ -111,10 +97,7 @@
               </span>
             </div>
             <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
-              <div
-                class="bg-green-500 h-2.5 rounded-full"
-                [style.width.%]="percentComplete"
-              ></div>
+              <div class="bg-green-500 h-2.5 rounded-full" [style.width.%]="percentComplete"></div>
             </div>
           </div>
 
@@ -155,16 +138,11 @@
       </h2>
 
       <div class="space-y-2">
-        <div
-          *ngFor="let zone of zones"
-          [ngClass]="
+        <div *ngFor="let zone of zones" [ngClass]="
             selectedZone === zone.id
               ? 'bg-green-100 dark:bg-green-900/30 border border-green-500 dark:border-green-600'
               : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
-          "
-          class="p-3 rounded-md cursor-pointer transition-colors"
-          (click)="onZoneClick(zone.id)"
-        >
+          " class="p-3 rounded-md cursor-pointer transition-colors" (click)="onZoneClick(zone.id)">
           <div class="flex justify-between items-center">
             <span class="font-medium text-gray-900 dark:text-white">
               {{ zone.name }}
