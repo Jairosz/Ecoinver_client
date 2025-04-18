@@ -35,11 +35,11 @@
 
     <div class="container mx-auto">
       <!-- Panel de Géneros de Cultivos -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-200 hover:shadow-md w-full mx-auto">
-        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md w-full mx-auto">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <div class="flex items-center gap-2">
             <!-- Icono de lista -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="8" y1="6" x2="21" y2="6"></line>
               <line x1="8" y1="12" x2="21" y2="12"></line>
               <line x1="8" y1="18" x2="21" y2="18"></line>
@@ -47,49 +47,47 @@
               <line x1="3" y1="12" x2="3.01" y2="12"></line>
               <line x1="3" y1="18" x2="3.01" y2="18"></line>
             </svg>
-            <h2 class="text-base font-semibold text-gray-900">Géneros de Cultivos</h2>
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white">Géneros de Cultivos</h2>
           </div>
           <div class="flex items-center gap-2">
             <!-- Tabs -->
-            <div class="bg-gray-100 rounded-md p-0.5 flex text-xs">
-              <button class="py-1 px-3 rounded-md bg-white shadow-sm font-medium">Todos</button>
-              <button class="py-1 px-3 rounded-md text-gray-600">Seeleccionados({{seleccionados}})</button>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-md p-0.5 flex text-xs">
+              <button class="py-1 px-3 rounded-md bg-white dark:bg-gray-600 shadow-sm font-medium dark:text-white">Todos</button>
+              <button class="py-1 px-3 rounded-md text-gray-600 dark:text-gray-300">Seeleccionados({{seleccionados}})</button>
             </div>
           </div>
         </div>
         
         <!-- Barra de búsqueda y filtros -->
-        <div class="px-6 py-3 border-b border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-3">
           <!-- Búsqueda -->
           <div class="relative">
-            <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             <input type="text"  
             [(ngModel)]="texto"
-            placeholder="Buscar cultivos..." class="pl-8 h-9 w-full text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+            placeholder="Buscar cultivos..." class="pl-8 h-9 w-full text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent dark:text-white dark:placeholder-gray-400">
           </div>
           
           <!-- Filtro por familia -->
           <div class="flex gap-2">
             <div class="relative w-full">
-              <select [(ngModel)]="familiaSeleccionada" class="h-9 w-full text-sm bg-gray-50 border border-gray-200 rounded-md pl-8 pr-10 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+              <select [(ngModel)]="familiaSeleccionada" class="h-9 w-full text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md pl-8 pr-10 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent dark:text-white">
                 <option value="todas">Todas las familias</option>
                 @for(familia of family;track familia){
-
                   <option value={{familia.familia}}>{{familia.familia}}</option>
-   
                 }
               </select>
-              <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
               </svg>
-              <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-2.5 top-2.5 h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-2.5 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </div>
-            <button (click)="borrarFiltros()" class="h-9 px-3 text-xs border border-gray-200 rounded-md hover:bg-gray-50">Limpiar filtros</button>
+            <button (click)="borrarFiltros()" class="h-9 px-3 text-xs border border-gray-200 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300">Limpiar filtros</button>
           </div>
         </div>
         
@@ -99,19 +97,18 @@
             @for(familia of busquedaFamilia;track familia){
             <!-- Categoría: Cereales -->
             <div class="mb-4">
-              <h3 class="text-xs font-medium text-gray-500 mb-2">{{familia.familia}}</h3>
+              <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{{familia.familia}}</h3>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 @for(nombre of familia.nombreGenero; track nombre){
                 <div class="flex items-center group">
-                  <input type="radio" (click)="contarSeleccionados()" name="genero" [value]="nombre" class="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
-                  <label for="gender_1" class="ml-2 text-sm text-gray-700 truncate flex-1">{{nombre}}</label>
-                  <span class="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">{{nombre}}</span>
+                  <input type="radio" (click)="contarSeleccionados()" name="genero" [value]="nombre" class="form-checkbox h-4 w-4 text-indigo-600 dark:text-indigo-400 rounded border-gray-300 dark:border-gray-600 focus:ring-indigo-500 dark:focus:ring-indigo-400">
+                  <label for="gender_1" class="ml-2 text-sm text-gray-700 dark:text-gray-300 truncate flex-1">{{nombre}}</label>
+                  <span class="text-xs text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">{{nombre}}</span>
                 </div>
-              }
+                }
               </div>
             </div>
-            
-          }
+            }
           </div>
         </div>
         
@@ -120,9 +117,9 @@
           <div class="px-6 py-4">
             <div class="flex flex-wrap gap-2">
               <!-- Maíz -->
-              <span class="inline-flex items-center px-3 py-1 rounded-md text-sm bg-gray-100 text-gray-800">
+              <span class="inline-flex items-center px-3 py-1 rounded-md text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                 Maíz
-                <button class="ml-2 text-gray-500 hover:text-gray-700">
+                <button class="ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -130,9 +127,9 @@
                 </button>
               </span>
               <!-- Tomate -->
-              <span class="inline-flex items-center px-3 py-1 rounded-md text-sm bg-gray-100 text-gray-800">
+              <span class="inline-flex items-center px-3 py-1 rounded-md text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                 Tomate
-                <button class="ml-2 text-gray-500 hover:text-gray-700">
+                <button class="ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -140,9 +137,9 @@
                 </button>
               </span>
               <!-- Lechuga -->
-              <span class="inline-flex items-center px-3 py-1 rounded-md text-sm bg-gray-100 text-gray-800">
+              <span class="inline-flex items-center px-3 py-1 rounded-md text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                 Lechuga
-                <button class="ml-2 text-gray-500 hover:text-gray-700">
+                <button class="ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -154,14 +151,11 @@
         </div>
         
         <!-- Footer con contador -->
-        <div class="px-6 py-3 border-t border-gray-200 bg-gray-50 text-xs text-gray-500 flex justify-between items-center">
-          
-          <span class="text-indigo-600">Filtrando por: {{familiaSeleccionada || 'Ningún filtro'}}</span>
+        <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-500 dark:text-gray-400 flex justify-between items-center">
+          <span class="text-indigo-600 dark:text-indigo-400">Filtrando por: {{familiaSeleccionada || 'Ningún filtro'}}</span>
         </div>
       </div>
     </div>
-      
-   
 
     <!-- Métricas -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -215,9 +209,38 @@
           </div>
           <div class="inline-flex p-0.5 bg-gray-100 dark:bg-gray-700 rounded-lg">
            
-            <button class="py-1.5 px-3 text-xs font-medium rounded-md bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 shadow-sm">Semana</button>
-            <button class="py-1.5 px-3 text-xs font-medium text-gray-700 dark:text-gray-300">Mes</button>
-            <button class="py-1.5 px-3 text-xs font-medium text-gray-700 dark:text-gray-300">Año</button>
+            <button 
+            (click)="actualizarGrafica('semana')"
+            [ngClass]="{
+              'bg-white dark:bg-gray-800 text-indigo-600 shadow-sm': vistaSeleccionada === 'semana',
+              'text-gray-700 dark:text-gray-300': vistaSeleccionada !== 'semana'
+            }"
+            class="py-1.5 px-3 text-xs font-medium rounded-md"
+            value="semana">
+            Semana
+          </button>
+          
+          <button 
+            (click)="actualizarGrafica('mes')"
+            [ngClass]="{
+              'bg-white dark:bg-gray-800 text-indigo-600 shadow-sm': vistaSeleccionada === 'mes',
+              'text-gray-700 dark:text-gray-300': vistaSeleccionada !== 'mes'
+            }"
+            class="py-1.5 px-3 text-xs font-medium rounded-md"
+            value="mes">
+            Mes
+          </button>
+          
+          <button 
+            (click)="actualizarGrafica('año')"
+            [ngClass]="{
+              'bg-white dark:bg-gray-800 text-indigo-600 shadow-sm': vistaSeleccionada === 'año',
+              'text-gray-700 dark:text-gray-300': vistaSeleccionada !== 'año'
+            }"
+            class="py-1.5 px-3 text-xs font-medium rounded-md"
+            value="año">
+            Año
+          </button>
           </div>
         </div>
         <div class="p-6 h-80">
