@@ -52,7 +52,7 @@ export class DashboardComponent implements OnInit {
   // Propiedades adicionales para el nuevo diseño
   // Arrays para manejar los filtros de géneros y necesidades
   genders: any[] = [];
-  selectedGenderIds: number[] = [];
+  selectedGenderIds:string='';
   selectedComNeedIds: number[] = [];
   filteredComNeeds: Comercial[] = [];
   family: { familia: string, nombreGenero: string[] }[] = [];
@@ -143,8 +143,6 @@ export class DashboardComponent implements OnInit {
 
     }
 
-
-
   }
 
   // Inicializar las configuraciones de los gráficos
@@ -189,7 +187,7 @@ export class DashboardComponent implements OnInit {
 
 
     let meses: number[] = [];
-    for (let i = mesActual; i < (mesActual + 6); i++) {//Rellenamos el label
+    for (let i = mesActual - 2; i < (mesActual + 4); i++) {//Rellenamos el label
       meses.push(i + 1);
 
     }
@@ -269,7 +267,7 @@ export class DashboardComponent implements OnInit {
         y: {
           beginAtZero: true,
           ticks: {
-            stepSize: 20,
+           
             color: '#64748b'
           },
           grid: {
@@ -333,7 +331,7 @@ export class DashboardComponent implements OnInit {
           display: true,
           position: 'left',
           ticks: {
-            stepSize: 10,
+          
             color: '#64748b'
           },
           grid: {
@@ -347,7 +345,7 @@ export class DashboardComponent implements OnInit {
           display: true,
           position: 'right',
           ticks: {
-            stepSize: 10,
+           
             color: '#64748b'
           },
           grid: {
@@ -472,7 +470,7 @@ export class DashboardComponent implements OnInit {
         y: {
           beginAtZero: true,
           ticks: {
-            stepSize: 20,
+            
             color: '#64748b',
             font: {
               size: window.innerWidth < 768 ? 10 : 12
@@ -544,15 +542,7 @@ export class DashboardComponent implements OnInit {
     this.showCombined = !this.showCombined;
   }
 
-  // Métodos para manejar los nuevos checkboxes de selección
-  toggleAllGenders(event: any) {
-    if (event.target.checked) {
-      this.selectedGenderIds = this.genders.map(g => g.idGenero);
-    } else {
-      this.selectedGenderIds = [];
-    }
-
-  }
+  
 
   toggleAllComNeeds(event: any) {
     if (event.target.checked) {
@@ -563,15 +553,7 @@ export class DashboardComponent implements OnInit {
 
   }
 
-  toggleGenderSelection(generoId: number) {
-    const index = this.selectedGenderIds.indexOf(generoId);
-    if (index > -1) {
-      this.selectedGenderIds.splice(index, 1);
-    } else {
-      this.selectedGenderIds.push(generoId);
-    }
-
-  }
+  
 
   toggleComNeedSelection(needId: number) {
     const index = this.selectedComNeedIds.indexOf(needId);
@@ -687,6 +669,7 @@ export class DashboardComponent implements OnInit {
   }
 
   contarSeleccionados() {//Para contar los géneros seleccionados
+    this.selectedGenderIds='';
     this.seleccionados = 0;
     const checkboxes = document.querySelectorAll('input[type="radio"]');
     for (let i = 0; i < checkboxes.length; i++) {
@@ -694,6 +677,7 @@ export class DashboardComponent implements OnInit {
 
       if (checkbox.checked) {
         this.seleccionados++;
+        this.selectedGenderIds=checkbox.value;
       }
     }
     // Configuración inicial de gráficos
@@ -744,7 +728,7 @@ export class DashboardComponent implements OnInit {
 
 
         let meses: number[] = [];
-        for (let i = mesActual; i < (mesActual + 6); i++) {//Rellenamos el label
+        for (let i = mesActual - 2; i < (mesActual + 4); i++) {//Rellenamos el label
           meses.push(i + 1);
 
         }
@@ -815,7 +799,7 @@ export class DashboardComponent implements OnInit {
           }
         }
 
-        // Configuraciones para gráficos de barra     
+        // Configuraciones para gráficos de barra optimizada
         const barOptions = {
           responsive: true,
           maintainAspectRatio: false,
@@ -823,8 +807,13 @@ export class DashboardComponent implements OnInit {
             y: {
               beginAtZero: true,
               ticks: {
-                stepSize: 20,
-                color: '#64748b'
+                // Cambiar stepSize por maxTicksLimit para mejor rendimiento
+                maxTicksLimit: 8,
+                precision: 0,
+                color: '#64748b',
+                font: {
+                  size: window.innerWidth < 768 ? 9 : 12
+                }
               },
               grid: {
                 color: '#e2e8f0'
@@ -837,7 +826,13 @@ export class DashboardComponent implements OnInit {
               },
               ticks: {
                 color: '#64748b',
-                autoSkip: false   // Para mostrar todas las etiquetas       
+                // Permitir saltar etiquetas en móviles
+                autoSkip: window.innerWidth < 768,
+                maxRotation: window.innerWidth < 768 ? 45 : 0,
+                maxTicksLimit: window.innerWidth < 768 ? 6 : 12,
+                font: {
+                  size: window.innerWidth < 768 ? 9 : 12
+                }
               },
               offset: true,
               distribution: 'series'  // Distribuir uniformemente
@@ -848,13 +843,14 @@ export class DashboardComponent implements OnInit {
               labels: {
                 color: '#334155',
                 font: {
-                  weight: '500'
+                  weight: '500',
+                  size: window.innerWidth < 768 ? 10 : 12
                 }
               }
             }
           }
         };
-
+        
         // Gráfico principal     
         this.data = {
           labels: label,
@@ -887,7 +883,7 @@ export class DashboardComponent implements OnInit {
               display: true,
               position: 'left',
               ticks: {
-                stepSize: 10,
+                
                 color: '#64748b'
               },
               grid: {
@@ -901,7 +897,7 @@ export class DashboardComponent implements OnInit {
               display: true,
               position: 'right',
               ticks: {
-                stepSize: 10,
+                
                 color: '#64748b'
               },
               grid: {
@@ -967,39 +963,57 @@ export class DashboardComponent implements OnInit {
         this.vistaSeleccionada = 'semana';
         const s = new Date();
 
-        let primerDia = new Date(s.getFullYear(), s.getMonth(), 1);
-        let ultimoDia = new Date(s.getFullYear(), s.getMonth() + 1, 0);
+        // Para el primer día (dos semanas antes del primer día del mes)
+        let primerDia = new Date(s.getFullYear(), s.getMonth(), s.getDate());
+        primerDia.setDate(primerDia.getDate() - 14); // Resta 14 días (2 semanas)
+        primerDia = new Date(primerDia);
+        console.log("Fecha original:", s.toLocaleDateString());
+        console.log("Primer día (2 semanas antes):", primerDia.toLocaleDateString());
+
+        // Para el último día (dos semanas después del último día del mes)
+        let ultimoDia = new Date(s.getFullYear(), s.getMonth(), s.getDate());
+        ultimoDia.setDate(ultimoDia.getDate() + 21); // Suma 14 días (2 semanas)
+        ultimoDia = new Date(ultimoDia);
+        console.log("Último día (2 semanas después):", ultimoDia.toLocaleDateString());
         let label2: number[] = [];
         let semanas: string[] = []//Para guardar las semanas
 
-        for (let i = primerDia.getDate(); i <= ultimoDia.getDate(); i++) {
-          let dia = new Date(s.getFullYear(), s.getMonth(), i);
-          if (dia.getDay() == 0) {
-            const primerDiaAno = new Date(primerDia.getFullYear(), 0, 1);
+        for (let i = new Date(primerDia); i < ultimoDia; i.setDate(i.getDate() + 1)) {
+
+
+          if (i.getDay() == 0) {
+            const primerDiaAno = new Date(i.getFullYear(), 0, 1);
             const diaSemana1EneroGrande = primerDiaAno.getDay();
-            let semana = Math.floor((dia.getTime() - primerDiaAno.getTime()) / (1000 * 60 * 60 * 24));
+            let semana = Math.floor((i.getTime() - primerDiaAno.getTime()) / (1000 * 60 * 60 * 24));
             semana = Math.ceil((semana + diaSemana1EneroGrande) / 7);
             label2.push(semana);
 
+
           }
-          if (i == ultimoDia.getDate() && dia.getDay() != 0) {
-            const primerDiaAno = new Date(primerDia.getFullYear(), 0, 1);
+          else if (i.getDate() == ultimoDia.getDate() && i.getMonth() == ultimoDia.getMonth() && i.getFullYear() == ultimoDia.getFullYear() && i.getDay() != 0) {
+
+            const primerDiaAno = new Date(i.getFullYear(), 0, 1);
             const diaSemana1EneroGrande = primerDiaAno.getDay();
-            let semana = Math.floor((dia.getTime() - primerDiaAno.getTime()) / (1000 * 60 * 60 * 24));
+            let semana = Math.ceil((i.getTime() - primerDiaAno.getTime()) / (1000 * 60 * 60 * 24));
             semana = Math.ceil((semana + diaSemana1EneroGrande) / 7);
             label2.push(semana);
+
           }
         }
+        console.log(label2);
 
         let kgs2: number[] = new Array(label2.length).fill(0);
+
         let clientes2: string[] = new Array(label2.length);
         let repetidos2: { mes: number, cliente: string }[] = [];
         for (let i = 0; i < planningDetails.length; i++) {//para ir sumando los kg de cada semana
           let dia = new Date(planningDetails[i].fechaDesde);
+
           //Necesitamos saber en que semana entra la planificación de la necesidad
           const primerDiaAno = new Date(dia.getFullYear(), 0, 1);
-          const diaSemana1EneroGrande = primerDiaAno.getDay();
+          const diaSemana1EneroGrande = primerDiaAno.getDay(); // 0 = domingo, 1 = lunes, etc.
           let semana = Math.floor((dia.getTime() - primerDiaAno.getTime()) / (1000 * 60 * 60 * 24));
+
           semana = Math.ceil((semana + diaSemana1EneroGrande) / 7);
 
 
@@ -1007,13 +1021,14 @@ export class DashboardComponent implements OnInit {
             if (semana == label2[j]) {
               //Saber los clientes que estan en la semana de la necesidad
               const id = this.planning.find(item => item.id == planningDetails[i].idCommercialNeedsPlanning);
+
               const client = this.comNeeds.find(item => item.id == id?.idCommercialNeed)
               if (!repetidos2.find(item => item.mes == j && item.cliente == client?.clientName)) {
                 clientes2[j] = (clientes2[j] || '') + client?.clientName + '-';
                 repetidos2.push({ mes: j, cliente: client?.clientName ?? '' })
               }
               kgs2[j] = (kgs2[j] || 0) + planningDetails[i].kilos;//Si los kilos estan vacios lo ponemos a 0.
-
+              console.log(planningDetails[i].id);
             }
           }
         }
@@ -1022,6 +1037,7 @@ export class DashboardComponent implements OnInit {
           semanas.push('Semana ' + (i + 1));
 
         }
+
         // Configuraciones para gráficos de barra     
         const barOptions2 = {
           responsive: true,
@@ -1030,7 +1046,7 @@ export class DashboardComponent implements OnInit {
             y: {
               beginAtZero: true,
               ticks: {
-                stepSize: 20,
+               
                 color: '#64748b'
               },
               grid: {
@@ -1094,7 +1110,7 @@ export class DashboardComponent implements OnInit {
               display: true,
               position: 'left',
               ticks: {
-                stepSize: 10,
+                
                 color: '#64748b'
               },
               grid: {
@@ -1108,7 +1124,7 @@ export class DashboardComponent implements OnInit {
               display: true,
               position: 'right',
               ticks: {
-                stepSize: 10,
+               
                 color: '#64748b'
               },
               grid: {
@@ -1173,8 +1189,8 @@ export class DashboardComponent implements OnInit {
         break;
       case 'año':
         this.vistaSeleccionada = 'año';
-        let meses2: number[] = [9,10,11,12,1,2,3,4,5,6,7,8];
-        
+        let meses2: number[] = [9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8];
+
 
         let kgs3: number[] = new Array(meses2.length).fill(0);
         let clientes3: string[] = new Array(meses2.length);
@@ -1240,8 +1256,8 @@ export class DashboardComponent implements OnInit {
               label3.push('Diciembre');
           }
         }
-         // Gráfico principal     
-         this.data = {
+        // Gráfico principal     
+        this.data = {
           labels: label3,
           datasets: [
             {
@@ -1272,7 +1288,7 @@ export class DashboardComponent implements OnInit {
               display: true,
               position: 'left',
               ticks: {
-                stepSize: 10,
+                
                 color: '#64748b'
               },
               grid: {
@@ -1286,7 +1302,7 @@ export class DashboardComponent implements OnInit {
               display: true,
               position: 'right',
               ticks: {
-                stepSize: 10,
+                
                 color: '#64748b'
               },
               grid: {

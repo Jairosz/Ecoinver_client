@@ -108,7 +108,112 @@ export class ComercialPlanningComponent {
       this.comercialDetails.get().subscribe(
         (data) => {
           this.plannigDetails = data;
-
+          this.selectedComercial = {//El comercial seleccionado en el ngSelect.
+            id: evento.id,
+            clientCode: evento.clientCode,
+            clientName: evento.clientName,
+            startDate: evento.startDate,
+            endDate: evento.endDate,
+            idGenero: evento.idGenero,
+            nombreGenero: evento.nombreGenero,
+            kgs: evento.kgs
+          };
+    
+    
+    
+          const startDate = new Date(evento.startDate);
+          const endDate = new Date(evento.endDate);
+          let inicio = new Date(startDate);
+          let fin;
+          let numSemanas = 0;
+          //Calculo del número de semana
+          const primerDia = new Date(inicio.getFullYear(), 0, 1);
+          let semana = Math.floor((inicio.getTime() - primerDia.getTime()) / (1000 * 60 * 60 * 24));
+          semana = Math.ceil(semana / 7);
+    
+          for (let i = new Date(startDate); i <= endDate; i.setDate(i.getDate() + 1)) {//Se recorren las fechas
+    
+            if (i.getDay() == 0) {//Si el dia de la fecha es igual a domingo
+              fin = new Date(i.getFullYear(), i.getMonth(), i.getDate());
+              numSemanas++;//Sumamos una semana
+              this.semanas.push({
+                semana: semana, fecha: inicio.toLocaleDateString('es-ES', {
+                  day: '2-digit',   // Asegura que el día tenga 2 dígitos
+                  month: '2-digit', // Asegura que el mes tenga 2 dígitos
+                  year: 'numeric',
+                }) + '-' + fin.toLocaleString('es-ES', {
+                  day: '2-digit',   // Asegura que el día tenga 2 dígitos
+                  month: '2-digit', // Asegura que el mes tenga 2 dígitos
+                  year: 'numeric',
+                })
+              });
+    
+              this.rangoSemana.push({
+                inicio: new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate(), 12, 0, 0),
+                fin: new Date(fin.getFullYear(), fin.getMonth(), fin.getDate(), 12, 0, 0)
+              });
+              inicio = new Date(i.getFullYear(), i.getMonth(), i.getDate() + 1);
+    
+              semana++;
+            }
+            if (i.getTime() === endDate.getTime()) {
+              fin = new Date(i.getFullYear(), i.getMonth(), i.getDate());
+    
+              if (i.getDay() != 0) {//Si hemos entrado en una nueva semana aunque no sea domingo.
+    
+                this.semanas.push({
+                  semana: semana, fecha: inicio.toLocaleDateString('es-ES', {
+                    day: '2-digit',   // Asegura que el día tenga 2 dígitos
+                    month: '2-digit', // Asegura que el mes tenga 2 dígitos
+                    year: 'numeric',
+                  }) + '-' + fin.toLocaleString('es-ES', {
+                    day: '2-digit',   // Asegura que el día tenga 2 dígitos
+                    month: '2-digit', // Asegura que el mes tenga 2 dígitos
+                    year: 'numeric',
+                  })
+                });
+                this.rangoSemana.push({
+                  inicio: new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate(), 12, 0, 0),
+                  fin: new Date(fin.getFullYear(), fin.getMonth(), fin.getDate(), 12, 0, 0)
+                });
+                numSemanas++;//Sumamos una semana
+                semana++;
+              }
+    
+            }
+    
+          }
+         
+            
+           
+          console.log(this.rangoSemana);
+        
+          const planning: ComercialPlanningPost = {
+    
+            idCommercialNeed: this.selectedComercial.id,
+            weekNumber: numSemanas,
+            kgs: this.selectedComercial.kgs,
+            startDate: this.selectedComercial.startDate,
+            endDate: this.selectedComercial.endDate
+          }
+          //Guardamos en la tabla planning la necesidad comercial.
+    
+          if (planning && !this.planning.find(item => item.idCommercialNeed == planning.idCommercialNeed)) {//Para que no se repita la misma necesidad comercial en la tabla
+            console.log(this.planning);
+            console.log(planning.idCommercialNeed);
+            this.comercialPlanning.post(planning).subscribe(
+              (data) => {
+                console.log('Se han insertado los datos correctamente');
+                this.planning.push(data.entity);
+    
+    
+              },
+              (error) => {
+                console.log(error);
+              }
+    
+            );
+          }
           if (this.planning.find(item => item.idCommercialNeed == evento.id)) {
             const edit = this.planning.find(item => item.idCommercialNeed == evento.id);
 
@@ -131,7 +236,7 @@ export class ComercialPlanningComponent {
 
           }
           this.semanasFormArray.clear();
-
+          console.log(this.planningEditar);
         this.semanas.forEach((semana, index) => {
           // Crear un FormControl deshabilitado por defecto
           const control = this.fb.control(
@@ -141,10 +246,11 @@ export class ComercialPlanningComponent {
   
           this.semanasFormArray.push(control);
         });
+        console.log(this.planningEditar)
           this.semanasFormArray.controls.forEach(control =>{ 
             if(control.value!==''){
               control.disable();
-              alert(control.value);
+              
             }
             else{
               control.enable();
@@ -163,112 +269,7 @@ export class ComercialPlanningComponent {
       );
 
 
-      this.selectedComercial = {//El comercial seleccionado en el ngSelect.
-        id: evento.id,
-        clientCode: evento.clientCode,
-        clientName: evento.clientName,
-        startDate: evento.startDate,
-        endDate: evento.endDate,
-        idGenero: evento.idGenero,
-        nombreGenero: evento.nombreGenero,
-        kgs: evento.kgs
-      };
-
-
-
-      const startDate = new Date(evento.startDate);
-      const endDate = new Date(evento.endDate);
-      let inicio = new Date(startDate);
-      let fin;
-      let numSemanas = 0;
-      //Calculo del número de semana
-      const primerDia = new Date(inicio.getFullYear(), 0, 1);
-      let semana = Math.floor((inicio.getTime() - primerDia.getTime()) / (1000 * 60 * 60 * 24));
-      semana = Math.ceil(semana / 7)+1;
-
-      for (let i = new Date(startDate); i <= endDate; i.setDate(i.getDate() + 1)) {//Se recorren las fechas
-
-        if (i.getDay() == 0) {//Si el dia de la fecha es igual a domingo
-          fin = new Date(i.getFullYear(), i.getMonth(), i.getDate());
-          numSemanas++;//Sumamos una semana
-          this.semanas.push({
-            semana: semana, fecha: inicio.toLocaleDateString('es-ES', {
-              day: '2-digit',   // Asegura que el día tenga 2 dígitos
-              month: '2-digit', // Asegura que el mes tenga 2 dígitos
-              year: 'numeric',
-            }) + '-' + fin.toLocaleString('es-ES', {
-              day: '2-digit',   // Asegura que el día tenga 2 dígitos
-              month: '2-digit', // Asegura que el mes tenga 2 dígitos
-              year: 'numeric',
-            })
-          });
-
-          this.rangoSemana.push({
-            inicio: new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate(), 12, 0, 0),
-            fin: new Date(fin.getFullYear(), fin.getMonth(), fin.getDate(), 12, 0, 0)
-          });
-          inicio = new Date(i.getFullYear(), i.getMonth(), i.getDate() + 1);
-
-          semana++;
-        }
-        if (i.getTime() === endDate.getTime()) {
-          fin = new Date(i.getFullYear(), i.getMonth(), i.getDate());
-
-          if (i.getDay() != 0) {//Si hemos entrado en una nueva semana aunque no sea domingo.
-
-            this.semanas.push({
-              semana: semana, fecha: inicio.toLocaleDateString('es-ES', {
-                day: '2-digit',   // Asegura que el día tenga 2 dígitos
-                month: '2-digit', // Asegura que el mes tenga 2 dígitos
-                year: 'numeric',
-              }) + '-' + fin.toLocaleString('es-ES', {
-                day: '2-digit',   // Asegura que el día tenga 2 dígitos
-                month: '2-digit', // Asegura que el mes tenga 2 dígitos
-                year: 'numeric',
-              })
-            });
-            this.rangoSemana.push({
-              inicio: new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate(), 12, 0, 0),
-              fin: new Date(fin.getFullYear(), fin.getMonth(), fin.getDate(), 12, 0, 0)
-            });
-            numSemanas++;//Sumamos una semana
-            semana++;
-          }
-
-        }
-
-      }
-     
-        
-       
-      
-    
-      const planning: ComercialPlanningPost = {
-
-        idCommercialNeed: this.selectedComercial.id,
-        weekNumber: numSemanas,
-        kgs: this.selectedComercial.kgs,
-        startDate: this.selectedComercial.startDate,
-        endDate: this.selectedComercial.endDate
-      }
-      //Guardamos en la tabla planning la necesidad comercial.
-
-      if (planning && !this.planning.find(item => item.idCommercialNeed == planning.idCommercialNeed)) {//Para que no se repita la misma necesidad comercial en la tabla
-        console.log(this.planning);
-        console.log(planning.idCommercialNeed);
-        this.comercialPlanning.post(planning).subscribe(
-          (data) => {
-            console.log('Se han insertado los datos correctamente');
-            this.planning.push(data.entity);
-
-
-          },
-          (error) => {
-            console.log(error);
-          }
-
-        );
-      }
+  
 
 
     }
@@ -340,7 +341,7 @@ export class ComercialPlanningComponent {
             kilos: Number(input[i].value),
             fechaDesde: this.rangoSemana[i].inicio,
             fechaHasta: this.rangoSemana[i].fin,
-            numeroSemana: i + 1
+            numeroSemana: this.semanas[i].semana
 
           };
           console.log(this.guardarPlanning);
@@ -370,9 +371,9 @@ export class ComercialPlanningComponent {
   //Barra de progreso
 
   get calcularPorcentaje() {
-    const porecentaje = (this.distribuido * 100) / this.selectedComercial.kgs;
-    if (porecentaje <= 100) {
-      return porecentaje;
+    const porcentaje = (this.distribuido * 100) / this.selectedComercial.kgs;
+    if (porcentaje <= 100) {
+      return porcentaje;
     } else {
       return 100;
     }
@@ -389,6 +390,7 @@ export class ComercialPlanningComponent {
 
           this.editarPlanning = true;
           this.validar = null;
+          this.editarBoton=false;
         },
         (error) => {
           console.log('Error al editar'+error);
@@ -397,6 +399,36 @@ export class ComercialPlanningComponent {
     }
     else{
       const id = this.planning.find(item => item.idCommercialNeed == this.selectedComercial.id);
+      
+      const input = document.querySelectorAll('input[type="number"]') as NodeListOf<HTMLInputElement>;
+      
+        
+        this.guardarPlanning = {
+          idCommercialNeedsPlanning: id?.id || 0,
+          kilos: Number(input[indice].value),
+          fechaDesde: this.rangoSemana[indice].inicio,
+          fechaHasta: this.rangoSemana[indice].fin,
+          numeroSemana: indice + 1
+          
+  
+        };
+        
+      
+      
+      this.comercialDetails.post(this.guardarPlanning).subscribe(
+        (data)=>{
+          console.log(data);
+          this.editarPlanning = true;
+          this.validar = null;
+          this.editarBoton=false;
+          this.semanasFormArray.controls[indice].disable();
+        },
+        (error)=>{
+          console.log(error);
+        }
+
+
+      )
       
     }
 

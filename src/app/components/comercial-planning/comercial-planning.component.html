@@ -302,7 +302,9 @@
             Guardar
           </button>
           }
-          @if(planningEditar[i]?.kilos || i>planningEditar.length-1){
+          @if(planningEditar[i]?.kilos || (planningEditar.length > 0 && planningEditar.length != semanas.length)) {
+            
+            
           <button type="button"
             class="px-3 py-1.5 bg-indigo-50 text-indigo-700 text-sm font-medium rounded-lg hover:bg-indigo-100 transition-colors dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50"
             (click)="habilitarBoton(i)">
