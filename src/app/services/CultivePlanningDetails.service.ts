@@ -115,7 +115,7 @@ export class CultivePlanningDetailsService {
       fechaInicio: fechaInicio,
       fechaFin: fechaFin,
       kilos: details.kilos || 0,
-      tramos: details.tramos || 0,
+      tramos: details.tramo || 0,
       // Asegurarse de que cultivePlanningId es un número
       cultivePlanningId: Number(planningId)  // NOTA: Cambiado de 'idCultivePlanning' a 'cultivePlanningId'
     };
@@ -223,7 +223,7 @@ createMultiplePlanningDetails(planningId: string, tramosDetails: any[]): Observa
       fechaInicio: fechaInicio,
       fechaFin: fechaFin,
       kilos: details.kilos || 0,
-      tramos: details.tramos || 0
+      tramos: details.tramo || 0
     };
     
     return this.http
