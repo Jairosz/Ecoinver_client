@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Comercial, ComercialServiceService } from '../../services/Comercial.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { CommonModule } from '@angular/common';
@@ -27,7 +27,8 @@ export interface ComercialPlanningDetailsWithId {
 })
 export class ComercialPlanningComponent {
   modal = false;
-  editarBoton:boolean=false;
+  editarBoton: boolean = false;
+
   validar: string | null = null//Para el botón guardar planificación
   semanas: { semana: number, fecha: string }[] = [];//Array que contendrá la semana y fecha de los cards
   rangoSemana: { inicio: Date, fin: Date }[] = [];
@@ -57,14 +58,15 @@ export class ComercialPlanningComponent {
   editarPlanning: boolean = false;
   formulario: FormGroup;
   validForm: boolean = false;//Para validar el formualarrio
+  index:number=-1;
 
-  constructor(private comercialServicio: ComercialServiceService, private comercialPlanning: ComercialPlanningService, private comercialDetails: ComercialPlanningDetailsService, private fb: FormBuilder) {
+  constructor(private comercialServicio: ComercialServiceService, private comercialPlanning: ComercialPlanningService, private comercialDetails: ComercialPlanningDetailsService, private fb: FormBuilder, private cdr: ChangeDetectorRef) {
     this.formulario = this.fb.group({
-      kilos: ['', [Validators.required, Validators.min(1)]]
-
+      semanas: this.fb.array([]) // Inicializa un FormArray vacío
     });
   }
   ngOnInit(): void {
+
     this.comercialServicio.getComercial().subscribe(//Obtenemos las necesidades comerciales guardadas en la base de datos
       (data) => {
         this.comercial = data;
@@ -85,7 +87,10 @@ export class ComercialPlanningComponent {
       }
 
     );
-   
+    
+  }
+  ngAfterViewInit() {
+    this.cdr.detectChanges();
   }
 
   calcularSemanas(evento: Comercial) {//Calculo del rengo de las fechas para generar los Cards
@@ -96,7 +101,7 @@ export class ComercialPlanningComponent {
     this.pendiente = 0;
     this.planningEditar = [];
     this.validar = null;
-
+    this.editarBoton = false;
 
     if (evento) {
       //Obtenemos los datos detalles de cada card del planning de la BD
@@ -108,7 +113,8 @@ export class ComercialPlanningComponent {
             const edit = this.planning.find(item => item.idCommercialNeed == evento.id);
 
             for (let i = 0; i < this.plannigDetails.length; i++) {
-              if (this.plannigDetails[i].idCommercialNeedsPlanning == edit?.id) {
+              if (this.plannigDetails[i].idCommercialNeedsPlanning == edit?.id) {//Si encuentra el comercial ya planificado se guardan los valores
+                
                 this.planningEditar.push({
                   id: this.plannigDetails[i].id,
                   idCommercialNeedsPlanning: this.plannigDetails[i].idCommercialNeedsPlanning,
@@ -122,8 +128,31 @@ export class ComercialPlanningComponent {
               }
             }
 
+
           }
-          
+          this.semanasFormArray.clear();
+
+        this.semanas.forEach((semana, index) => {
+          // Crear un FormControl deshabilitado por defecto
+          const control = this.fb.control(
+            this.planningEditar[index]?.kilos || '',
+            [Validators.required, Validators.min(1)]
+          );
+  
+          this.semanasFormArray.push(control);
+        });
+          this.semanasFormArray.controls.forEach(control =>{ 
+            if(control.value!==''){
+              control.disable();
+              alert(control.value);
+            }
+            else{
+              control.enable();
+            }
+           
+
+        });
+          console.log(this.planningEditar);
           this.pendiente = evento.kgs - this.distribuido;
 
         },
@@ -155,7 +184,7 @@ export class ComercialPlanningComponent {
       //Calculo del número de semana
       const primerDia = new Date(inicio.getFullYear(), 0, 1);
       let semana = Math.floor((inicio.getTime() - primerDia.getTime()) / (1000 * 60 * 60 * 24));
-      semana = Math.ceil(semana / 7);
+      semana = Math.ceil(semana / 7)+1;
 
       for (let i = new Date(startDate); i <= endDate; i.setDate(i.getDate() + 1)) {//Se recorren las fechas
 
@@ -209,8 +238,11 @@ export class ComercialPlanningComponent {
         }
 
       }
-
-
+     
+        
+       
+      
+    
       const planning: ComercialPlanningPost = {
 
         idCommercialNeed: this.selectedComercial.id,
@@ -269,9 +301,9 @@ export class ComercialPlanningComponent {
 
 
     const id = this.planning.find(item => item.idCommercialNeed == this.selectedComercial.id);
+    
 
-
-    if (this.plannigDetails.find(item => item.idCommercialNeedsPlanning == id?.id)) {
+    if (id===undefined || this.plannigDetails.find(item => item.idCommercialNeedsPlanning == id?.id)) {
 
       this.validar = 'Esta necesidad comercial ya existe en el sistema';
       this.modal = false;
@@ -283,7 +315,14 @@ export class ComercialPlanningComponent {
 
     }
     else {
-      if (this.formulario.get('kilos')?.invalid) {
+      for (let i = 0; i < this.semanasFormArray.length; i++) {
+        if (this.semanasFormArray.controls[i].invalid) {
+
+          this.validForm = true;
+
+        }
+      }
+      if (this.validForm) {
 
         this.validForm = true;
         console.log('Error');
@@ -291,7 +330,6 @@ export class ComercialPlanningComponent {
           this.validForm = false;
           return;
         }, 2000)
-
       }
       else {
         const input = document.querySelectorAll('input[type="number"]') as NodeListOf<HTMLInputElement>;
@@ -303,13 +341,14 @@ export class ComercialPlanningComponent {
             fechaDesde: this.rangoSemana[i].inicio,
             fechaHasta: this.rangoSemana[i].fin,
             numeroSemana: i + 1
-            
+
           };
           console.log(this.guardarPlanning);
           try {
             const resultado = await this.comercialDetails.post(this.guardarPlanning).toPromise();
-            
-            console.log('Datos insertados correctamente');
+
+
+            console.log('Datos insertados correctamente '+resultado);
 
           } catch (error) {
             console.log('Error al guardar los datos ' + error);
@@ -352,11 +391,14 @@ export class ComercialPlanningComponent {
           this.validar = null;
         },
         (error) => {
-          console.log('Error al editar');
+          console.log('Error al editar'+error);
         }
-      )
+      );
     }
-
+    else{
+      const id = this.planning.find(item => item.idCommercialNeed == this.selectedComercial.id);
+      
+    }
 
   }
 
@@ -364,15 +406,20 @@ export class ComercialPlanningComponent {
     this.editarPlanning = false;
   }
 
-  habilitarBoton(){
-    if(this.editarBoton==false){
-      this.editarBoton=true;
-    }
+  habilitarBoton(i: number) {
+    if (this.editarBoton == false) {
+      this.editarBoton = true;
+      this.semanasFormArray.controls[i].enable();
+      this.index=i;
+    } else {
+      this.editarBoton = false;
 
-    else{
-      this.editarBoton=false;
+      this.semanasFormArray.controls[i].disable();
     }
-    
+    this.cdr.detectChanges(); // Forzar la detección de cambios
   }
- 
+  get semanasFormArray(): FormArray<FormControl> {
+    return this.formulario.get('semanas') as FormArray<FormControl>;
+  }
+
 }
