@@ -10,6 +10,12 @@ import {
 } from '../../services/CultivePlanning.service';
 import { CultivePlanningDetailsService } from '../../services/CultivePlanningDetails.service';
 import { CultivePlanningDetails } from '../../types/CultivePlanningDetails';
+import { CultiveProductionService } from '../../services/CultiveProduction.service';
+import {
+  CultiveProductionDto,
+  CreateCultiveProductionDto,
+  UpdateCultiveProductionDto,
+} from '../../types/CultiveProductionTypes';
 
 // Define el DTO aquí ya que no está exportado desde el servicio
 interface CultivePlanningDTO {
@@ -87,10 +93,18 @@ export class CultivePlanningComponent implements OnInit {
   generos: string[] = []; // Lista de géneros únicos
   cultivosPorGenero: { [genero: string]: Cultive[] } = {}; // Mapa de cultivos agrupados por género
   filteredCultivos: Cultive[] = []; // Cultivos filtrados según el género seleccionado
+
+  /** Detalles de los tramos recibidos de la API */
+  details: CultivePlanningDetails[] = [];
+  // Mapa de producciones cargadas: key = cultivePlanningDetailsId, value = DTO
+
+  private produccionesMap = new Map<number, CultiveProductionDto>();
+
   constructor(
     private cultivoService: CultivoService,
     private cultivoPlanningService: CultivePlanningService,
-    private cultivePlanningDetailsService: CultivePlanningDetailsService
+    private cultivePlanningDetailsService: CultivePlanningDetailsService,
+    private productionService: CultiveProductionService
   ) {}
 
   ngOnInit(): void {
@@ -502,114 +516,114 @@ export class CultivePlanningComponent implements OnInit {
     this.planificaciones = [...planificacionesMuestra];
   }
   // Carga una planificación seleccionada
+  /**
+   * Carga la planificación seleccionada, sus detalles de tramos
+   * y las producciones existentes para cada tramo.
+   */
   cargarPlanificacion(): void {
-    console.log('Seleccionada planificación:', this.selectedPlanificacion);
+    console.log('Planificación seleccionada:', this.selectedPlanificacion);
 
-    // Si se tiene seleccionado el placeholder (ninguna planificación elegida)
+    // 1) Si no hay nada seleccionado, reiniciar formularios y salir
     if (this.selectedPlanificacion === '') {
-      // Se podría limpiar o reinicializar los campos si se necesita
       this.nuevaPlanificacionNombre = '';
       this.selectedCultivos = [];
-      // Opcional: vaciar o no inicializar los tramos, de modo que la sección se oculte
       this.cards = [];
       return;
     }
 
-    // Verificar si la planificación seleccionada es "nueva"
+    // 2) Si es "nueva", inicializar tramos vacíos y salir
     if (this.selectedPlanificacion === 'nueva') {
-      console.log('Inicializando nueva planificación');
       this.initializeTramos();
       this.selectedCultivos = [];
       this.nuevaPlanificacionNombre = '';
       return;
     }
 
-    // Buscar la planificación seleccionada
-    const planificacion = this.planificaciones.find(
-      (p) =>
-        p.id === this.selectedPlanificacion ||
-        String(p.id) === String(this.selectedPlanificacion)
+    // 3) Buscar la planificación existente en memoria
+    const plan = this.planificaciones.find(
+      (p) => String(p.id) === String(this.selectedPlanificacion)
     );
-
-    if (!planificacion) {
+    if (!plan) {
       console.error(
         'No se encontró la planificación con ID:',
         this.selectedPlanificacion
       );
       this.mostrarMensajeExito(
-        'Error: No se encontró la planificación seleccionada.'
+        'Error: planificación no encontrada, intentando cargar desde API...'
       );
       this.cargarPlanificacionDesdeAPI();
       return;
     }
 
-    // Cargar datos básicos de la planificación
-    this.nuevaPlanificacionNombre = planificacion.nombre;
-
-    // Verificar que los cultivos seleccionados existan en los cultivos disponibles
-    this.selectedCultivos = planificacion.cultivos.filter((cultivo) =>
-      this.cultivos.includes(cultivo)
+    // 4) Poner nombre y cultivos básicos
+    this.nuevaPlanificacionNombre = plan.nombre;
+    this.selectedCultivos = plan.cultivos.filter((c) =>
+      this.cultivos.includes(c)
     );
 
-    // Consultar a la API por los detalles específicos de esta planificación
+    // 5) Solicitar al servidor los detalles de tramo
     this.cultivePlanningDetailsService
       .getDetailsByPlanningId(this.selectedPlanificacion)
       .subscribe(
         (details) => {
-          if (details && details.length > 0) {
-            // Ordenar los detalles por número de tramo
-            const sortedDetails = [...details].sort(
-              (a, b) => a.tramo - b.tramo
-            );
+          // Guardar detalles para uso posterior
+          this.details = details;
 
-            // Crear un mapa de los detalles por número de tramo para acceso más rápido
-            const detailsByTramo = new Map();
-            sortedDetails.forEach((detail) => {
-              detailsByTramo.set(detail.tramo, detail);
-            });
+          // Inicializar los 12 tramos de la UI
+          this.initializeTramos();
 
-            // Inicializar las cards
-            this.initializeTramos();
+          // Rellenar cada card con datos de kilos y fechas de la API
+          details.forEach((detail) => {
+            const idx = detail.tramo - 1;
+            this.cards[idx] = {
+              value: detail.kilos,
+              startDate: this.formatDate(new Date(detail.fechaInicio)),
+              endDate: this.formatDate(new Date(detail.fechaFin)),
+            };
+          });
 
-            // Actualizar cada tramo con los datos específicos de la API
-            for (let i = 0; i < this.numTramos; i++) {
-              const tramoNum = i + 1; // Números de tramo son del 1 al 12
-              const detail = detailsByTramo.get(tramoNum);
+          // 6) Cargar producciones existentes para estos detalles
+          this.loadProductionsForDetails(details);
 
-              if (detail) {
-                // Actualizar la card correspondiente con los valores de la API
-                this.cards[i] = {
-                  value: detail.kilos,
-                  startDate: this.formatDate(new Date(detail.fechaInicio)),
-                  endDate: this.formatDate(new Date(detail.fechaFin)),
-                };
-              }
-            }
-
-            this.mostrarMensajeExito(
-              'Datos de planificación cargados correctamente'
-            );
-          } else {
-            // Si no hay detalles en la API pero tenemos la planificación local, usamos esos tramos
-            if (planificacion.tramos && planificacion.tramos.length > 0) {
-              this.cards = [...planificacion.tramos];
-            } else {
-              this.initializeTramos();
-            }
-          }
+          this.mostrarMensajeExito(
+            'Datos de planificación cargados correctamente'
+          );
         },
         (error) => {
-          console.error('Error al cargar detalles de tramos:', error);
-          if (planificacion.tramos && planificacion.tramos.length > 0) {
-            this.cards = [...planificacion.tramos];
+          console.error('Error al cargar detalles de planificación:', error);
+          // En caso de fallo, dejamos los tramos de plan local
+          if (plan.tramos && plan.tramos.length) {
+            this.cards = [...plan.tramos];
           } else {
             this.initializeTramos();
           }
           this.mostrarMensajeExito(
-            'Error al cargar datos. Usando datos locales.'
+            'Error cargando detalles. Usando datos locales.'
           );
         }
       );
+  }
+
+  private loadProductionsForDetails(details: CultivePlanningDetails[]) {
+    this.productionService.getAllCultiveProductions().subscribe(
+      (allProds) => {
+        // Filtramos para quedarnos solo con las producciones de los detalles actuales
+        const detailIds = new Set(details.map((d) => d.id));
+        allProds
+          .filter((p) => detailIds.has(p.cultivePlanningDetailsId))
+          .forEach((p) =>
+            this.produccionesMap.set(p.cultivePlanningDetailsId, p)
+          );
+
+        console.log(
+          'Producciones cargadas para estos detalles:',
+          this.produccionesMap
+        );
+      },
+      (error) => {
+        console.error('Error al cargar producciones:', error);
+      }
+    );
   }
 
   // Método para intentar cargar directamente desde la API
@@ -692,39 +706,74 @@ export class CultivePlanningComponent implements OnInit {
       this.tempSelectedCultivos
     );
 
-    // Si no hay selección, salir de la función
+    // Si no hay selección, salir
     if (!this.tempSelectedCultivos || this.tempSelectedCultivos.length === 0) {
       return;
     }
 
-    // Limpiar cualquier selección anterior
+    // 1) Actualizar la vista: construir this.selectedCultivos a partir de tempSelectedCultivos
     this.selectedCultivos = [];
-
-    // Añadir cada cultivo seleccionado en el formato correcto
     for (const selectedIdStr of this.tempSelectedCultivos) {
-      // Convertir el ID de string a number para la comparación
       const selectedId = Number(selectedIdStr);
-
-      // Buscar el cultivo correspondiente por ID
-      const selectedCultivo = this.filteredCultivos.find(
-        (cultivo) => cultivo.id === selectedId
-      );
-
-      if (selectedCultivo) {
-        // Crear el nombre formateado para mostrar
-        const displayName = `${selectedCultivo.nombreAgricultor} - ${selectedCultivo.nombreGenero} - ${selectedCultivo.nombreVariedad}`;
-
-        // Añadir a la lista de seleccionados
+      const cultivo = this.filteredCultivos.find((c) => c.id === selectedId);
+      if (cultivo) {
+        const displayName = `${cultivo.nombreAgricultor} - ${cultivo.nombreGenero} - ${cultivo.nombreVariedad}`;
         this.selectedCultivos.push(displayName);
       }
     }
-
-    console.log('Cultivos seleccionados finales:', this.selectedCultivos);
     this.closeCultivoModal();
+
+    // 2) Para cada tramo/detail, crear o actualizar su CultiveProduction
+    this.details.forEach((detail) => {
+      const idx = detail.tramo - 1;
+      const card = this.cards[idx];
+
+      const createDto: CreateCultiveProductionDto = {
+        cultivePlanningDetailsId: detail.id,
+        kilos: String(card.value),
+        fechaInicio: card.startDate!,
+        fechaFin: card.endDate!,
+      };
+
+      const existing = this.produccionesMap.get(detail.id);
+      if (existing) {
+        // Ya existe → actualizar
+        const updateDto: UpdateCultiveProductionDto = { ...createDto };
+        this.productionService
+          .updateCultiveProduction(existing.id, updateDto)
+          .subscribe((updated) => {
+            this.produccionesMap.set(detail.id, updated);
+            console.log(
+              `Producción actualizada para detail ${detail.id}`,
+              updated
+            );
+          });
+      } else {
+        // No existe → crear
+        this.productionService
+          .createCultiveProduction(createDto)
+          .subscribe((created) => {
+            this.produccionesMap.set(detail.id, created);
+            console.log(`Producción creada para detail ${detail.id}`, created);
+          });
+      }
+    });
   }
 
   removeCultivo(index: number): void {
+    // 6.1 Quitar de la lista UI
     this.selectedCultivos.splice(index, 1);
+
+    // 6.2 Determinar qué detail corresponde (adapta según tu lógica)
+    const detail = this.details[index];
+    if (!detail) return;
+
+    const prod = this.produccionesMap.get(detail.id);
+    if (prod) {
+      this.productionService
+        .deleteCultiveProduction(prod.id)
+        .subscribe(() => this.produccionesMap.delete(detail.id));
+    }
   }
 
   // Valida las fechas de un tramo
