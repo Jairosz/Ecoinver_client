@@ -10,10 +10,11 @@ export interface Cultive {
     generoId?: number;           // Opcional
     nombreGenero: string;
     nombreVariedad: string;
-    superficie?: number;         // Opcional
+    superficie: number;         // Opcional
     produccionEstimada?: number; // Opcional
     fechaSiembra?: Date;         // Opcional
     fechaFin?: Date;             // Opcional
     latitud?: number;
     longitud?: number;
+    idCultivePlanning: number | null; //ID DEL PLANING ASOCIADO
   }
