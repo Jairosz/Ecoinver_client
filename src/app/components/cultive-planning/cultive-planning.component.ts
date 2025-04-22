@@ -71,6 +71,9 @@ export class CultivePlanningComponent implements OnInit {
   cultivos: string[] = []; // Será llenado con géneros de la base de datos
   selectedCultivos: string[] = [];
   tempSelectedCultivos: string[] = []; // Para almacenar selección temporal en el modal
+  selectedCultivosIds: number[] = [];// ids de cultivos seleccionados
+  // ids temporales (modal)
+  tempSelectedCultivosIds: number[] = [];
   cultivo: Cultive[] = []; // Array de cultivos desde API
 
   // Modal control
@@ -691,7 +694,7 @@ export class CultivePlanningComponent implements OnInit {
       this.filteredCultivos = [...this.cultivo];
       this.prepareDisplayNames();
     }
-
+    this.tempSelectedCultivosIds = [...this.selectedCultivosIds];
     this.showCultivoModal = true;
   }
 
@@ -701,64 +704,57 @@ export class CultivePlanningComponent implements OnInit {
 
   // Método modificado para añadir cultivos seleccionados con NgSelect
   addSelectedCultivos(): void {
-    console.log(
-      'Cultivos seleccionados temporalmente:',
-      this.tempSelectedCultivos
-    );
-
-    // Si no hay selección, salir
-    if (!this.tempSelectedCultivos || this.tempSelectedCultivos.length === 0) {
-      return;
-    }
-
-    // 1) Actualizar la vista: construir this.selectedCultivos a partir de tempSelectedCultivos
-    this.selectedCultivos = [];
-    for (const selectedIdStr of this.tempSelectedCultivos) {
-      const selectedId = Number(selectedIdStr);
-      const cultivo = this.filteredCultivos.find((c) => c.id === selectedId);
-      if (cultivo) {
-        const displayName = `${cultivo.nombreAgricultor} - ${cultivo.nombreGenero} - ${cultivo.nombreVariedad}`;
-        this.selectedCultivos.push(displayName);
-      }
-    }
+    // 1) IDs antes y IDs nuevas (modal)
+    const anteriores = [...this.selectedCultivosIds];
+    const nuevas    = this.tempSelectedCultivos.map(idStr => Number(idStr));
+  
+    // 2) Calcular añadidos y eliminados
+    const añadidos  = nuevas.filter(id => !anteriores.includes(id));
+    const eliminados = anteriores.filter(id => !nuevas.includes(id));
+  
+    // 3) Actualizar UI: ids y nombres
+    this.selectedCultivosIds = nuevas;
+    this.selectedCultivos    = nuevas.map(id => {
+      const c = this.filteredCultivos.find(x => x.id === id)!;
+      return `${c.nombreAgricultor} - ${c.nombreGenero} - ${c.nombreVariedad}`;
+    });
     this.closeCultivoModal();
-
-    // 2) Para cada tramo/detail, crear o actualizar su CultiveProduction
-    this.details.forEach((detail) => {
-      const idx = detail.tramo - 1;
-      const card = this.cards[idx];
-
-      const createDto: CreateCultiveProductionDto = {
-        cultivePlanningDetailsId: detail.id,
-        kilos: String(card.value),
-        fechaInicio: card.startDate!,
-        fechaFin: card.endDate!,
-      };
-
-      const existing = this.produccionesMap.get(detail.id);
-      if (existing) {
-        // Ya existe → actualizar
-        const updateDto: UpdateCultiveProductionDto = { ...createDto };
+  
+    // 4) Crear un map cultivoId→superficie
+    const superficies = new Map<number, number>();
+    this.filteredCultivos.forEach(c => superficies.set(c.id, c.superficie));
+  
+    // 5) Para cada cultivo añadido: crear 12 producciones (una por tramo)
+    añadidos.forEach(cultivoId => {
+      const sup = superficies.get(cultivoId) ?? 1;
+  
+      this.details.forEach(detail => {
+        const card     = this.cards[ detail.tramo - 1 ];
+        const kilosStr = String(card.value ?? 0);
+  
+        const dto: CreateCultiveProductionDto = {
+          cultivePlanningDetailsId: detail.id,
+          cultiveId:                cultivoId,
+          kilos:                    kilosStr,
+          fechaInicio:              card.startDate!,
+          fechaFin:                 card.endDate!
+        };
+  
         this.productionService
-          .updateCultiveProduction(existing.id, updateDto)
-          .subscribe((updated) => {
-            this.produccionesMap.set(detail.id, updated);
-            console.log(
-              `Producción actualizada para detail ${detail.id}`,
-              updated
-            );
-          });
-      } else {
-        // No existe → crear
-        this.productionService
-          .createCultiveProduction(createDto)
-          .subscribe((created) => {
-            this.produccionesMap.set(detail.id, created);
-            console.log(`Producción creada para detail ${detail.id}`, created);
-          });
-      }
+          .createCultiveProduction(dto)
+          .subscribe(created =>
+            console.log(`Producción creada detail ${detail.id}`, created)
+          );
+      });
+    });
+  
+    // 6) (Opcional) eliminar producciones de cultivos quitados
+    eliminados.forEach(cultivoId => {
+      // podrías filtrar produccionesMap y llamar a deleteCultiveProduction(...)
+      console.log(`Cultivo ${cultivoId} desasociado`);
     });
   }
+  
 
   removeCultivo(index: number): void {
     // 6.1 Quitar de la lista UI
