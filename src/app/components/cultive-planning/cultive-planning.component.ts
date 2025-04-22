@@ -725,8 +725,8 @@ export class CultivePlanningComponent implements OnInit {
     this.filteredCultivos.forEach(c => superficies.set(c.id, c.superficie));
   
     // 5) Para cada cultivo añadido: crear 12 producciones (una por tramo)
-    añadidos.forEach(cultivoId => {
-      const sup = superficies.get(cultivoId) ?? 1;
+    añadidos.forEach(cultiveId => {
+      const sup = superficies.get(cultiveId) ?? 1;
   
       this.details.forEach(detail => {
         const card     = this.cards[ detail.tramo - 1 ];
@@ -734,7 +734,7 @@ export class CultivePlanningComponent implements OnInit {
   
         const dto: CreateCultiveProductionDto = {
           cultivePlanningDetailsId: detail.id,
-          cultiveId:                cultivoId,
+          cultiveId:                cultiveId,
           kilos:                    kilosStr,
           fechaInicio:              card.startDate!,
           fechaFin:                 card.endDate!
