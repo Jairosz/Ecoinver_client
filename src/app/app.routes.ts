@@ -9,7 +9,7 @@ import { CultivePlanningComponent } from './components/cultive-planning/cultive-
 import { RolesComponent } from './components/roles/roles.component';
 import { ComercialPlanningComponent } from './components/comercial-planning/comercial-planning.component';
 import { CultiveDetailsComponent } from './components/cultive-details/cultive-details.component';
-import { CropDistributionMapComponent } from './components/crop-distribution-map/crop-distribution-map.component';
+import { CropManagementComponent } from './components/crop-management/crop-management.component';
 
 export const routes: Routes = [
   // Redirige la raíz al login
@@ -31,7 +31,7 @@ export const routes: Routes = [
       { path: 'roles', component: RolesComponent},
       {path: 'cultive/:id', component: CultiveDetailsComponent},
       {path:'comercial-planning', component:ComercialPlanningComponent},
-      {path:'cultive-map', component:CropDistributionMapComponent},
+      {path:'cultive-map', component:CropManagementComponent},
 
 
 
