@@ -283,7 +283,7 @@
 
 
               <input type="number" placeholder="0" [formControlName]="i" (input)="resumen()"
-                [value]="planningEditar[i]?.kilos"
+                [value]="planningEditar[i] ? planningEditar[i].kilos:''"
                 class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg w-full p-2.5 pr-12 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-800 dark:focus:border-indigo-700" />
 
               <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -302,7 +302,7 @@
             Guardar
           </button>
           }
-          @if(planningEditar[i]?.kilos || (planningEditar.length > 0 && planningEditar.length != semanas.length)) {
+          @if((planningEditar[i] && planningEditar[i].kilos) || (planningEditar.length > 0 && planningEditar.length != semanas.length)) {
             
             
           <button type="button"

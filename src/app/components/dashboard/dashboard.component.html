@@ -103,7 +103,7 @@
                 <div class="flex items-center group">
                   <input type="radio" (click)="contarSeleccionados()" name="genero" [value]="nombre" class="form-checkbox h-4 w-4 text-indigo-600 dark:text-indigo-400 rounded border-gray-300 dark:border-gray-600 focus:ring-indigo-500 dark:focus:ring-indigo-400">
                   <label for="gender_1" class="ml-2 text-sm text-gray-700 dark:text-gray-300 truncate flex-1">{{nombre}}</label>
-                  <span class="text-xs text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">{{nombre}}</span>
+                 
                 </div>
                 }
               </div>
@@ -271,7 +271,7 @@
             </div>
             <div>
               <p class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Géneros seleccionados</p>
-              <p class="text-sm sm:text-base font-semibold text-indigo-600 dark:text-indigo-400">{{ selectedGenderIds|| 'Todos' }}</p>
+              <p class="text-sm sm:text-base font-semibold text-indigo-600 dark:text-indigo-400">{{ selectedGenderIds|| 'Sin género' }}</p>
             </div>
           </div>
           
@@ -284,7 +284,7 @@
             </div>
             <div>
               <p class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Necesidades seleccionadas</p>
-              <p class="text-sm sm:text-base font-semibold text-emerald-600 dark:text-emerald-400">{{ selectedComNeedIds.length || 'Todas' }}</p>
+              <p class="text-sm sm:text-base font-semibold text-emerald-600 dark:text-emerald-400">{{ nombreComerciales|| 'No existen necesidades comerciales para el género seleccionado' }}</p>
             </div>
           </div>
           
@@ -310,21 +310,26 @@
             </div>
             <div>
               <p class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total registros</p>
-              <p class="text-sm sm:text-base font-semibold text-blue-600 dark:text-blue-400">{{ filteredComNeeds.length }}</p>
+              <p class="text-sm sm:text-base font-semibold text-blue-600 dark:text-blue-400">{{ filteredComNeeds.length }}</p><!--Esto se tiene que corregir-->
             </div>
           </div>
         </div>
         
-        <div class="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-gray-700">
-          <button class="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Exportar datos
-          </button>
-        </div>
+        <!-- Reemplaza el botón actual de exportación en el panel informativo -->
+<div class="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-gray-700">
+  <div class="space-y-2">
+    <button (click)="exportToPdf()" class="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      Exportar dashboard completo
+    </button>
+    
+    
+  </div>
+</div>
       </div>
     </div>
 
@@ -382,7 +387,7 @@
               <div class="p-2 sm:p-4">
                 <!-- Altura ajustable para gráfica de teoría -->
                 <div class="w-full h-40 sm:h-48 md:h-60 overflow-hidden">
-                  <p-chart type="line" [data]="teoricaData" [options]="teoricaOptions" class="w-full h-full" />
+                  <p-chart type="line" [data]="data" [options]="teoricaOptions" class="w-full h-full" />
                 </div>
               </div>
             </div>
