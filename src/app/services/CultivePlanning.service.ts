@@ -4,6 +4,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../environment/environment';
+import { CreateCultivePlanningDto, UpdateCultivePlanningDto } from '../types/CultivePlanningTypes';
 
 export interface CultivePlanning {
   id: string;
@@ -69,14 +70,14 @@ export class CultivePlanningService {
     );
   }
 
-  createCultivePlanning(planning: CultivePlanningDTO): Observable<CultivePlanning> {
+  createCultivePlanning(planning: CreateCultivePlanningDto): Observable<CultivePlanning> {
     return this.http
       .post<CultivePlanning>(this.apiUrl, planning)
       .pipe(catchError(this.handleError));
   }
 
   // Updated method for CultivePlanning.service.ts
-  updateCultivePlanning(id: string, planificacion: CultivePlanningDTO): Observable<CultivePlanning> {
+  updateCultivePlanning(id: string, planificacion: UpdateCultivePlanningDto): Observable<CultivePlanning> {
     console.log('Actualizando planificación en:', `${this.apiUrl}/${id}`);
     console.log('Datos enviados:', JSON.stringify(planificacion));
     
@@ -86,7 +87,8 @@ export class CultivePlanningService {
       id: Number(id),
       nombre: planificacion.nombre,
       fechaInicio: planificacion.fechaInicio,
-      fechaFin: planificacion.fechaFin
+      fechaFin: planificacion.fechaFin,
+      idGenero: planificacion.idGenero
     };
     
     return this.http

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { CultivoService } from '../../services/Cultivo.service';
 import { Cultive } from '../../types/Cultive';
+import { GenderTypes } from '../../types/GenderTypes';
 import {
   CultivePlanningService,
   CultivePlanning,
@@ -16,12 +17,18 @@ import {
   CreateCultiveProductionDto,
   UpdateCultiveProductionDto,
 } from '../../types/CultiveProductionTypes';
+import {
+  CreateCultivePlanningDto,
+  UpdateCultivePlanningDto,
+} from '../../types/CultivePlanningTypes';
+import { GenderService } from '../../services/Gender.service';
 
 // Define el DTO aquí ya que no está exportado desde el servicio
 interface CultivePlanningDTO {
   nombre: string;
   fechaInicio: Date | null;
   fechaFin: Date | null;
+  idGenero: number | null;
 }
 
 interface TramoCard {
@@ -71,7 +78,7 @@ export class CultivePlanningComponent implements OnInit {
   cultivos: string[] = []; // Será llenado con géneros de la base de datos
   selectedCultivos: string[] = [];
   tempSelectedCultivos: string[] = []; // Para almacenar selección temporal en el modal
-  selectedCultivosIds: number[] = [];// ids de cultivos seleccionados
+  selectedCultivosIds: number[] = []; // ids de cultivos seleccionados
   // ids temporales (modal)
   tempSelectedCultivosIds: number[] = [];
   cultivo: Cultive[] = []; // Array de cultivos desde API
@@ -100,14 +107,26 @@ export class CultivePlanningComponent implements OnInit {
   /** Detalles de los tramos recibidos de la API */
   details: CultivePlanningDetails[] = [];
   // Mapa de producciones cargadas: key = cultivePlanningDetailsId, value = DTO
+  // al principio de la clase
+  genderList: GenderTypes[] = [];
+  idGnero: number | undefined = 0;
+  generoPrueba: GenderTypes[] = [];
 
-  private produccionesMap = new Map<number, CultiveProductionDto>();
+  selectedGeneroId: number | undefined = undefined;
+
+  // 1) Metemos en la clase esta propiedad para guardar el listado completo:
+  produccionesList: CultiveProductionDto[] = [];
+
+  //private produccionesMap = new Map<number, CultiveProductionDto>();
+  // antes: Map<number, CultiveProductionDto>
+  private produccionesMap = new Map<string, CultiveProductionDto>();
 
   constructor(
     private cultivoService: CultivoService,
     private cultivoPlanningService: CultivePlanningService,
     private cultivePlanningDetailsService: CultivePlanningDetailsService,
-    private productionService: CultiveProductionService
+    private productionService: CultiveProductionService,
+    private genderService: GenderService
   ) {}
 
   ngOnInit(): void {
@@ -122,6 +141,17 @@ export class CultivePlanningComponent implements OnInit {
 
     // Cargar los cultivos de la API
     this.cargarCultivos();
+
+    // cargamos géneros
+    this.genderService.getWithId().subscribe(
+      (data) => {
+        this.genderList = data;
+        console.log('Generos get:', this.genderList);
+      },
+      (error) => {
+        console.error('Error cargando géneros', error);
+      }
+    );
   }
 
   // Método para comprobar si está activo el tema oscuro
@@ -254,7 +284,7 @@ export class CultivePlanningComponent implements OnInit {
 
     // Convertir el conjunto a un array ordenado y asignarlo a géneros
     this.generos = Array.from(genresSet).sort();
-
+    console.log(this.generos);
     // Inicializar cultivos filtrados con todos los cultivos
     this.filteredCultivos = [...this.cultivo];
 
@@ -311,26 +341,37 @@ export class CultivePlanningComponent implements OnInit {
 
   // Método para manejar el cambio de género seleccionado
   onGenreChange(): void {
-    console.log('Género seleccionado:', this.selectedGenre);
+    // 1) Mostrar el ID seleccionado
+    console.log('ID de género seleccionado:', this.selectedGeneroId);
 
-    // Filtrar cultivos según el género seleccionado
+    // 2) Obtener el objeto completo a partir del ID
+    const generoObj = this.genderList.find(
+      (g) => g.idGenero === this.selectedGeneroId
+    );
+    this.idGnero = generoObj?.id;
+
+    // 3) Actualizar el texto del género para uso en el filtro y la UI
+    this.selectedGenre = generoObj?.nombreGenero ?? '';
+    console.log('Nombre de género seleccionado:', this.selectedGenre);
+
+    // 4) Filtrar cultivos según el género (por nombreGenero)
     if (this.selectedGenre && this.cultivosPorGenero[this.selectedGenre]) {
       this.filteredCultivos = this.cultivosPorGenero[this.selectedGenre];
       console.log(
         `Filtrados ${this.filteredCultivos.length} cultivos para el género ${this.selectedGenre}`
       );
     } else {
-      // Si no hay género seleccionado o es "Todos", mostrar todos los cultivos
+      // Si no hay género o no existe en el mapa, mostramos todos
       this.filteredCultivos = [...this.cultivo];
       console.log(
         `Mostrando todos los cultivos (${this.filteredCultivos.length})`
       );
     }
 
-    // Preparar displayNames para NgSelect
+    // 5) Recalcular los displayName para el ng-select de cultivos
     this.prepareDisplayNames();
 
-    // Reset de selección temporal de cultivos en el modal
+    // 6) Limpiar la selección temporal del modal
     this.tempSelectedCultivos = [];
   }
 
@@ -361,7 +402,7 @@ export class CultivePlanningComponent implements OnInit {
       endDate.setDate(startDate.getDate() + 6); // Cada tramo dura 7 días
 
       this.cards.push({
-        value: 100, // Valor por defecto para los kilos
+        value: 0.1, // Valor por defecto para los kilos
         startDate: this.formatDate(startDate),
         endDate: this.formatDate(endDate),
       });
@@ -607,26 +648,18 @@ export class CultivePlanningComponent implements OnInit {
       );
   }
 
+  // 2) Ajustamos loadProductionsForDetails:
   private loadProductionsForDetails(details: CultivePlanningDetails[]) {
-    this.productionService.getAllCultiveProductions().subscribe(
-      (allProds) => {
-        // Filtramos para quedarnos solo con las producciones de los detalles actuales
-        const detailIds = new Set(details.map((d) => d.id));
-        allProds
-          .filter((p) => detailIds.has(p.cultivePlanningDetailsId))
-          .forEach((p) =>
-            this.produccionesMap.set(p.cultivePlanningDetailsId, p)
-          );
-
-        console.log(
-          'Producciones cargadas para estos detalles:',
-          this.produccionesMap
-        );
-      },
-      (error) => {
-        console.error('Error al cargar producciones:', error);
-      }
-    );
+    this.productionService.getAllCultiveProductions().subscribe((allProds) => {
+      // filtra solo los de estos details
+      const detailIds = new Set(details.map((d) => d.id));
+      allProds
+        .filter((p) => detailIds.has(p.cultivePlanningDetailsId))
+        .forEach((p) => {
+          const key = `${p.cultivePlanningDetailsId}_${p.cultiveId}`;
+          this.produccionesMap.set(key, p);
+        });
+    });
   }
 
   // Método para intentar cargar directamente desde la API
@@ -686,15 +719,35 @@ export class CultivePlanningComponent implements OnInit {
 
   // Método para abrir el modal con los cultivos filtrados
   openCultivoModal(): void {
-    // Inicializar con la selección actual
+    // 1) Limpio la selección temporal
     this.tempSelectedCultivos = [];
 
-    // Si no hay cultivos filtrados, intentar cargar todos los cultivos
-    if (this.filteredCultivos.length === 0 && this.cultivo.length > 0) {
+    // 2) Si hay un género elegido, filtrar por él; si no, cargar todos
+    if (this.selectedGeneroId != null) {
+      // Busco el nombre del género a partir de su ID
+      const generoObj = this.genderList.find(
+        (g) => g.idGenero === this.selectedGeneroId
+      );
+      if (generoObj) {
+        // Aplico filtro
+        this.filteredCultivos =
+          this.cultivosPorGenero[generoObj.nombreGenero.trim()] || [];
+      } else {
+        // Si por algún motivo no lo encuentro, dejo vacío
+        this.filteredCultivos = [];
+      }
+    } else {
+      // Sin género, muestro todos
       this.filteredCultivos = [...this.cultivo];
-      this.prepareDisplayNames();
     }
+
+    // 3) Recalculo los displayName para el ng-select de cultivos
+    this.prepareDisplayNames();
+
+    // 4) Mantengo los IDs previamente seleccionados (si quieres)
     this.tempSelectedCultivosIds = [...this.selectedCultivosIds];
+
+    // 5) Abro el modal
     this.showCultivoModal = true;
   }
 
@@ -706,71 +759,104 @@ export class CultivePlanningComponent implements OnInit {
   addSelectedCultivos(): void {
     // 1) IDs antes y IDs nuevas (modal)
     const anteriores = [...this.selectedCultivosIds];
-    const nuevas    = this.tempSelectedCultivos.map(idStr => Number(idStr));
-  
+    const nuevas = this.tempSelectedCultivos.map((idStr) => Number(idStr));
+
     // 2) Calcular añadidos y eliminados
-    const añadidos  = nuevas.filter(id => !anteriores.includes(id));
-    const eliminados = anteriores.filter(id => !nuevas.includes(id));
-  
+    const añadidos = nuevas.filter((id) => !anteriores.includes(id));
+    const eliminados = anteriores.filter((id) => !nuevas.includes(id));
+
     // 3) Actualizar UI: ids y nombres
     this.selectedCultivosIds = nuevas;
-    this.selectedCultivos    = nuevas.map(id => {
-      const c = this.filteredCultivos.find(x => x.id === id)!;
+    this.selectedCultivos = nuevas.map((id) => {
+      const c = this.filteredCultivos.find((x) => x.id === id)!;
       return `${c.nombreAgricultor} - ${c.nombreGenero} - ${c.nombreVariedad}`;
     });
     this.closeCultivoModal();
-  
-    // 4) Crear un map cultivoId→superficie
-    const superficies = new Map<number, number>();
-    this.filteredCultivos.forEach(c => superficies.set(c.id, c.superficie));
-  
-    // 5) Para cada cultivo añadido: crear 12 producciones (una por tramo)
-    añadidos.forEach(cultiveId => {
-      const sup = superficies.get(cultiveId) ?? 1;
-  
-      this.details.forEach(detail => {
-        const card     = this.cards[ detail.tramo - 1 ];
-        const kilosStr = String(card.value ?? 0);
-  
+
+    // 4) Para cada detalle y cada cultivo, crear o actualizar
+    this.details.forEach((detail) => {
+      const card = this.cards[detail.tramo - 1];
+      const kilosStr = String(card.value ?? 0);
+
+      nuevas.forEach((cultiveId) => {
+        const key = `${detail.id}_${cultiveId}`;
+        const existing = this.produccionesMap.get(key);
+
         const dto: CreateCultiveProductionDto = {
           cultivePlanningDetailsId: detail.id,
-          cultiveId:                cultiveId,
-          kilos:                    kilosStr,
-          fechaInicio:              card.startDate!,
-          fechaFin:                 card.endDate!
+          cultiveId: cultiveId,
+          kilos: kilosStr,
+          fechaInicio: card.startDate!,
+          fechaFin: card.endDate!,
         };
-  
-        this.productionService
-          .createCultiveProduction(dto)
-          .subscribe(created =>
-            console.log(`Producción creada detail ${detail.id}`, created)
-          );
+
+        if (existing) {
+          // **UPDATE** si ya existía
+          this.productionService
+            .updateCultiveProduction(
+              existing.id,
+              dto as UpdateCultiveProductionDto
+            )
+            .subscribe((updated) => {
+              console.log(
+                `Producción actualizada detail ${detail.id}`,
+                updated
+              );
+              this.produccionesMap.set(key, updated);
+            });
+        } else {
+          // **CREATE** si no existía
+          this.productionService
+            .createCultiveProduction(dto)
+            .subscribe((created) => {
+              console.log(`Producción creada detail ${detail.id}`, created);
+              this.produccionesMap.set(key, created);
+            });
+        }
       });
     });
+
+    // 5) Borrar producciones de cultivos eliminados
+    eliminados.forEach((cultiveId) => {
+      this.details.forEach((detail) => {
+        const key = `${detail.id}_${cultiveId}`;
+        const prod = this.produccionesMap.get(key);
+        if (prod) {
+          this.productionService
+            .deleteCultiveProduction(prod.id)
+            .subscribe(() => {
+              console.log(`Producción ${prod.id} eliminada`);
+              this.produccionesMap.delete(key);
+            });
+        }
+      });
+    });
+  }
+
+  removeCultivo(index: number): void {
+    // 1) Obtener el ID del cultivo que vamos a quitar
+    const cultiveId = this.selectedCultivosIds[index];
   
-    // 6) (Opcional) eliminar producciones de cultivos quitados
-    eliminados.forEach(cultivoId => {
-      // podrías filtrar produccionesMap y llamar a deleteCultiveProduction(...)
-      console.log(`Cultivo ${cultivoId} desasociado`);
+    // 2) Quitar de la UI: nombre y ID
+    this.selectedCultivos.splice(index, 1);
+    this.selectedCultivosIds.splice(index, 1);
+  
+    // 3) Para cada detalle (tramo) borrar la producción correspondiente a este cultivo
+    this.details.forEach(detail => {
+      const key = `${detail.id}_${cultiveId}`;
+      const prod = this.produccionesMap.get(key);
+      if (prod) {
+        this.productionService.deleteCultiveProduction(prod.id)
+          .subscribe(() => {
+            console.log(`Producción borrada detail ${detail.id}, cultive ${cultiveId}`);
+            this.produccionesMap.delete(key);
+          }, err => {
+            console.error(`Error borrando producción detail ${detail.id}`, err);
+          });
+      }
     });
   }
   
-
-  removeCultivo(index: number): void {
-    // 6.1 Quitar de la lista UI
-    this.selectedCultivos.splice(index, 1);
-
-    // 6.2 Determinar qué detail corresponde (adapta según tu lógica)
-    const detail = this.details[index];
-    if (!detail) return;
-
-    const prod = this.produccionesMap.get(detail.id);
-    if (prod) {
-      this.productionService
-        .deleteCultiveProduction(prod.id)
-        .subscribe(() => this.produccionesMap.delete(detail.id));
-    }
-  }
 
   // Valida las fechas de un tramo
   validateDates(index: number) {
@@ -867,120 +953,67 @@ export class CultivePlanningComponent implements OnInit {
 
   // Recolecta datos de los inputs y envía
   enviarDatos() {
-    // Validar nombre de planificación
+    // 1) Validar nombre
     if (!this.nuevaPlanificacionNombre) {
       alert('Debe ingresar un nombre para la planificación');
       return;
     }
 
-    // Obtener fechas de inicio y fin a partir de los tramos
+    // 2) Calcular fechas globales
     let fechaInicioGlobal: Date | null = null;
     let fechaFinGlobal: Date | null = null;
-
-    // Buscar la fecha de inicio más temprana y la fecha de fin más tardía
     this.cards.forEach((card) => {
       if (card.startDate) {
-        const fechaInicio = new Date(card.startDate);
-        if (fechaInicioGlobal === null || fechaInicio < fechaInicioGlobal) {
-          fechaInicioGlobal = fechaInicio;
-        }
+        const d = new Date(card.startDate);
+        if (!fechaInicioGlobal || d < fechaInicioGlobal) fechaInicioGlobal = d;
       }
-
       if (card.endDate) {
-        const fechaFin = new Date(card.endDate);
-        if (fechaFinGlobal === null || fechaFin > fechaFinGlobal) {
-          fechaFinGlobal = fechaFin;
-        }
+        const d = new Date(card.endDate);
+        if (!fechaFinGlobal || d > fechaFinGlobal) fechaFinGlobal = d;
       }
     });
-
-    // Verificar que tengamos fechas válidas
     if (!fechaInicioGlobal || !fechaFinGlobal) {
       alert('No se pudieron determinar las fechas de inicio y fin');
       return;
     }
 
-    // Crear un objeto DTO para enviar a la API
-    const planificacionDTO: CultivePlanningDTO = {
+    // 3) Preparar DTO
+    const baseDto: CreateCultivePlanningDto = {
       nombre: this.nuevaPlanificacionNombre,
       fechaInicio: fechaInicioGlobal,
       fechaFin: fechaFinGlobal,
+      idGenero: this.idGnero ?? undefined,
     };
-
-    // Determinar si es una nueva planificación o edición de una existente
+    console.log('Gra gra' + baseDto.idGenero);
+    // 4) Crear o actualizar
     if (this.selectedPlanificacion === 'nueva') {
-      // Crear nueva planificación en la API
-      this.cultivoPlanningService
-        .createCultivePlanning(planificacionDTO)
-        .subscribe(
-          (response: CultivePlanning) => {
-            console.log('Planificación creada en la API:', response);
-
-            // Crear objeto de planificación local
-            const nuevaPlanificacion: Planificacion = {
-              id: response.id || '',
-              nombre: response.nombre,
-              tramos: [...this.cards],
-              cultivos: [...this.selectedCultivos],
-            };
-
-            // Añadir a la lista local
-            this.planificaciones.push(nuevaPlanificacion);
-
-            // Actualizar las opciones del selector
-            this.prepararOpcionesPlanificacion();
-
-            // Guardar los detalles de cada tramo
-            this.guardarDetallesTramos(response.id);
-
-            // Mostrar mensaje de éxito
-            this.mostrarMensajeExito('Planificación creada correctamente');
-
-            // Seleccionar la planificación recién creada
-            this.selectedPlanificacion = nuevaPlanificacion.id;
-          },
-          (error: Error) => {
-            console.error('Error al crear planificación:', error);
-            alert(
-              'Error al crear la planificación. Por favor, inténtelo de nuevo.'
-            );
-          }
-        );
+      this.cultivoPlanningService.createCultivePlanning(baseDto).subscribe(
+        (response) => {
+          console.log('Planificación creada:', response);
+          // Actualizar lista local y re-cargar UI
+          this.selectedPlanificacion = response.id!.toString();
+          this.prepararOpcionesPlanificacion();
+          this.guardarDetallesTramos(this.selectedPlanificacion);
+          this.mostrarMensajeExito('Planificación creada correctamente');
+        },
+        (err) => {
+          console.error('Error al crear planificación', err);
+          alert('Error al crear la planificación.');
+        }
+      );
     } else {
-      // Actualizar planificación existente
       this.cultivoPlanningService
-        .updateCultivePlanning(this.selectedPlanificacion, planificacionDTO)
+        .updateCultivePlanning(this.selectedPlanificacion, baseDto)
         .subscribe(
-          (response: CultivePlanning) => {
-            console.log('Planificación actualizada en la API:', response);
-
-            // Actualizar objeto de planificación local
-            const index = this.planificaciones.findIndex(
-              (p) => p.id === this.selectedPlanificacion
-            );
-            if (index >= 0) {
-              this.planificaciones[index] = {
-                id: this.selectedPlanificacion,
-                nombre: this.nuevaPlanificacionNombre,
-                tramos: [...this.cards],
-                cultivos: [...this.selectedCultivos],
-              };
-            }
-
-            // Actualizar las opciones del selector
+          (response) => {
+            console.log('Planificación actualizada:', response);
             this.prepararOpcionesPlanificacion();
-
-            // Guardar los detalles de cada tramo
             this.guardarDetallesTramos(this.selectedPlanificacion);
-
-            // Mostrar mensaje de éxito
             this.mostrarMensajeExito('Planificación actualizada correctamente');
           },
-          (error: Error) => {
-            console.error('Error al actualizar planificación:', error);
-            alert(
-              'Error al actualizar la planificación. Por favor, inténtelo de nuevo.'
-            );
+          (err) => {
+            console.error('Error al actualizar planificación', err);
+            alert('Error al actualizar la planificación.');
           }
         );
     }
@@ -989,96 +1022,94 @@ export class CultivePlanningComponent implements OnInit {
   // Método actualizado para guardarDetallesTramos
   guardarDetallesTramos(planningId: string): void {
     console.log('Guardando detalles para planificación ID:', planningId);
-
-    // Primero eliminar los detalles existentes
+  
+    // 1) Eliminar detalles existentes
     this.cultivePlanningDetailsService
       .deleteDetailsByPlanningId(planningId)
       .subscribe(
         () => {
           console.log('Detalles anteriores eliminados correctamente');
-
-          // Luego crear los nuevos detalles para cada tramo
-          const tramosDetails = this.cards.map((card, index) => {
-            // Convertir las fechas de string a Date
-            const startDate = card.startDate
-              ? new Date(card.startDate)
-              : new Date();
-            const endDate = card.endDate ? new Date(card.endDate) : new Date();
-
-            // Crear objeto con el formato exacto que espera la API
-            return {
-              fechaInicio: startDate,
-              fechaFin: endDate,
-              kilos: card.value || 0,
-              tramo: index + 1, // Usar el índice + 1 como número de tramo
-              // No incluir cultivePlanningId aquí, el servicio lo añadirá
-            };
-          });
-
-          console.log('Guardando detalles de tramos para ID:', planningId);
-
-          // Intentar crear los detalles
-          this.cultivePlanningDetailsService
-            .createMultiplePlanningDetails(planningId, tramosDetails)
-            .subscribe(
-              (response: CultivePlanningDetails[]) => {
-                console.log(
-                  'Detalles de tramos guardados correctamente:',
-                  response
-                );
-                this.mostrarMensajeExito(
-                  'Planificación completa guardada correctamente'
-                );
-              },
-              (error: Error) => {
-                console.error('Error al guardar detalles de tramos:', error);
-                alert(
-                  `Error al guardar los detalles de los tramos: ${error.message}`
-                );
-              }
-            );
+          this.createAndSyncDetails(planningId);
         },
         (error: Error) => {
           console.error('Error al eliminar detalles anteriores:', error);
-
-          // Continuar con la creación aunque falle la eliminación
-          const tramosDetails = this.cards.map((card, index) => {
-            const startDate = card.startDate
-              ? new Date(card.startDate)
-              : new Date();
-            const endDate = card.endDate ? new Date(card.endDate) : new Date();
-
-            return {
-              fechaInicio: startDate,
-              fechaFin: endDate,
-              kilos: card.value || 0,
-              tramo: index + 1, // Usar el índice + 1 como número de tramo
-            };
-          });
-
-          this.cultivePlanningDetailsService
-            .createMultiplePlanningDetails(planningId, tramosDetails)
-            .subscribe(
-              (response: CultivePlanningDetails[]) => {
-                console.log(
-                  'Detalles de tramos guardados correctamente (fallback):',
-                  response
-                );
-                this.mostrarMensajeExito(
-                  'Planificación completa guardada correctamente'
-                );
-              },
-              (error: Error) => {
-                console.error(
-                  'Error al guardar detalles de tramos (fallback):',
-                  error
-                );
-                alert(
-                  `Error al guardar los detalles de los tramos: ${error.message}`
-                );
-              }
-            );
+          // Aun así, seguimos con la creación
+          this.createAndSyncDetails(planningId);
         }
       );
   }
+  
+  // Método auxiliar que crea los detalles y sincroniza producciones
+  private createAndSyncDetails(planningId: string): void {
+    // 2) Construir array de detalles desde los cards
+    const tramosDetails = this.cards.map((card, index) => ({
+      fechaInicio: card.startDate ? new Date(card.startDate) : new Date(),
+      fechaFin:    card.endDate   ? new Date(card.endDate)   : new Date(),
+      kilos:       card.value     || 0,
+      tramo:       index + 1
+    }));
+  
+    console.log('Creando detalles de tramos para ID:', planningId, tramosDetails);
+  
+    // 3) Crear detalles en la API
+    this.cultivePlanningDetailsService
+      .createMultiplePlanningDetails(planningId, tramosDetails)
+      .subscribe(
+        (details: CultivePlanningDetails[]) => {
+          console.log('Detalles de tramos guardados correctamente:', details);
+          // 4) Actualizar array local de detalles
+          this.details = details;
+          // 5) Sincronizar todas las producciones de los cultivos seleccionados
+          this.syncAllProductions();
+          this.mostrarMensajeExito('Planificación completa guardada correctamente');
+        },
+        (error: Error) => {
+          console.error('Error al crear detalles de tramos:', error);
+          alert(`Error al guardar los detalles de los tramos: ${error.message}`);
+        }
+      );
+  }
+  
+  /**  
+   * Recorre todos los detalles y cultivos seleccionados,
+   * y crea o actualiza cada producción según exista en el mapa.  
+   */
+  private syncAllProductions(): void {
+    this.details.forEach(detail => {
+      const card = this.cards[detail.tramo - 1];
+      const kilosStr = String(card.value ?? 0);
+  
+      this.selectedCultivosIds.forEach(cultiveId => {
+        const key = `${detail.id}_${cultiveId}`;
+        const existing = this.produccionesMap.get(key);
+  
+        const dto = {
+          cultivePlanningDetailsId: detail.id,
+          cultiveId:                cultiveId,
+          kilos:                    kilosStr,
+          fechaInicio:              card.startDate!,
+          fechaFin:                 card.endDate!
+        };
+  
+        if (existing) {
+          // Actualizar producción existente
+          this.productionService
+            .updateCultiveProduction(existing.id, dto as UpdateCultiveProductionDto)
+            .subscribe(updated => {
+              console.log(`Producción actualizada detail ${detail.id}`, updated);
+              this.produccionesMap.set(key, updated);
+            });
+        } else {
+          // Crear nueva producción
+          this.productionService
+            .createCultiveProduction(dto)
+            .subscribe(created => {
+              console.log(`Producción creada detail ${detail.id}`, created);
+              this.produccionesMap.set(key, created);
+            });
+        }
+      });
+    });
+  }
+  
 }
