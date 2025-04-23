@@ -71,7 +71,7 @@ export class ComercialComponent implements OnInit {
 
       });
       this.miFormulario.get('generoNombre')?.disable();
-      this.miFormulario.get('clientname')?.disable();
+      this.miFormulario.get('clientName')?.disable();
     this.miFormulario2 = this.fb.group(//Otro validador del formulario para el create
       {
         clientCode2: ['', Validators.required],
@@ -83,8 +83,7 @@ export class ComercialComponent implements OnInit {
         kgs2: ['', [Validators.required, Validators.pattern('^[0-9]+$')]]
 
       });
-      this.miFormulario2.get('generoNombre2')?.disable();
-      this.miFormulario2.get('clientName2')?.disable();
+    
   }
 
   // Variables para búsqueda y paginación
@@ -211,7 +210,8 @@ export class ComercialComponent implements OnInit {
   }
   //Método para crear un nuevo comercial
   create(): void {
-
+    this.miFormulario2.get('clientName2')?.enable();
+    this.miFormulario2.get('generoNombre2')?.enable();
     const formulario = this.miFormulario2.value;
 
     this.clientData = {
@@ -266,6 +266,8 @@ export class ComercialComponent implements OnInit {
 
   // Método para editar
   edit(): void {
+    this.miFormulario.get('clientName')?.enable();
+    this.miFormulario.get('generoNombre')?.enable();
     const formulario = this.miFormulario.value;
 
     this.clientData = {
@@ -277,6 +279,7 @@ export class ComercialComponent implements OnInit {
       endDate: formulario.endDate,
       kgs: formulario.kgs
     };
+    console.log(this.clientData);
     //Comprobación de la fecha fechaInicio>fechaFin
     if (this.clientData.startDate && this.clientData.endDate) {
       const startDate = new Date(this.clientData.startDate);
