@@ -135,9 +135,11 @@
           </label>
           <ng-select
             id="genreSelect"
-            [(ngModel)]="selectedGenre"
+            [(ngModel)]="selectedGeneroId"
             (change)="onGenreChange()"
-            [items]="generos"
+            [items]="genderList"
+            bindLabel="nombreGenero"
+            bindValue="idGenero"
             placeholder="Seleccione un género"
             appendTo="body"
             [clearable]="true"
@@ -145,7 +147,7 @@
             [ngClass]="{ 'ng-select-dark': isDarkMode }"
           >
             <ng-template ng-label-tmp let-item="item">
-              {{ item }}
+              {{ item.nombreGenero }}
             </ng-template>
             <ng-template ng-option-tmp let-item="item">
               <div class="flex items-center">
@@ -163,7 +165,7 @@
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                {{ item }}
+                {{ item.nombreGenero }}
               </div>
             </ng-template>
           </ng-select>
