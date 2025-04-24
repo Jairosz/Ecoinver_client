@@ -182,8 +182,8 @@ export class DashboardComponent implements OnInit {
 
   // Inicializar las configuraciones de los gráficos
   initializeCharts() {
-    this.vistaSeleccionada='mes';
-    this.selectedProductions=[];
+    this.vistaSeleccionada = 'mes';
+    this.selectedProductions = [];
     this.nombreComerciales = '';
     const d = new Date();//Para saber el mes en el que estamos
     let genero: string;
@@ -652,7 +652,7 @@ export class DashboardComponent implements OnInit {
 
   // Calcular total de KGs (para el panel de información)
   getTotalKgs(): number {
-    let genero = '';  
+    let genero = '';
     const checkboxes = document.querySelectorAll('input[type="radio"]');
     for (let i = 0; i < checkboxes.length; i++) {
       const checkbox = checkboxes[i] as HTMLInputElement;
@@ -776,7 +776,7 @@ export class DashboardComponent implements OnInit {
   }
   actualizarGrafica(vista: string) {
     let genero: string;
-    this.selectedProductions=[];
+    this.selectedProductions = [];
     const checkboxes = document.querySelectorAll('input[type="radio"]');
     for (let i = 0; i < checkboxes.length; i++) {
       const checkbox = checkboxes[i] as HTMLInputElement;
@@ -836,23 +836,23 @@ export class DashboardComponent implements OnInit {
           meses.push(i + 1);
 
         }
-        let kgsProduction:number[]=new Array(meses.length).fill(0);
+        let kgsProduction: number[] = new Array(meses.length).fill(0);
         for (let i = 0; i < this.selectedProductions.length; i++) {//para ir sumando los kg de cada semana de la producción
 
           //Necesitamos saber en que mes entra la planificación de la necesidad
           const mes = new Date(this.selectedProductions[i].fechaInicio);
-    
-          
+
+
           for (let j = 0; j < meses.length; j++) {
             if (mes.getMonth() + 1 == meses[j]) {
               //Saber los clientes que estan en la semana de la necesidad
-    
+
               kgsProduction[j] = (kgsProduction[j] || 0) + parseFloat(this.selectedProductions[i].kilosAjustados
               );//Si los kilos estan vacios lo ponemos a 0.
-    
+
             }
           }
-    
+
         }
         let kgs: number[] = new Array(meses.length).fill(0);
         let clientes: string[] = new Array(meses.length);
@@ -919,15 +919,15 @@ export class DashboardComponent implements OnInit {
           }
         }
 
-       
-       
+
+
 
         // Gráfico principal     
         this.data = {
           labels: label,
           datasets: [
             {
-              label: 'Dataset 1',
+              label: 'Necesidad comercial',
               data: label.map((_, i) => kgs[i] ?? null),
               borderColor: '#4f46e5', // Color indigo para Tailwind           
               tension: 0.4,
@@ -935,7 +935,7 @@ export class DashboardComponent implements OnInit {
               yAxisID: 'y'
             },
             {
-              label: 'Dataset 2',
+              label: 'Producción cultivo',
               data: kgsProduction,
               borderColor: '#10b981', // Color emerald para Tailwind           
               tension: 0.4,
@@ -1075,11 +1075,11 @@ export class DashboardComponent implements OnInit {
         console.log(label2);
 
         let kgs2: number[] = new Array(label2.length).fill(0);
-        let kgsProduction3:number[]=new Array(label2.length).fill(0);
+        let kgsProduction3: number[] = new Array(label2.length).fill(0);
         let clientes2: string[] = new Array(label2.length);
         let repetidos2: { mes: number, cliente: string }[] = [];
-        for(let i=0;i<this.selectedProductions.length;i++){
-          let dia2=new Date(this.selectedProductions[i].fechaInicio)
+        for (let i = 0; i < this.selectedProductions.length; i++) {
+          let dia2 = new Date(this.selectedProductions[i].fechaInicio)
           //Necesitamos saber en que semana entra la planificación de la necesidad
           const primerDiaAno = new Date(dia2.getFullYear(), 0, 1);
           const diaSemana1EneroGrande = primerDiaAno.getDay(); // 0 = domingo, 1 = lunes, etc.
@@ -1087,13 +1087,13 @@ export class DashboardComponent implements OnInit {
 
           semana = Math.ceil((semana + diaSemana1EneroGrande) / 7);
 
-           
+
           for (let j = 0; j < label2.length; j++) {
             if (semana == label2[j]) {
-              
-            
+
+
               kgsProduction3[j] = (kgsProduction3[j] || 0) + parseFloat(this.selectedProductions[i].kilosAjustados);//Si los kilos estan vacios lo ponemos a 0.
-              
+
             }
           }
         }
@@ -1108,7 +1108,7 @@ export class DashboardComponent implements OnInit {
 
           semana = Math.ceil((semana + diaSemana1EneroGrande) / 7);
 
-           
+
           for (let j = 0; j < label2.length; j++) {
             if (semana == label2[j]) {
               //Saber los clientes que estan en la semana de la necesidad
@@ -1130,13 +1130,13 @@ export class DashboardComponent implements OnInit {
 
         }
 
-       console.log(kgsProduction3);
+        console.log(kgsProduction3);
         // Gráfico principal     
         this.data = {
           labels: semanas,
           datasets: [
             {
-              label: 'Dataset 1',
+              label: 'Necesidad comercial',
               data: semanas.map((_, i) => kgs2[i] ?? null),
               borderColor: '#4f46e5', // Color indigo para Tailwind           
               tension: 0.4,
@@ -1144,7 +1144,7 @@ export class DashboardComponent implements OnInit {
               yAxisID: 'y'
             },
             {
-              label: 'Dataset 2',
+              label: 'Producción cultivo',
               data: kgsProduction3,
               borderColor: '#10b981', // Color emerald para Tailwind           
               tension: 0.4,
@@ -1245,24 +1245,31 @@ export class DashboardComponent implements OnInit {
       case 'año':
         this.vistaSeleccionada = 'año';
         let meses2: number[] = [9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8];
-        let kgsProduction2:number[]=new Array(meses2.length).fill(1);
+        let kgsProduction2: number[] = new Array(meses2.length).fill(0);
 
         let kgs3: number[] = new Array(meses2.length).fill(0);
         let clientes3: string[] = new Array(meses2.length);
         let repetidos3: { mes: number, cliente: string }[] = [];
+        for (let i = 0; i < this.selectedProductions.length; i++) {
+          const mes = new Date(this.selectedProductions[i].fechaInicio);
+
+
+          for (let j = 0; j < meses2.length; j++) {
+            if (mes.getMonth() + 1 == meses2[j]) {
+              //Saber los clientes que estan en la semana de la necesidad
+
+              kgsProduction2[j] = (kgsProduction2[j] || 0) + parseFloat(this.selectedProductions[i].kilosAjustados
+              );//Si los kilos estan vacios lo ponemos a 0.
+
+            }
+          }
+        }
+        
         for (let i = 0; i < planningDetails.length; i++) {//para ir sumando los kg de cada semana
 
           //Necesitamos saber en que mes entra la planificación de la necesidad
           const mes = new Date(planningDetails[i].fechaDesde);
-          for (let j = 0; j < meses2.length; j++) {
-            if (mes.getMonth() + 1 == meses2[j]) {
-              //Saber los clientes que estan en la semana de la necesidad
-    
-              kgsProduction2[j] = (kgsProduction2[j] || 0) + parseFloat(this.selectedProductions[i].kilosAjustados
-              );//Si los kilos estan vacios lo ponemos a 0.
-    
-            }
-          }
+
 
           for (let j = 0; j < meses2.length; j++) {
             if (mes.getMonth() + 1 == meses2[j]) {
@@ -1279,6 +1286,7 @@ export class DashboardComponent implements OnInit {
           }
 
         }
+       
         let label3: string[] = [];
         for (let i = 0; i < meses2.length; i++) {
           switch (meses2[i]) {
@@ -1324,7 +1332,7 @@ export class DashboardComponent implements OnInit {
           labels: label3,
           datasets: [
             {
-              label: 'Dataset 1',
+              label: 'Necesidad comercial',
               data: meses2.map((_, i) => kgs3[i] ?? null),
               borderColor: '#4f46e5', // Color indigo para Tailwind           
               tension: 0.4,
@@ -1332,7 +1340,7 @@ export class DashboardComponent implements OnInit {
               yAxisID: 'y'
             },
             {
-              label: 'Dataset 2',
+              label: 'Producción cultivo',
               data: kgsProduction2,
               borderColor: '#10b981', // Color emerald para Tailwind           
               tension: 0.4,
