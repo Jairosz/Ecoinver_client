@@ -223,7 +223,8 @@ createMultiplePlanningDetails(planningId: string, tramosDetails: any[]): Observa
       fechaInicio: fechaInicio,
       fechaFin: fechaFin,
       kilos: details.kilos || 0,
-      tramos: details.tramo || 0
+      tramo: details.tramo || 0,
+      cultivePlanningId: details.cultivePlanningId
     };
     
     return this.http
