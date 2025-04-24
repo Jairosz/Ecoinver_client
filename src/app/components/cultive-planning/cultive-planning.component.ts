@@ -22,6 +22,7 @@ import {
   UpdateCultivePlanningDto,
 } from '../../types/CultivePlanningTypes';
 import { GenderService } from '../../services/Gender.service';
+import { forkJoin } from 'rxjs';
 
 // Define el DTO aquí ya que no está exportado desde el servicio
 interface CultivePlanningDTO {
@@ -121,6 +122,10 @@ export class CultivePlanningComponent implements OnInit {
   // antes: Map<number, CultiveProductionDto>
   private produccionesMap = new Map<string, CultiveProductionDto>();
 
+
+  private selectedCultivosIdsBefore: number[] = [];
+
+  
   constructor(
     private cultivoService: CultivoService,
     private cultivoPlanningService: CultivePlanningService,
@@ -564,89 +569,94 @@ export class CultivePlanningComponent implements OnInit {
    * Carga la planificación seleccionada, sus detalles de tramos
    * y las producciones existentes para cada tramo.
    */
-  cargarPlanificacion(): void {
-    console.log('Planificación seleccionada:', this.selectedPlanificacion);
+  // Actualización del método cargarPlanificacion para llamar a cargarCultivosAsociados
+cargarPlanificacion(): void {
+  console.log('Planificación seleccionada:', this.selectedPlanificacion);
 
-    // 1) Si no hay nada seleccionado, reiniciar formularios y salir
-    if (this.selectedPlanificacion === '') {
-      this.nuevaPlanificacionNombre = '';
-      this.selectedCultivos = [];
-      this.cards = [];
-      return;
-    }
+  // 1) Si no hay nada seleccionado, reiniciar formularios y salir
+  if (this.selectedPlanificacion === '') {
+    this.nuevaPlanificacionNombre = '';
+    this.selectedCultivos = [];
+    this.selectedCultivosIds = [];
+    this.cards = [];
+    return;
+  }
 
-    // 2) Si es "nueva", inicializar tramos vacíos y salir
-    if (this.selectedPlanificacion === 'nueva') {
-      this.initializeTramos();
-      this.selectedCultivos = [];
-      this.nuevaPlanificacionNombre = '';
-      return;
-    }
+  // 2) Si es "nueva", inicializar tramos vacíos y salir
+  if (this.selectedPlanificacion === 'nueva') {
+    this.initializeTramos();
+    this.selectedCultivos = [];
+    this.selectedCultivosIds = [];
+    this.nuevaPlanificacionNombre = '';
+    return;
+  }
 
-    // 3) Buscar la planificación existente en memoria
-    const plan = this.planificaciones.find(
-      (p) => String(p.id) === String(this.selectedPlanificacion)
+  // 3) Buscar la planificación existente en memoria
+  const plan = this.planificaciones.find(
+    (p) => String(p.id) === String(this.selectedPlanificacion)
+  );
+  if (!plan) {
+    console.error(
+      'No se encontró la planificación con ID:',
+      this.selectedPlanificacion
     );
-    if (!plan) {
-      console.error(
-        'No se encontró la planificación con ID:',
-        this.selectedPlanificacion
-      );
-      this.mostrarMensajeExito(
-        'Error: planificación no encontrada, intentando cargar desde API...'
-      );
-      this.cargarPlanificacionDesdeAPI();
-      return;
-    }
-
-    // 4) Poner nombre y cultivos básicos
-    this.nuevaPlanificacionNombre = plan.nombre;
-    this.selectedCultivos = plan.cultivos.filter((c) =>
-      this.cultivos.includes(c)
+    this.mostrarMensajeExito(
+      'Error: planificación no encontrada, intentando cargar desde API...'
     );
+    this.cargarPlanificacionDesdeAPI();
+    return;
+  }
 
-    // 5) Solicitar al servidor los detalles de tramo
-    this.cultivePlanningDetailsService
-      .getDetailsByPlanningId(this.selectedPlanificacion)
-      .subscribe(
-        (details) => {
-          // Guardar detalles para uso posterior
-          this.details = details;
+  // 4) Poner nombre
+  this.nuevaPlanificacionNombre = plan.nombre;
+  
+  // 5) Cargar cultivos asociados con esta planificación
+  this.cargarCultivosAsociados(Number(this.selectedPlanificacion));
 
-          // Inicializar los 12 tramos de la UI
-          this.initializeTramos();
+  // 6) Solicitar al servidor los detalles de tramo
+  this.cultivePlanningDetailsService
+    .getDetailsByPlanningId(this.selectedPlanificacion)
+    .subscribe(
+      (details) => {
+        // Guardar detalles para uso posterior
+        this.details = details;
 
-          // Rellenar cada card con datos de kilos y fechas de la API
-          details.forEach((detail) => {
-            const idx = detail.tramo - 1;
+        // Inicializar los 12 tramos de la UI
+        this.initializeTramos();
+
+        // Rellenar cada card con datos de kilos y fechas de la API
+        details.forEach((detail) => {
+          const idx = detail.tramo - 1;
+          if (idx >= 0 && idx < this.cards.length) {
             this.cards[idx] = {
               value: detail.kilos,
               startDate: this.formatDate(new Date(detail.fechaInicio)),
               endDate: this.formatDate(new Date(detail.fechaFin)),
             };
-          });
-
-          // 6) Cargar producciones existentes para estos detalles
-          this.loadProductionsForDetails(details);
-
-          this.mostrarMensajeExito(
-            'Datos de planificación cargados correctamente'
-          );
-        },
-        (error) => {
-          console.error('Error al cargar detalles de planificación:', error);
-          // En caso de fallo, dejamos los tramos de plan local
-          if (plan.tramos && plan.tramos.length) {
-            this.cards = [...plan.tramos];
-          } else {
-            this.initializeTramos();
           }
-          this.mostrarMensajeExito(
-            'Error cargando detalles. Usando datos locales.'
-          );
+        });
+
+        // 7) Cargar producciones existentes para estos detalles
+        this.loadProductionsForDetails(details);
+
+        this.mostrarMensajeExito(
+          'Datos de planificación cargados correctamente'
+        );
+      },
+      (error) => {
+        console.error('Error al cargar detalles de planificación:', error);
+        // En caso de fallo, dejamos los tramos de plan local
+        if (plan.tramos && plan.tramos.length) {
+          this.cards = [...plan.tramos];
+        } else {
+          this.initializeTramos();
         }
-      );
-  }
+        this.mostrarMensajeExito(
+          'Error cargando detalles. Usando datos locales.'
+        );
+      }
+    );
+}
 
   // 2) Ajustamos loadProductionsForDetails:
   private loadProductionsForDetails(details: CultivePlanningDetails[]) {
@@ -719,10 +729,17 @@ export class CultivePlanningComponent implements OnInit {
 
   // Método para abrir el modal con los cultivos filtrados
   openCultivoModal(): void {
-    // 1) Limpio la selección temporal
+    console.log('Abriendo modal de selección de cultivos');
+    
+    // 1) Almacenar los IDs seleccionados actuales para comparar después
+    this.selectedCultivosIdsBefore = [...this.selectedCultivosIds];
+    
+    // 2) Inicializar arreglos temporales con las selecciones actuales
+    this.tempSelectedCultivosIds = [...this.selectedCultivosIds];
+    this.tempSelectedCultivos = this.tempSelectedCultivosIds.map(id => id.toString());
     this.tempSelectedCultivos = [];
-
-    // 2) Si hay un género elegido, filtrar por él; si no, cargar todos
+    
+    // 3) Si hay un género elegido, filtrar por él; si no, cargar todos
     if (this.selectedGeneroId != null) {
       // Busco el nombre del género a partir de su ID
       const generoObj = this.genderList.find(
@@ -733,22 +750,22 @@ export class CultivePlanningComponent implements OnInit {
         this.filteredCultivos =
           this.cultivosPorGenero[generoObj.nombreGenero.trim()] || [];
       } else {
-        // Si por algún motivo no lo encuentro, dejo vacío
-        this.filteredCultivos = [];
+        // Si por algún motivo no lo encuentro, muestro todos
+        this.filteredCultivos = [...this.cultivo];
       }
     } else {
       // Sin género, muestro todos
       this.filteredCultivos = [...this.cultivo];
     }
-
-    // 3) Recalculo los displayName para el ng-select de cultivos
+  
+    // 4) Recalculo los displayName para el ng-select de cultivos
     this.prepareDisplayNames();
-
-    // 4) Mantengo los IDs previamente seleccionados (si quieres)
-    this.tempSelectedCultivosIds = [...this.selectedCultivosIds];
-
+  
     // 5) Abro el modal
     this.showCultivoModal = true;
+    
+    console.log('Lista de cultivos filtrados cargada:', this.filteredCultivos.length);
+    console.log('Cultivos seleccionados al abrir modal:', this.tempSelectedCultivosIds);
   }
 
   closeCultivoModal(): void {
@@ -756,24 +773,50 @@ export class CultivePlanningComponent implements OnInit {
   }
 
   // Método modificado para añadir cultivos seleccionados con NgSelect
-  addSelectedCultivos(): void {
-    // 1) IDs antes y IDs nuevas (modal)
-    const anteriores = [...this.selectedCultivosIds];
-    const nuevas = this.tempSelectedCultivos.map((idStr) => Number(idStr));
-
-    // 2) Calcular añadidos y eliminados
-    const añadidos = nuevas.filter((id) => !anteriores.includes(id));
-    const eliminados = anteriores.filter((id) => !nuevas.includes(id));
-
-    // 3) Actualizar UI: ids y nombres
-    this.selectedCultivosIds = nuevas;
-    this.selectedCultivos = nuevas.map((id) => {
-      const c = this.filteredCultivos.find((x) => x.id === id)!;
-      return `${c.nombreAgricultor} - ${c.nombreGenero} - ${c.nombreVariedad}`;
-    });
+  // Método modificado para añadir cultivos seleccionados con NgSelect
+addSelectedCultivos(): void {
+  console.log('Procesando cultivos seleccionados en modal:', this.tempSelectedCultivosIds);
+  
+  // Si no hay selecciones, cerrar el modal y salir
+  if (!this.tempSelectedCultivosIds || this.tempSelectedCultivosIds.length === 0) {
+    console.log('No hay cultivos seleccionados');
     this.closeCultivoModal();
+    return;
+  }
 
-    // 4) Para cada detalle y cada cultivo, crear o actualizar
+  // 1) Obtener las selecciones actuales y previas
+  const anteriores = [...this.selectedCultivosIdsBefore];
+  const nuevas = [...this.tempSelectedCultivosIds];
+
+  // 2) Calcular añadidos y eliminados
+  const añadidos = nuevas.filter((id) => !anteriores.includes(id));
+  const eliminados = anteriores.filter((id) => !nuevas.includes(id));
+
+  console.log('Cultivos añadidos:', añadidos);
+  console.log('Cultivos eliminados:', eliminados);
+
+  // 3) Actualizar UI: ids y nombres
+  this.selectedCultivosIds = nuevas;
+  this.selectedCultivos = nuevas.map((id) => {
+    const c = this.cultivo.find((x) => x.id === id);
+    if (c) {
+      return `${c.nombreAgricultor} - ${c.nombreGenero} - ${c.nombreVariedad}`;
+    }
+    return `Cultivo ID ${id}`;
+  });
+  
+  console.log('Cultivos seleccionados actualizados:', this.selectedCultivos);
+  
+  this.closeCultivoModal();
+
+  // 4) Si tenemos una planificación seleccionada (no nueva), actualizar en DB
+  if (this.selectedPlanificacion && this.selectedPlanificacion !== 'nueva') {
+    const planificacionId = Number(this.selectedPlanificacion);
+    this.asociarCultivosAPlanificacion(planificacionId);
+  }
+
+  // 5) Para cada detalle y cada cultivo, crear o actualizar producciones
+  if (this.details && this.details.length > 0) {
     this.details.forEach((detail) => {
       const card = this.cards[detail.tramo - 1];
       const kilosStr = String(card.value ?? 0);
@@ -816,7 +859,7 @@ export class CultivePlanningComponent implements OnInit {
       });
     });
 
-    // 5) Borrar producciones de cultivos eliminados
+    // 6) Borrar producciones de cultivos eliminados
     eliminados.forEach((cultiveId) => {
       this.details.forEach((detail) => {
         const key = `${detail.id}_${cultiveId}`;
@@ -832,6 +875,7 @@ export class CultivePlanningComponent implements OnInit {
       });
     });
   }
+}
 
   removeCultivo(index: number): void {
     // 1) Obtener el ID del cultivo que vamos a quitar
@@ -958,7 +1002,7 @@ export class CultivePlanningComponent implements OnInit {
       alert('Debe ingresar un nombre para la planificación');
       return;
     }
-
+  
     // 2) Calcular fechas globales
     let fechaInicioGlobal: Date | null = null;
     let fechaFinGlobal: Date | null = null;
@@ -976,7 +1020,7 @@ export class CultivePlanningComponent implements OnInit {
       alert('No se pudieron determinar las fechas de inicio y fin');
       return;
     }
-
+  
     // 3) Preparar DTO
     const baseDto: CreateCultivePlanningDto = {
       nombre: this.nuevaPlanificacionNombre,
@@ -984,7 +1028,7 @@ export class CultivePlanningComponent implements OnInit {
       fechaFin: fechaFinGlobal,
       idGenero: this.idGnero ?? undefined,
     };
-    console.log('Gra gra' + baseDto.idGenero);
+    
     // 4) Crear o actualizar
     if (this.selectedPlanificacion === 'nueva') {
       this.cultivoPlanningService.createCultivePlanning(baseDto).subscribe(
@@ -994,6 +1038,10 @@ export class CultivePlanningComponent implements OnInit {
           this.selectedPlanificacion = response.id!.toString();
           this.prepararOpcionesPlanificacion();
           this.guardarDetallesTramos(this.selectedPlanificacion);
+          
+          // Asociar cultivos a la planificación
+          this.asociarCultivosAPlanificacion(Number(this.selectedPlanificacion));
+          
           this.mostrarMensajeExito('Planificación creada correctamente');
         },
         (err) => {
@@ -1009,6 +1057,10 @@ export class CultivePlanningComponent implements OnInit {
             console.log('Planificación actualizada:', response);
             this.prepararOpcionesPlanificacion();
             this.guardarDetallesTramos(this.selectedPlanificacion);
+            
+            // Asociar cultivos a la planificación
+            this.asociarCultivosAPlanificacion(Number(this.selectedPlanificacion));
+            
             this.mostrarMensajeExito('Planificación actualizada correctamente');
           },
           (err) => {
@@ -1019,25 +1071,210 @@ export class CultivePlanningComponent implements OnInit {
     }
   }
 
+// Método para cargar los cultivos asociados a una planificación
+cargarCultivosAsociados(planificacionId: number): void {
+  console.log(`Cargando cultivos asociados a planificación ${planificacionId}...`);
+  
+  // Limpiar selecciones previas
+  this.selectedCultivos = [];
+  this.selectedCultivosIds = [];
+  
+  // Obtener todos los cultivos
+  this.cultivoService.getAll().subscribe(
+    (cultivos) => {
+      // Filtrar solo los que tienen este ID de planificación
+      const cultivosAsociados = cultivos.filter(c => c.idCultivePlanning === planificacionId);
+      
+      if (cultivosAsociados.length > 0) {
+        console.log(`Encontrados ${cultivosAsociados.length} cultivos asociados a la planificación ${planificacionId}`);
+        
+        // Guardar IDs
+        this.selectedCultivosIds = cultivosAsociados.map(c => c.id);
+        
+        // Generar nombres para la vista
+        this.selectedCultivos = cultivosAsociados.map(c => 
+          `${c.nombreAgricultor} - ${c.nombreGenero} - ${c.nombreVariedad}`
+        );
+      } else {
+        console.log(`No se encontraron cultivos asociados a la planificación ${planificacionId}`);
+      }
+      
+      // Si la planificación existe pero no tiene cultivos asociados,
+      // intentamos cargar los cultivos de plan.cultivos por retrocompatibilidad
+      const plan = this.planificaciones.find(p => String(p.id) === String(planificacionId));
+      if (plan && plan.cultivos && plan.cultivos.length > 0 && this.selectedCultivos.length === 0) {
+        this.selectedCultivos = plan.cultivos.filter(c => this.cultivos.includes(c));
+      }
+    },
+    (error) => {
+      console.error('Error al cargar cultivos asociados:', error);
+      this.mostrarMensajeExito('Error al cargar cultivos asociados');
+    }
+  );
+}
+
+  // Método para asociar los cultivos seleccionados a la planificación
+asociarCultivosAPlanificacion(planificacionId: number): void {
+  console.log(`Asociando cultivos a planificación ${planificacionId}...`);
+  console.log(`Cultivos seleccionados: ${this.selectedCultivosIds.join(', ')}`);
+  
+  if (!planificacionId) {
+    console.error('ID de planificación inválido, no se pueden asociar cultivos');
+    return;
+  }
+
+  // Obtener todos los cultivos
+  this.cultivoService.getAll().subscribe(
+    (cultivos) => {
+      console.log(`Total de cultivos en el sistema: ${cultivos.length}`);
+      
+      // Cultivos que ya tienen esta planificación
+      const cultivosConEstaPlanificacion = cultivos.filter(c => 
+        c.idCultivePlanning === planificacionId
+      );
+      
+      console.log(`Cultivos que ya tienen esta planificación: ${cultivosConEstaPlanificacion.length}`);
+      
+      // Cultivos a vincular (los seleccionados que no tienen esta planificación)
+      const cultivosAVincular = this.selectedCultivosIds.filter(id => 
+        !cultivosConEstaPlanificacion.some(c => c.id === id)
+      );
+      
+      // Cultivos a desvincular (los que tienen esta planificación pero no están seleccionados)
+      const cultivosADesvincular = cultivosConEstaPlanificacion.filter(c => 
+        !this.selectedCultivosIds.includes(c.id)
+      );
+      
+      console.log(`Cultivos a vincular: ${cultivosAVincular.length}`);
+      console.log(`Cultivos a desvincular: ${cultivosADesvincular.length}`);
+      
+      // Vincular cultivos
+      cultivosAVincular.forEach(cultivoId => {
+        this.cultivoService.updateCultivo(cultivoId, {
+          idCultivePlanning: planificacionId
+        }).subscribe(
+          (updated) => {
+            console.log(`Cultivo ${cultivoId} asociado a planificación ${planificacionId}`);
+          },
+          (error) => {
+            console.error(`Error al asociar cultivo ${cultivoId}:`, error);
+          }
+        );
+      });
+      
+      // Desvincular cultivos
+      cultivosADesvincular.forEach(cultivo => {
+        this.cultivoService.updateCultivo(cultivo.id, {
+          idCultivePlanning: null
+        }).subscribe(
+          () => {
+            console.log(`Cultivo ${cultivo.id} desvinculado de planificación ${planificacionId}`);
+          },
+          (error) => {
+            console.error(`Error al desvincular cultivo ${cultivo.id}:`, error);
+          }
+        );
+      });
+    },
+    (error) => {
+      console.error('Error al obtener cultivos:', error);
+    }
+  );
+}
+
   // Método actualizado para guardarDetallesTramos
   guardarDetallesTramos(planningId: string): void {
-    console.log('Guardando detalles para planificación ID:', planningId);
+  console.log('Guardando detalles para planificación ID:', planningId);
   
-    // 1) Eliminar detalles existentes
-    this.cultivePlanningDetailsService
-      .deleteDetailsByPlanningId(planningId)
-      .subscribe(
-        () => {
-          console.log('Detalles anteriores eliminados correctamente');
-          this.createAndSyncDetails(planningId);
-        },
-        (error: Error) => {
-          console.error('Error al eliminar detalles anteriores:', error);
-          // Aun así, seguimos con la creación
-          this.createAndSyncDetails(planningId);
+  // Primero obtenemos los detalles existentes
+  this.cultivePlanningDetailsService.getDetailsByPlanningId(planningId).subscribe(
+    (existingDetails) => {
+      if (existingDetails && existingDetails.length > 0) {
+        console.log(`Encontrados ${existingDetails.length} detalles existentes, actualizando...`);
+        
+        // Arrays para almacenar observables de actualización y creación
+        const updateObservables = [];
+        
+        // Recorrer los 12 tramos
+        for (let i = 0; i < this.numTramos; i++) {
+          const tramoNum = i + 1;
+          const card = this.cards[i];
+          
+          // Buscar si existe un detalle para este tramo
+          const existingDetail = existingDetails.find(d => d.tramo === tramoNum);
+          
+          if (existingDetail) {
+            // Si existe, actualizarlo
+            console.log(`Actualizando detalle para tramo ${tramoNum}`);
+            
+            const updateData = {
+              fechaInicio: card.startDate ? new Date(card.startDate) : new Date(),
+              fechaFin: card.endDate ? new Date(card.endDate) : new Date(),
+              kilos: card.value || 0,
+              tramo: tramoNum,
+              cultivePlanningId: Number(planningId)     // ← ¡AÑADIDO!
+            };
+            
+            updateObservables.push(
+              this.cultivePlanningDetailsService.updateCultivePlanningDetails(
+                existingDetail.id, 
+                updateData
+              )
+            );
+          } else {
+            // Si no existe, crear uno nuevo
+            console.log(`Creando detalle para tramo ${tramoNum}`);
+            
+            const newDetail = {
+              fechaInicio: card.startDate ? new Date(card.startDate) : new Date(),
+              fechaFin: card.endDate ? new Date(card.endDate) : new Date(),
+              kilos: card.value || 0,
+              tramo: tramoNum,
+              cultivePlanningId: Number(planningId)
+            };
+            
+            updateObservables.push(
+              this.cultivePlanningDetailsService.createCultivePlanningDetails(
+                planningId, 
+                newDetail
+              )
+            );
+          }
         }
-      );
-  }
+        
+        // Ejecutar todas las operaciones y esperar resultados
+        if (updateObservables.length > 0) {
+          forkJoin(updateObservables).subscribe(
+            (updatedDetails) => {
+              console.log('Detalles actualizados correctamente:', updatedDetails);
+              // Actualizar array local de detalles
+              this.details = updatedDetails;
+              // Sincronizar producciones
+              this.syncAllProductions();
+              this.mostrarMensajeExito('Planificación actualizada correctamente');
+            },
+            (error) => {
+              console.error('Error al actualizar detalles:', error);
+              alert('Error al actualizar los detalles de los tramos');
+            }
+          );
+        } else {
+          console.log('No hay detalles para actualizar');
+          this.mostrarMensajeExito('No se encontraron cambios en los tramos');
+        }
+      } else {
+        console.log('No hay detalles existentes, creando nuevos...');
+        // Si no hay detalles, crear todos nuevos
+        this.createAndSyncDetails(planningId);
+      }
+    },
+    (error) => {
+      console.error('Error al verificar detalles existentes:', error);
+      // En caso de error, intentar crear nuevos
+      this.createAndSyncDetails(planningId);
+    }
+  );
+}
   
   // Método auxiliar que crea los detalles y sincroniza producciones
   private createAndSyncDetails(planningId: string): void {

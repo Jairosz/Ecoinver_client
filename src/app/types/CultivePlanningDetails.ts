@@ -6,5 +6,5 @@ export interface CultivePlanningDetails {
   kilos: number;
   tramo: number; 
   idCultivePlanning?: number; // Optional as it might be called different in your API
-  cultivePlanningId?: number; // Adding this as it appears in your API response
+  cultivePlanningId: number; // Adding this as it appears in your API response
 }
