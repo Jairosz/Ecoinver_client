@@ -58,7 +58,7 @@ export class ComercialPlanningComponent {
   editarPlanning: boolean = false;
   formulario: FormGroup;
   validForm: boolean = false;//Para validar el formualarrio
-  index:number=-1;
+  index: number = -1;
 
   constructor(private comercialServicio: ComercialServiceService, private comercialPlanning: ComercialPlanningService, private comercialDetails: ComercialPlanningDetailsService, private fb: FormBuilder, private cdr: ChangeDetectorRef) {
     this.formulario = this.fb.group({
@@ -66,6 +66,7 @@ export class ComercialPlanningComponent {
     });
   }
   ngOnInit(): void {
+
 
     this.comercialServicio.getComercial().subscribe(//Obtenemos las necesidades comerciales guardadas en la base de datos
       (data) => {
@@ -87,7 +88,7 @@ export class ComercialPlanningComponent {
       }
 
     );
-    
+
   }
   ngAfterViewInit() {
     this.cdr.detectChanges();
@@ -118,9 +119,9 @@ export class ComercialPlanningComponent {
             nombreGenero: evento.nombreGenero,
             kgs: evento.kgs
           };
-    
-    
-    
+
+
+
           const startDate = new Date(evento.startDate);
           const endDate = new Date(evento.endDate);
           let inicio = new Date(startDate);
@@ -130,9 +131,9 @@ export class ComercialPlanningComponent {
           const primerDia = new Date(inicio.getFullYear(), 0, 1);
           let semana = Math.floor((inicio.getTime() - primerDia.getTime()) / (1000 * 60 * 60 * 24));
           semana = Math.ceil(semana / 7);
-    
+
           for (let i = new Date(startDate); i <= endDate; i.setDate(i.getDate() + 1)) {//Se recorren las fechas
-    
+
             if (i.getDay() == 0) {//Si el dia de la fecha es igual a domingo
               fin = new Date(i.getFullYear(), i.getMonth(), i.getDate());
               numSemanas++;//Sumamos una semana
@@ -147,20 +148,20 @@ export class ComercialPlanningComponent {
                   year: 'numeric',
                 })
               });
-    
+
               this.rangoSemana.push({
                 inicio: new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate(), 12, 0, 0),
                 fin: new Date(fin.getFullYear(), fin.getMonth(), fin.getDate(), 12, 0, 0)
               });
               inicio = new Date(i.getFullYear(), i.getMonth(), i.getDate() + 1);
-    
+
               semana++;
             }
             if (i.getTime() === endDate.getTime()) {
               fin = new Date(i.getFullYear(), i.getMonth(), i.getDate());
-    
+
               if (i.getDay() != 0) {//Si hemos entrado en una nueva semana aunque no sea domingo.
-    
+
                 this.semanas.push({
                   semana: semana, fecha: inicio.toLocaleDateString('es-ES', {
                     day: '2-digit',   // Asegura que el día tenga 2 dígitos
@@ -179,17 +180,17 @@ export class ComercialPlanningComponent {
                 numSemanas++;//Sumamos una semana
                 semana++;
               }
-    
+
             }
-    
+
           }
-         
-            
-           
+
+
+
           console.log(this.rangoSemana);
-        
+
           const planning: ComercialPlanningPost = {
-    
+
             idCommercialNeed: this.selectedComercial.id,
             weekNumber: numSemanas,
             kgs: this.selectedComercial.kgs,
@@ -197,7 +198,7 @@ export class ComercialPlanningComponent {
             endDate: this.selectedComercial.endDate
           }
           //Guardamos en la tabla planning la necesidad comercial.
-    
+
           if (planning && !this.planning.find(item => item.idCommercialNeed == planning.idCommercialNeed)) {//Para que no se repita la misma necesidad comercial en la tabla
             console.log(this.planning);
             console.log(planning.idCommercialNeed);
@@ -205,13 +206,13 @@ export class ComercialPlanningComponent {
               (data) => {
                 console.log('Se han insertado los datos correctamente');
                 this.planning.push(data.entity);
-    
-    
+
+
               },
               (error) => {
                 console.log(error);
               }
-    
+
             );
           }
           if (this.planning.find(item => item.idCommercialNeed == evento.id)) {
@@ -219,7 +220,7 @@ export class ComercialPlanningComponent {
 
             for (let i = 0; i < this.plannigDetails.length; i++) {
               if (this.plannigDetails[i].idCommercialNeedsPlanning == edit?.id) {//Si encuentra el comercial ya planificado se guardan los valores
-                
+
                 this.planningEditar.push({
                   id: this.plannigDetails[i].id,
                   idCommercialNeedsPlanning: this.plannigDetails[i].idCommercialNeedsPlanning,
@@ -237,27 +238,27 @@ export class ComercialPlanningComponent {
           }
           this.semanasFormArray.clear();
           console.log(this.planningEditar);
-        this.semanas.forEach((semana, index) => {
-          // Crear un FormControl deshabilitado por defecto
-          const control = this.fb.control(
-            this.planningEditar[index]?.kilos || '',
-            [Validators.required, Validators.min(1)]
-          );
-  
-          this.semanasFormArray.push(control);
-        });
-        console.log(this.planningEditar)
-          this.semanasFormArray.controls.forEach(control =>{ 
-            if(control.value!==''){
+          this.semanas.forEach((semana, index) => {
+            // Crear un FormControl deshabilitado por defecto
+            const control = this.fb.control(
+              this.planningEditar[index]?.kilos || '',
+              [Validators.required, Validators.min(1)]
+            );
+
+            this.semanasFormArray.push(control);
+          });
+          console.log(this.planningEditar)
+          this.semanasFormArray.controls.forEach(control => {
+            if (control.value !== '') {
               control.disable();
-              
+
             }
-            else{
+            else {
               control.enable();
             }
-           
 
-        });
+
+          });
           console.log(this.planningEditar);
           this.pendiente = evento.kgs - this.distribuido;
 
@@ -268,13 +269,10 @@ export class ComercialPlanningComponent {
 
       );
 
-
-  
-
-
     }
 
   }
+
   resumen() {
     this.distribuido = 0;
 
@@ -302,9 +300,9 @@ export class ComercialPlanningComponent {
 
 
     const id = this.planning.find(item => item.idCommercialNeed == this.selectedComercial.id);
-    
 
-    if (id===undefined || this.plannigDetails.find(item => item.idCommercialNeedsPlanning == id?.id)) {
+
+    if (id === undefined || this.plannigDetails.find(item => item.idCommercialNeedsPlanning == id?.id)) {
 
       this.validar = 'Esta necesidad comercial ya existe en el sistema';
       this.modal = false;
@@ -345,23 +343,23 @@ export class ComercialPlanningComponent {
 
           };
           console.log(this.guardarPlanning);
-          const promesa =this.comercialDetails.post(this.guardarPlanning).toPromise();
+          const promesa = this.comercialDetails.post(this.guardarPlanning).toPromise();
           promesas.push(promesa);
         }
-          
-          try {
-          const resultado=await Promise.all(promesas);
 
-            this.modal=true;
-            console.log('Datos insertados correctamente '+resultado);
+        try {
+          const resultado = await Promise.all(promesas);
 
-          } catch (error) {
-            console.log('Error al guardar los datos ' + error);
-            this.modal = false;
-          }
+          this.modal = true;
+          console.log('Datos insertados correctamente ' + resultado);
+
+        } catch (error) {
+          console.log('Error al guardar los datos ' + error);
+          this.modal = false;
+        }
 
 
-        
+
       }
     }
 
@@ -394,46 +392,46 @@ export class ComercialPlanningComponent {
 
           this.editarPlanning = true;
           this.validar = null;
-          this.editarBoton=false;
+          this.editarBoton = false;
         },
         (error) => {
-          console.log('Error al editar'+error);
+          console.log('Error al editar' + error);
         }
       );
     }
-    else{
+    else {
       const id = this.planning.find(item => item.idCommercialNeed == this.selectedComercial.id);
-      
+
       const input = document.querySelectorAll('input[type="number"]') as NodeListOf<HTMLInputElement>;
-      
-        
-        this.guardarPlanning = {
-          idCommercialNeedsPlanning: id?.id || 0,
-          kilos: Number(input[indice].value),
-          fechaDesde: this.rangoSemana[indice].inicio,
-          fechaHasta: this.rangoSemana[indice].fin,
-          numeroSemana: indice + 1
-          
-  
-        };
-        
-      
-      
+
+
+      this.guardarPlanning = {
+        idCommercialNeedsPlanning: id?.id || 0,
+        kilos: Number(input[indice].value),
+        fechaDesde: this.rangoSemana[indice].inicio,
+        fechaHasta: this.rangoSemana[indice].fin,
+        numeroSemana: indice + 1
+
+
+      };
+
+
+
       this.comercialDetails.post(this.guardarPlanning).subscribe(
-        (data)=>{
+        (data) => {
           console.log(data);
           this.editarPlanning = true;
           this.validar = null;
-          this.editarBoton=false;
+          this.editarBoton = false;
           this.semanasFormArray.controls[indice].disable();
         },
-        (error)=>{
+        (error) => {
           console.log(error);
         }
 
 
       )
-      
+
     }
 
   }
@@ -446,7 +444,7 @@ export class ComercialPlanningComponent {
     if (this.editarBoton == false) {
       this.editarBoton = true;
       this.semanasFormArray.controls[i].enable();
-      this.index=i;
+      this.index = i;
     } else {
       this.editarBoton = false;
 

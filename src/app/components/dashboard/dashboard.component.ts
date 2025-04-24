@@ -757,6 +757,85 @@ export class DashboardComponent implements OnInit {
       checkbox.checked = false;
     }
     this.seleccionados = 0;
+    // Gráfico principal 
+    switch (this.vistaSeleccionada) {
+
+      case 'mes':
+        this.data = {
+          labels: ['Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio'],
+          datasets: [
+            {
+              label: 'Necesidad comercial',
+              data: [0, 0, 0, 0, 0, 0, 0],
+              borderColor: '#4f46e5', // Color indigo para Tailwind           
+              tension: 0.4,
+              spanGaps: true,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Producción cultivo',
+              data: [0, 0, 0, 0],
+              borderColor: '#10b981', // Color emerald para Tailwind           
+              tension: 0.4,
+              spanGaps: true,
+              yAxisID: 'y1'
+            }
+          ]
+        };
+        break;
+      case 'semana':
+        this.data = {
+          labels: ['Seamana 1', 'Semana 2', 'Semana 3', 'Semana 4', 'Semana 5'],
+          datasets: [
+            {
+              label: 'Necesidad comercial',
+              data: [0, 0, 0, 0, 0],
+              borderColor: '#4f46e5', // Color indigo para Tailwind           
+              tension: 0.4,
+              spanGaps: true,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Producción cultivo',
+              data: [0, 0, 0, 0, 0],
+              borderColor: '#10b981', // Color emerald para Tailwind           
+              tension: 0.4,
+              spanGaps: true,
+              yAxisID: 'y1'
+            }
+          ]
+        };
+        break;
+
+      case 'año':
+        this.data = {
+          labels: ['Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto'],
+          datasets: [
+            {
+              label: 'Necesidad comercial',
+              data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              borderColor: '#4f46e5', // Color indigo para Tailwind           
+              tension: 0.4,
+              spanGaps: true,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Producción cultivo',
+              data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              borderColor: '#10b981', // Color emerald para Tailwind           
+              tension: 0.4,
+              spanGaps: true,
+              yAxisID: 'y1'
+            }
+          ]
+        };
+
+
+
+    }
+
+
+
   }
 
   contarSeleccionados() {//Para contar los géneros seleccionados
@@ -1264,7 +1343,7 @@ export class DashboardComponent implements OnInit {
             }
           }
         }
-        
+
         for (let i = 0; i < planningDetails.length; i++) {//para ir sumando los kg de cada semana
 
           //Necesitamos saber en que mes entra la planificación de la necesidad
@@ -1286,7 +1365,7 @@ export class DashboardComponent implements OnInit {
           }
 
         }
-       
+
         let label3: string[] = [];
         for (let i = 0; i < meses2.length; i++) {
           switch (meses2[i]) {
