@@ -9,11 +9,12 @@ export interface CultiveProductionDto {
   /** Kilos producidos (crudos) */
   kilos: string;
   /** Fecha de inicio (ISO 8601) */
-  fechaInicio?: string;
+  fechaInicio: string;
   /** Fecha de fin (ISO 8601) */
-  fechaFin?: string;
+  fechaFin: string;
   /** FK al cultivo */
   cultiveId: number;
+  kilosAjustados:string;
 }
 
 /** DTO para creación de CultiveProduction */
@@ -28,6 +29,7 @@ export interface CreateCultiveProductionDto {
   fechaInicio: string;
   /** Fecha de fin (ISO 8601) */
   fechaFin: string;
+
 }
 
 /** DTO para actualización de CultiveProduction */

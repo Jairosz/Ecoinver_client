@@ -47,7 +47,7 @@ export class ComercialComponent implements OnInit {
     startDate: undefined,
     endDate: undefined,
     idGenero: 0,
-    nombreGenero:'',
+    nombreGenero: '',
 
     kgs: 0
   };
@@ -65,13 +65,13 @@ export class ComercialComponent implements OnInit {
         startDate: ['', Validators.required],
         endDate: ['', Validators.required],
         genero: ['', Validators.required],
-        generoNombre:['',Validators.required],
-        kgs: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+        generoNombre: ['', Validators.required],
+        kgs: ['', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$')]],
 
 
       });
-      this.miFormulario.get('generoNombre')?.disable();
-      this.miFormulario.get('clientName')?.disable();
+    this.miFormulario.get('generoNombre')?.disable();
+    this.miFormulario.get('clientName')?.disable();
     this.miFormulario2 = this.fb.group(//Otro validador del formulario para el create
       {
         clientCode2: ['', Validators.required],
@@ -79,11 +79,10 @@ export class ComercialComponent implements OnInit {
         startDate2: ['', Validators.required],
         endDate2: ['', Validators.required],
         genero2: ['', Validators.required],
-        generoNombre2:['',Validators.required],
-        kgs2: ['', [Validators.required, Validators.pattern('^[0-9]+$')]]
+        generoNombre2: ['', Validators.required],
+        kgs2: ['', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$')]]
 
       });
-    
   }
 
   // Variables para búsqueda y paginación
@@ -221,10 +220,10 @@ export class ComercialComponent implements OnInit {
       endDate: formulario.endDate2,
 
       idGenero: formulario.genero2,
-      nombreGenero:formulario.generoNombre2,
+      nombreGenero: formulario.generoNombre2,
       kgs: formulario.kgs2
     };
-    
+
 
     //Comprobación de la fecha fechaInicio>fechaFin
     if (this.clientData.startDate && this.clientData.endDate) {
@@ -251,7 +250,7 @@ export class ComercialComponent implements OnInit {
     }
     console.log(this.clientData);
     this.comercialServicio.createComercial(this.clientData).subscribe(
-     
+
       (data) => {
         this.paginatedData = data;
         window.location.reload();
@@ -275,7 +274,7 @@ export class ComercialComponent implements OnInit {
       clientName: formulario.clientName,
       startDate: formulario.startDate,
       idGenero: formulario.genero,
-      nombreGenero:formulario.generoNombre,
+      nombreGenero: formulario.generoNombre,
       endDate: formulario.endDate,
       kgs: formulario.kgs
     };
@@ -337,7 +336,7 @@ export class ComercialComponent implements OnInit {
     this.miFormulario.get('clientName')?.setValue(this.selectedComercial.clientName);
     this.miFormulario.get('genero')?.setValue(this.selectedComercial.idGenero);
     this.miFormulario.get('generoNombre')?.setValue(this.selectedComercial.nombreGenero);
-   
+
     let dateObj = new Date(this.selectedComercial.startDate);
     let formattedDate = dateObj.toISOString().slice(0, 10); // "YYYY-MM-DD"
     this.miFormulario.get('startDate')?.setValue(formattedDate);
@@ -358,11 +357,11 @@ export class ComercialComponent implements OnInit {
     this.miFormulario2.get('clientName2')?.setValue(selectedComercial?.name);
 
   }
-  buscarGenero(genero:Gender){//Asignación input del nombre del género en el edit.
-    const selectedGenero=this.genderArray.find(item=> item.idGenero==genero.idGenero);
+  buscarGenero(genero: Gender) {//Asignación input del nombre del género en el edit.
+    const selectedGenero = this.genderArray.find(item => item.idGenero == genero.idGenero);
     this.miFormulario.get('generoNombre')?.setValue(selectedGenero?.nombreGenero);
   }
-  buscarGenero2(genero:Gender){//Asignación input del nombre del género en el create.
+  buscarGenero2(genero: Gender) {//Asignación input del nombre del género en el create.
     const selectedGenero = this.genderArray.find(item => item.idGenero == genero.idGenero);
     this.miFormulario2.get('generoNombre2')?.setValue(selectedGenero?.nombreGenero);
   }

@@ -334,7 +334,7 @@ export class ComercialPlanningComponent {
       }
       else {
         const input = document.querySelectorAll('input[type="number"]') as NodeListOf<HTMLInputElement>;
-        this.modal = true;
+        const promesas = [];
         for (let i = 0; i < input.length; i++) {
           this.guardarPlanning = {
             idCommercialNeedsPlanning: id?.id || 0,
@@ -345,10 +345,14 @@ export class ComercialPlanningComponent {
 
           };
           console.log(this.guardarPlanning);
+          const promesa =this.comercialDetails.post(this.guardarPlanning).toPromise();
+          promesas.push(promesa);
+        }
+          
           try {
-            const resultado = await this.comercialDetails.post(this.guardarPlanning).toPromise();
+          const resultado=await Promise.all(promesas);
 
-
+            this.modal=true;
             console.log('Datos insertados correctamente '+resultado);
 
           } catch (error) {
@@ -357,7 +361,7 @@ export class ComercialPlanningComponent {
           }
 
 
-        }
+        
       }
     }
 
