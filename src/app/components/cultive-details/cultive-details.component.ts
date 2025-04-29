@@ -1,16 +1,19 @@
 import { Component, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { DatePipe } from '@angular/common';
 import { WeatherIconsService } from '../../services/WeatherIcons.service';
 import { trigger, transition, style, query, group, animate } from '@angular/animations';
-//imports para el manejo de cultivo
 
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environment/environment';
 
 import { ChartModule } from 'primeng/chart';
+import { CultivoService } from '../../services/Cultivo.service';
+import { CultiveProductionService } from '../../services/CultiveProduction.service';
+import { CultiveProductionDto } from '../../types/CultiveProductionTypes';
 
 interface Cultivo {
   id: number;
@@ -37,13 +40,20 @@ interface WeatherForecast {
   temp: number;
   condition: string;
   precipitation: number;
-  weatherCode: number; // Añade esta propiedad
+  weatherCode: number;
+}
+
+// Actualizar la interfaz para tener ambas producciones
+interface ProductionData {
+  label: string; // Typically a time period like "T1", "T2", etc.
+  realProduction: number; // Real production in kilos (will be filled in the future)
+  estimatedProduction: number; // Estimated production in kilos (from kilosAjustados)
 }
 
 @Component({
   selector: 'app-cultive-details',
   standalone: true,
-  imports: [CommonModule, DatePipe, ChartModule],
+  imports: [CommonModule, DatePipe, ChartModule, FormsModule],
   templateUrl: './cultive-details.component.html',
 })
 export class CultiveDetailsComponent
@@ -52,14 +62,15 @@ export class CultiveDetailsComponent
   private map: L.Map | null = null;
   private shape: L.Layer | null = null; // Puede ser un círculo, rectángulo o polígono
 
-  // Valores predeterminados por si no hay datos de cultivo disponibles
-  //private defaultLatitud = 36.786911;
-  //private defaultLongitud = -2.651989;
-
   // Datos del cultivo
   cultivo: Cultivo | null = null;
   loading: boolean = true;
   error: string | null = null;
+
+  // Datos de producción
+  productions: CultiveProductionDto[] = [];
+  productionsLoaded: boolean = false;
+  productionError: string | null = null;
 
   // Indicador para mostrar el estado de carga de las coordenadas
   showCoordinatesLoading: boolean = false;
@@ -67,6 +78,12 @@ export class CultiveDetailsComponent
   // Añadir estas nuevas propiedades para el gráfico
   data: any;
   options: any;
+
+  // Nueva propiedad para el tramo seleccionado
+  selectedTramoIndex: number = 0;
+  
+  // Propiedad para alternar entre vistas de estadísticas
+  statsView: 'tramos' | 'resumen' = 'tramos';
 
   //barra progresiva
   progressPercentage: number = 0;
@@ -81,17 +98,60 @@ export class CultiveDetailsComponent
   constructor(
     public weatherIcons: WeatherIconsService,
     private route: ActivatedRoute,
-    private http: HttpClient
+    private http: HttpClient,
+    private cultive: CultivoService,
+    private productionService: CultiveProductionService
   ) { }
 
-  
   setActiveTab(tab: 'Datos de cultivo' | 'Mapping' | 'Insights' | 'nerfs'): void {
     this.activeTab = tab;
     if (tab === 'Mapping') {
       setTimeout(() => this.initMap(), 0); // Pequeño delay
     }
   }
-
+  
+  // Método para cambiar la vista de estadísticas
+  setStatsView(view: 'tramos' | 'resumen'): void {
+    this.statsView = view;
+  }
+  
+  // Método para calcular la producción total estimada
+  getTotalProduccionEstimada(): number {
+    if (!this.productions || this.productions.length === 0) {
+      return 0;
+    }
+    
+    return this.productions.reduce((total, prod) => {
+      return total + this.parseNumericValue(prod.kilosAjustados);
+    }, 0);
+  }
+  
+  // Método para formatear números con separadores de miles (puntos)
+  formatNumber(value: number): string {
+    return value.toLocaleString('es-ES'); // Formato español que usa punto como separador de miles
+  }
+  
+  // Método para calcular la duración total en días
+  getTotalDuracion(): number {
+    if (!this.productions || this.productions.length === 0) {
+      return 0;
+    }
+    
+    // Podríamos simplemente sumar las duraciones de cada tramo
+    // Pero es más preciso calcular la diferencia entre la fecha de inicio del primer tramo
+    // y la fecha de fin del último tramo
+    const sortedProductions = [...this.productions].sort((a, b) => 
+      new Date(a.fechaInicio).getTime() - new Date(b.fechaInicio).getTime()
+    );
+    
+    const firstDate = new Date(sortedProductions[0].fechaInicio);
+    const lastDate = new Date(sortedProductions[sortedProductions.length - 1].fechaFin);
+    
+    const diffTime = Math.abs(lastDate.getTime() - firstDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays;
+  }
 
   ngAfterViewInit(): void {
     if (this.activeTab === 'Mapping') {
@@ -104,10 +164,8 @@ export class CultiveDetailsComponent
   // Método para obtener la latitud del cultivo o usar el valor por defecto
   getLatitud(): number {
     if (this.cultivo && this.cultivo.latitud) {
-      //console.log(this.cultivo?.latitud);
       return parseFloat(this.cultivo.latitud);
     }
-
     return 0;
   }
 
@@ -119,24 +177,61 @@ export class CultiveDetailsComponent
     return 0;
   }
 
+  // Función auxiliar para analizar valores numéricos de manera más robusta
+  private parseNumericValue(value: string | number): number {
+    if (typeof value === 'number') return value;
+    if (!value) return 0;
+    
+    // Convertir a string y eliminar espacios
+    let str = String(value).trim();
+    
+    // Reemplazar coma con punto (para formato decimal español)
+    str = str.replace(',', '.');
+    
+    // Eliminar cualquier carácter no numérico excepto el punto decimal
+    str = str.replace(/[^\d.]/g, '');
+    
+    const result = parseFloat(str);
+    return isNaN(result) ? 0 : result;
+  }
+
   // se cargan los datos necesarios, id, latitud altitud
   async ngOnInit() {
-    this.initializeChart();
+    console.log('Iniciando CultiveDetailsComponent');
     // Obtener ID del cultivo de la URL
     const id = this.route.snapshot.paramMap.get('id');
+    console.log('ID del cultivo obtenido de la URL:', id);
+    
     this.actualizarProgreso(); // Calcular el valor inicial
+    
     // actualizar el progreso cada minuto:
     this.progressInterval = setInterval(() => {
       this.actualizarProgreso();
     }, 1000); // 60000 milisegundos = 1 minuto
-    //console.log(this.route.snapshot.paramMap);
+    
     if (id) {
-      await this.loadCultivo(id);
-      // Obtener datos meteorológicos usando las coordenadas del cultivo
-      this.weatherData = await this.getWeather(
-        this.getLatitud(),
-        this.getLongitud()
-      );
+      try {
+        console.log('Cargando datos del cultivo...');
+        await this.loadCultivo(id);
+        console.log('Datos del cultivo cargados:', this.cultivo);
+        
+        console.log('Cargando datos de producción...');
+        await this.loadProductions(id);
+        console.log('Datos de producción cargados, total:', this.productions.length);
+        
+        // Inicializar gráfico después de cargar todos los datos
+        this.initializeChart();
+        
+        // Obtener datos meteorológicos usando las coordenadas del cultivo
+        this.weatherData = await this.getWeather(
+          this.getLatitud(),
+          this.getLongitud()
+        );
+      } catch (error) {
+        console.error('Error en la inicialización del componente:', error);
+        this.error = 'Error al cargar los datos necesarios';
+        this.loading = false;
+      }
     } else {
       this.error = 'ID de cultivo no especificado';
       this.loading = false;
@@ -166,6 +261,202 @@ export class CultiveDetailsComponent
         },
       });
     });
+  }
+
+  private loadProductions(cultivoId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // Obtener producciones por cultivo ID
+      this.productionService.getAllCultiveProductions().subscribe({
+        next: (allProductions) => {
+          // Filtrar solo las producciones de este cultivo
+          this.productions = allProductions.filter(
+            prod => prod.cultiveId === parseInt(cultivoId)
+          );
+          
+          // Ordenar las producciones por fecha
+          this.productions = this.productions.sort((a, b) => 
+            new Date(a.fechaInicio).getTime() - new Date(b.fechaInicio).getTime()
+          );
+          
+          console.log('Producciones sin procesar:', this.productions);
+          
+          // NO MODIFICAR LOS DATOS - usar tal como vienen de la API
+          // Solo registrar para depuración
+          if (this.productions.length > 1) {
+            const uniqueValues = new Set(this.productions.map(p => p.kilosAjustados));
+            console.log(`Valores únicos de kilosAjustados: ${[...uniqueValues].join(', ')}`);
+            if (uniqueValues.size === 1) {
+              console.warn('Todas las producciones tienen el mismo valor de kilosAjustados');
+            }
+          }
+          
+          this.productionsLoaded = true;
+          
+          // Actualizar estadísticas del tramo inicial
+          if (this.productions.length > 0) {
+            // Intentar seleccionar un tramo actual si existe
+            const tramoActualIndex = this.productions.findIndex(prod => {
+              const fechaInicio = new Date(prod.fechaInicio);
+              const fechaFin = new Date(prod.fechaFin);
+              const now = new Date();
+              return fechaInicio <= now && now <= fechaFin;
+            });
+            
+            // Si hay un tramo actual, seleccionarlo; de lo contrario usar el primero (0)
+            this.selectedTramoIndex = tramoActualIndex >= 0 ? tramoActualIndex : 0;
+            this.updateSelectedTramoStats();
+          }
+          
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error cargando producciones:', error);
+          this.productionError = 'Error al cargar los datos de producción';
+          this.productionsLoaded = false;
+          reject(error);
+        }
+      });
+    });
+  }
+
+  // Método para manejar el cambio de tramo seleccionado
+  onTramoChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    this.selectedTramoIndex = parseInt(selectElement.value);
+    this.updateSelectedTramoStats();
+  }
+  
+  // Método para actualizar las estadísticas del tramo seleccionado
+  updateSelectedTramoStats(): void {
+    if (this.productions.length === 0 || this.selectedTramoIndex < 0 || 
+        this.selectedTramoIndex >= this.productions.length) {
+      return;
+    }
+    
+    // Aquí puedes actualizar las estadísticas basadas en el tramo seleccionado
+    const selectedTramo = this.productions[this.selectedTramoIndex];
+    console.log('Tramo seleccionado:', selectedTramo);
+    
+    // Las estadísticas se actualizarán automáticamente en la vista mediante los métodos de acceso
+  }
+  
+  // Método para obtener la duración de un tramo en días
+  getDuracionTramo(tramoIndex: number): number {
+    if (this.productions.length === 0 || tramoIndex < 0 || 
+        tramoIndex >= this.productions.length) {
+      return 0;
+    }
+    
+    const tramo = this.productions[tramoIndex];
+    const fechaInicio = new Date(tramo.fechaInicio);
+    const fechaFin = new Date(tramo.fechaFin);
+    
+    // Calcular la diferencia en días
+    const diffTime = Math.abs(fechaFin.getTime() - fechaInicio.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays;
+  }
+  
+  // Método para obtener el valor de kilosAjustados del tramo seleccionado
+  getValorKilosAjustados(tramoIndex: number): number {
+    if (this.productions.length === 0 || tramoIndex < 0 || 
+        tramoIndex >= this.productions.length) {
+      return 0;
+    }
+    
+    const tramo = this.productions[tramoIndex];
+    return this.parseNumericValue(tramo.kilosAjustados);
+  }
+  
+  // Método para determinar si un tramo está pendiente (fecha inicio en el futuro)
+  isPendingTramo(tramoIndex: number): boolean {
+    if (this.productions.length === 0 || tramoIndex < 0 || 
+        tramoIndex >= this.productions.length) {
+      return false;
+    }
+    
+    const tramo = this.productions[tramoIndex];
+    const fechaInicio = new Date(tramo.fechaInicio);
+    const now = new Date();
+    
+    return fechaInicio > now;
+  }
+  
+  // Método para determinar si un tramo está en curso
+  isCurrentTramo(tramoIndex: number): boolean {
+    if (this.productions.length === 0 || tramoIndex < 0 || 
+        tramoIndex >= this.productions.length) {
+      return false;
+    }
+    
+    const tramo = this.productions[tramoIndex];
+    const fechaInicio = new Date(tramo.fechaInicio);
+    const fechaFin = new Date(tramo.fechaFin);
+    const now = new Date();
+    
+    return fechaInicio <= now && now <= fechaFin;
+  }
+  
+  // Método para determinar si un tramo está completado
+  isCompletedTramo(tramoIndex: number): boolean {
+    if (this.productions.length === 0 || tramoIndex < 0 || 
+        tramoIndex >= this.productions.length) {
+      return false;
+    }
+    
+    const tramo = this.productions[tramoIndex];
+    const fechaFin = new Date(tramo.fechaFin);
+    const now = new Date();
+    
+    return fechaFin < now;
+  }
+  
+  // Método para obtener el estado del tramo como texto
+  getEstadoTramo(tramoIndex: number): string {
+    if (this.isPendingTramo(tramoIndex)) {
+      return 'Pendiente';
+    } else if (this.isCurrentTramo(tramoIndex)) {
+      return 'En progreso';
+    } else if (this.isCompletedTramo(tramoIndex)) {
+      return 'Completado';
+    } else {
+      return 'Desconocido';
+    }
+  }
+
+  // Procesar datos de producción para el gráfico
+  private processProductionData(): ProductionData[] {
+    if (!this.productions || this.productions.length === 0) {
+      console.log('No hay datos de producción disponibles para el gráfico');
+      return [];
+    }
+
+    // Ordenar producciones por fecha
+    const sortedProductions = [...this.productions].sort((a, b) => 
+      new Date(a.fechaInicio).getTime() - new Date(b.fechaInicio).getTime()
+    );
+
+    console.log('Producciones ordenadas por fecha:', sortedProductions);
+
+    // Convertir a formato de gráfico
+    const chartData = sortedProductions.map((prod, index) => {
+      // Usar el método robusto para parsear kilosAjustados para la producción estimada
+      const kilosAjustados = this.parseNumericValue(prod.kilosAjustados);
+      console.log(`Producción ${index+1}: kilosAjustados=${prod.kilosAjustados}, parseado=${kilosAjustados}`);
+      
+      // Para la producción real, de momento ponemos 0 (se rellenará en el futuro)
+      const realProduction = 0;
+      
+      return {
+        label: `T ${index + 1}`, // T1, T2, etc.
+        realProduction: realProduction, // Producción real (a rellenar en el futuro)
+        estimatedProduction: kilosAjustados // Usar kilosAjustados como la producción estimada
+      };
+    });
+    
+    console.log('Datos procesados para el gráfico:', chartData);
+    return chartData;
   }
 
   // Método para traducir los días de la semana a español
@@ -476,25 +767,59 @@ export class CultiveDetailsComponent
 
   //grafico:
   private initializeChart(): void {
-    this.data = {
-      labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-      datasets: [
-        {
-          label: 'Producción Real',
-          data: [65, 59, 80, 81, 56, 55],
-          borderColor: '#437d3f',
-          tension: 0.4,
-          fill: false
-        },
-        {
-          label: 'Producción Estimada',
-          data: [28, 48, 40, 19, 86, 27],
-          borderColor: '#65b15f',
-          tension: 0.4,
-          fill: false
-        }
-      ]
-    };
+    console.log('Inicializando gráfico...');
+    
+    // Procesar datos de producción para el gráfico
+    const chartData = this.processProductionData();
+    
+    console.log('Datos para el gráfico después de procesar:', chartData);
+    
+    // Si no hay datos, usar valores por defecto
+    if (chartData.length === 0) {
+      console.log('No hay datos para el gráfico, usando valores por defecto');
+      this.data = {
+        labels: ['T 1', 'T 2', 'T 3', 'T 4', 'T 5', 'T 6'],
+        datasets: [
+          {
+            label: 'Producción Real',
+            data: [0, 0, 0, 0, 0, 0],
+            borderColor: '#437d3f',
+            tension: 0.4,
+            fill: false
+          },
+          {
+            label: 'Producción Estimada',
+            data: [0, 0, 0, 0, 0, 0],
+            borderColor: '#65b15f',
+            tension: 0.4,
+            fill: false
+          }
+        ]
+      };
+    } else {
+      // Usar datos reales sin modificación
+      console.log('Usando datos reales para el gráfico');
+      
+      this.data = {
+        labels: chartData.map(item => item.label),
+        datasets: [
+          {
+            label: 'Producción Real',
+            data: chartData.map(item => item.realProduction), // Siempre será 0 por ahora, para rellenar en el futuro
+            borderColor: '#437d3f',
+            tension: 0.4,
+            fill: false
+          },
+          {
+            label: 'Producción Estimada',
+            data: chartData.map(item => item.estimatedProduction),
+            borderColor: '#65b15f',
+            tension: 0.4,
+            fill: false
+          }
+        ]
+      };
+    }
 
     this.options = {
       responsive: true,
@@ -529,13 +854,14 @@ export class CultiveDetailsComponent
     };
   }
 
-
-
-
   ngOnDestroy(): void {
     if (this.map) {
       this.map.remove();
       this.map = null;
+    }
+    
+    if (this.progressInterval) {
+      clearInterval(this.progressInterval);
     }
   }
 }

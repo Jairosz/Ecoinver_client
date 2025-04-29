@@ -317,9 +317,9 @@
     </div>
 
     <!-- Insights -->
-    <!-- Insights -->
     <div [class.hidden]="activeTab !== 'Insights'" class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
-      <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 mb-6">
+      <!-- Gráfico principal y cuadro de información lateral -->
+      <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
         <!-- Gráfico principal -->
         <div class="w-full lg:w-[65%] xl:w-[70%] bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
           <p-chart type="line" [data]="data" [options]="options" class="h-[300px] md:h-[350px]"></p-chart>
@@ -327,64 +327,153 @@
 
         <!-- Cuadro de información lateral -->
         <div class="w-full lg:w-[35%] xl:w-[30%] bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
-          <h3 class="text-lg font-semibold mb-4 dark:text-gray-200">
-            Estadísticas Clave
-          </h3>
-          <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
+            <h3 class="text-lg font-semibold dark:text-gray-200">
+              Estadísticas Clave
+            </h3>
+            
+            <!-- Botón de alternancia entre vistas -->
+            <div class="inline-flex p-0.5 bg-gray-100 dark:bg-gray-700 rounded-lg w-full sm:w-auto">
+              <button 
+                (click)="setStatsView('tramos')" 
+                [ngClass]="{
+                  'bg-white dark:bg-gray-800 text-[#437d3f] dark:text-[#65b15f] shadow-sm': statsView === 'tramos',
+                  'text-gray-700 dark:text-gray-300 hover:text-[#437d3f] dark:hover:text-[#65b15f]': statsView !== 'tramos'
+                }"
+                class="py-1.5 px-2 sm:px-3 text-xs font-medium rounded-md flex-1 sm:flex-none">
+                Tramos
+              </button>
+              
+              <button 
+                (click)="setStatsView('resumen')" 
+                [ngClass]="{
+                  'bg-white dark:bg-gray-800 text-[#437d3f] dark:text-[#65b15f] shadow-sm': statsView === 'resumen',
+                  'text-gray-700 dark:text-gray-300 hover:text-[#437d3f] dark:hover:text-[#65b15f]': statsView !== 'resumen'
+                }"
+                class="py-1.5 px-2 sm:px-3 text-xs font-medium rounded-md flex-1 sm:flex-none">
+                Resumen
+              </button>
+            </div>
+          </div>
+          
+          <!-- Vista de Tramos - Visible cuando statsView es 'tramos' -->
+          <div *ngIf="statsView === 'tramos'">
+            <!-- Desplegable de Tramos -->
+            <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg mb-4">
+              <label for="tramo-select" class="block text-sm text-gray-600 dark:text-gray-300 mb-2">
+                Seleccionar Tramo
+              </label>
+              <div class="relative">
+                <select 
+                  id="tramo-select" 
+                  [(ngModel)]="selectedTramoIndex"
+                  (change)="onTramoChange($event)"
+                  class="block w-full p-2 bg-white dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-[#437d3f] focus:border-[#437d3f] text-sm">
+                  <option *ngFor="let prod of productions; let i = index" [value]="i">
+                    T {{ i + 1 }}: {{ prod.fechaInicio | date: 'dd/MM/yyyy' }} - {{ prod.fechaFin | date: 'dd/MM/yyyy' }}
+                  </option>
+                  <option *ngIf="productions.length === 0" [value]="-1" disabled>No hay tramos disponibles</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
+                  <i class="fas fa-chevron-down text-xs"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="space-y-4">
+              <!-- Información del tramo seleccionado -->
+              <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+                <p class="text-sm text-gray-600 dark:text-gray-300">
+                  Duración del Tramo
+                </p>
+                <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]" *ngIf="productions.length > 0 && selectedTramoIndex >= 0">
+                  {{ getDuracionTramo(selectedTramoIndex) }} días
+                </p>
+                <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]" *ngIf="productions.length === 0 || selectedTramoIndex < 0">
+                  No disponible
+                </p>
+              </div>
+              <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+                <p class="text-sm text-gray-600 dark:text-gray-300">
+                  Producción Estimada
+                </p>
+                <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]" *ngIf="productions.length > 0 && selectedTramoIndex >= 0">
+                  {{ formatNumber(getValorKilosAjustados(selectedTramoIndex)) }} kg
+                </p>
+                <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]" *ngIf="productions.length === 0 || selectedTramoIndex < 0">
+                  No disponible
+                </p>
+              </div>
+              <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+                <p class="text-sm text-gray-600 dark:text-gray-300">
+                  Estado del Tramo
+                </p>
+                <p class="text-xl font-bold" 
+                   [ngClass]="{
+                     'text-amber-600 dark:text-amber-400': isPendingTramo(selectedTramoIndex),
+                     'text-blue-600 dark:text-blue-400': isCurrentTramo(selectedTramoIndex),
+                     'text-green-600 dark:text-green-400': isCompletedTramo(selectedTramoIndex),
+                     'text-gray-500 dark:text-gray-400': productions.length === 0 || selectedTramoIndex < 0
+                   }"
+                   *ngIf="productions.length > 0 && selectedTramoIndex >= 0">
+                  {{ getEstadoTramo(selectedTramoIndex) }}
+                </p>
+                <p class="text-xl font-bold text-gray-500 dark:text-gray-400" *ngIf="productions.length === 0 || selectedTramoIndex < 0">
+                  No disponible
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Vista de Resumen - Visible cuando statsView es 'resumen' -->
+          <div *ngIf="statsView === 'resumen'" class="space-y-4">
             <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
               <p class="text-sm text-gray-600 dark:text-gray-300">
-                Crecimiento Semanal
+                Total Tramos
               </p>
               <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">
-                Ejemplo
+                {{ formatNumber(productions.length) }}
               </p>
             </div>
             <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
               <p class="text-sm text-gray-600 dark:text-gray-300">
-                Salud del Cultivo
+                Producción Total Estimada
               </p>
               <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">
-                Ejemplo
+                {{ formatNumber(getTotalProduccionEstimada()) }} kg
               </p>
             </div>
             <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
               <p class="text-sm text-gray-600 dark:text-gray-300">
-                Rendimiento vs Estimado
+                Duración Total
               </p>
               <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">
-                Ejemplo
+                {{ getTotalDuracion() }} días
+              </p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+              <p class="text-sm text-gray-600 dark:text-gray-300">
+                Estado General
+              </p>
+              <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">
+                {{ getCultivoState() }}
               </p>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Sección adicional debajo -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
-          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
-            Temperatura Promedio
-          </p>
-          <p class="text-2xl font-bold text-gray-800 dark:text-white">
-            Ejemplo
-          </p>
-        </div>
-        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
-          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
-            Humedad del Suelo
-          </p>
-          <p class="text-2xl font-bold text-gray-800 dark:text-white">
-            Ejemplo
-          </p>
-        </div>
-        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
-          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
-            Horas de Luz Diarias
-          </p>
-          <p class="text-2xl font-bold text-gray-800 dark:text-white">
-            Ejemplo
-          </p>
-        </div>
+    </div>
+    
+    <!-- Contenido de la pestaña de Variables (antes nerfs) -->
+    <div [class.hidden]="activeTab !== 'nerfs'" class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+      <!-- Aquí puedes agregar el contenido de la pestaña Variables -->
+      <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+        <h3 class="text-lg font-semibold mb-4 dark:text-gray-200">
+          Variables del Cultivo
+        </h3>
+        <p class="text-gray-600 dark:text-gray-300">
+          Esta sección mostrará las variables de cultivo.
+        </p>
       </div>
     </div>
   </div>
