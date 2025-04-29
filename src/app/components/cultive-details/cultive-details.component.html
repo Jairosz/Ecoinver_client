@@ -48,12 +48,19 @@
     </li>
   </ul>
 
-  <!-- Cartelito a la derecha que muestra información del cultivo -->
-  <div class="bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded-lg shadow">
+  <!-- Cartelito a la derecha con información de cultivo y botón de exportación -->
+  <div class="bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded-lg shadow flex items-center gap-3">
     <p class="text-sm font-medium">
       {{ cultivo?.nombreAgricultor }} - {{ cultivo?.nombreGenero }} -
       {{ cultivo?.nombreVariedad }}
     </p>
+    <!-- Botón de exportación -->
+    <button 
+      (click)="exportToPdf()" 
+      class="ml-2 bg-[#437d3f] hover:bg-[#396a35] text-white px-3 py-1 rounded-md text-xs flex items-center transition-colors"
+      title="Exportar a PDF">
+      <i class="fas fa-file-pdf mr-1"></i> PDF
+    </button>
   </div>
 </div>
 
@@ -320,8 +327,8 @@
     <div [class.hidden]="activeTab !== 'Insights'" class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
       <!-- Gráfico principal y cuadro de información lateral -->
       <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
-        <!-- Gráfico principal -->
-        <div class="w-full lg:w-[65%] xl:w-[70%] bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+        <!-- Gráfico principal - Añadir clase insights-chart para la exportación PDF -->
+        <div class="w-full lg:w-[65%] xl:w-[70%] bg-white dark:bg-gray-700 p-4 rounded-lg shadow insights-chart">
           <p-chart type="line" [data]="data" [options]="options" class="h-[300px] md:h-[350px]"></p-chart>
         </div>
 

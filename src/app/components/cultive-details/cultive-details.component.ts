@@ -14,6 +14,8 @@ import { ChartModule } from 'primeng/chart';
 import { CultivoService } from '../../services/Cultivo.service';
 import { CultiveProductionService } from '../../services/CultiveProduction.service';
 import { CultiveProductionDto } from '../../types/CultiveProductionTypes';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface Cultivo {
   id: number;
@@ -863,5 +865,647 @@ export class CultiveDetailsComponent
     if (this.progressInterval) {
       clearInterval(this.progressInterval);
     }
+  }
+
+  // Método para exportar los datos a PDF
+  exportToPdf(): void {
+    try {
+      // Crear documento PDF con orientación horizontal para mejor presentación
+      const doc = new jsPDF('l', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 15;
+      const contentWidth = pageWidth - (margin * 2);
+
+      // Variable para seguir la página actual
+      let currentPage = 1;
+
+      // Referencia al contexto this para usar dentro de funciones
+      const self = this;
+
+      // Diseño de cabecera personalizada
+      const drawHeader = () => {
+        // Fondo verde
+        const docWidth = doc.internal.pageSize.getWidth();
+        const headerHeight = 30; // Altura del header en mm
+        doc.setFillColor(67, 160, 34); // Color principal verde
+        doc.rect(0, 0, docWidth, headerHeight, 'F');
+        
+        // Texto - Título del informe
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(22);
+        doc.text('Detalles del Cultivo', margin + 30, 15); 
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        doc.text(
+          `Informe generado el ${new Date().toLocaleDateString()} a las ${new Date().toLocaleTimeString()}`,
+          margin + 30, 
+          22
+        );
+      };
+
+      // Diseño de pie de página
+      const drawFooter = (pageNum: number, totalPages: number) => {
+        // Línea decorativa
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
+
+        // Texto de pie de página
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+
+        // Numeración de página
+        doc.text(
+          `Página ${pageNum} de ${totalPages}`,
+          pageWidth / 2,
+          pageHeight - 7,
+          { align: 'center' }
+        );
+
+        // Información de la empresa
+        doc.text('© 2025 · Ecoinver', margin, pageHeight - 7);
+
+        // Timestamp en la esquina derecha
+        doc.text(
+          `Generado: ${new Date().toLocaleTimeString()}`,
+          pageWidth - margin,
+          pageHeight - 7,
+          { align: 'right' }
+        );
+      };
+
+      // Dibujar encabezado en primera página
+      drawHeader();
+
+      // Posición inicial para el contenido después de la cabecera
+      let yPos = 40;
+
+      // SECCIÓN 1: DATOS DEL CULTIVO
+      // Título de la sección
+      doc.setFillColor(67, 125, 63); // Color verde más oscuro
+      doc.rect(margin, yPos, 40, 8, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text('DATOS DEL CULTIVO', margin + 5, yPos + 5.5);
+
+      // Subtítulo
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(67, 125, 63);
+      doc.text(`${this.cultivo?.nombreGenero || ''} - ${this.cultivo?.nombreVariedad || ''}`, margin + 45, yPos + 5.5);
+
+      yPos += 12;
+
+      // Crear cuadro para datos generales
+      doc.setFillColor(245, 247, 250);
+      doc.setDrawColor(220, 220, 220);
+      doc.roundedRect(margin, yPos, contentWidth, 65, 3, 3, 'FD');
+
+      // Datos del cultivo en forma de tabla (2 columnas x 4 filas)
+      const colWidth = contentWidth / 2;
+      const rowHeight = 15;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+
+      // Fila 1
+      doc.text('Agricultor:', margin + 5, yPos + 8);
+      doc.text('Finca:', margin + colWidth + 5, yPos + 8);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(50, 50, 50);
+      doc.text(this.cultivo?.nombreAgricultor || 'No especificado', margin + 5, yPos + 14);
+      doc.text(this.cultivo?.nombreFinca || 'No especificada', margin + colWidth + 5, yPos + 14);
+
+      // Fila 2
+      yPos += rowHeight;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text('Género:', margin + 5, yPos + 8);
+      doc.text('Variedad:', margin + colWidth + 5, yPos + 8);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(50, 50, 50);
+      doc.text(this.cultivo?.nombreGenero || 'No especificado', margin + 5, yPos + 14);
+      doc.text(this.cultivo?.nombreVariedad || 'No especificada', margin + colWidth + 5, yPos + 14);
+
+      // Fila 3
+      yPos += rowHeight;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text('Nave:', margin + 5, yPos + 8);
+      doc.text('Superficie:', margin + colWidth + 5, yPos + 8);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(50, 50, 50);
+      doc.text(this.cultivo?.nombreNave || 'No especificada', margin + 5, yPos + 14);
+      doc.text(`${this.cultivo?.superficie || 0} ha`, margin + colWidth + 5, yPos + 14);
+
+      // Fila 4
+      yPos += rowHeight;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text('Fecha siembra:', margin + 5, yPos + 8);
+      doc.text('Fecha fin:', margin + colWidth + 5, yPos + 8);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(50, 50, 50);
+
+      // Formatear fechas
+      const formatDate = (date: Date | null | undefined): string => {
+        if (!date) return 'No especificada';
+        return new Date(date).toLocaleDateString();
+      };
+
+      doc.text(formatDate(this.cultivo?.fechaSiembra), margin + 5, yPos + 14);
+      doc.text(formatDate(this.cultivo?.fechaFin), margin + colWidth + 5, yPos + 14);
+
+      // Estado del cultivo y barra de progreso
+      yPos += rowHeight + 5;
+
+      // Agregar cuadro de estado
+      doc.setFillColor(238, 247, 237); // Color verde claro
+      doc.roundedRect(margin, yPos, contentWidth, 30, 3, 3, 'F');
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text('Estado del cultivo:', margin + 5, yPos + 8);
+
+      // Estado actual
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      const estadoCultivo = this.getCultivoState();
+      if (estadoCultivo === 'Activo') {
+        doc.setTextColor(67, 160, 71); // Verde
+      } else {
+        doc.setTextColor(120, 120, 120); // Gris
+      }
+      doc.text(estadoCultivo, margin + 40, yPos + 8);
+
+      // Barra de progreso
+      const progressWidth = contentWidth - 10;
+      doc.setDrawColor(230, 230, 230);
+      doc.setFillColor(230, 230, 230);
+      doc.roundedRect(margin + 5, yPos + 15, progressWidth, 5, 2, 2, 'F');
+
+      // Progreso actual
+      const progressValue = this.getProgressPercentage();
+      const filledWidth = (progressValue / 100) * progressWidth;
+      doc.setFillColor(67, 125, 63); // Verde más oscuro
+      doc.roundedRect(margin + 5, yPos + 15, filledWidth, 5, 2, 2, 'F');
+
+      // Etiquetas de progreso
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(120, 120, 120);
+      doc.text('Trasplante', margin + 5, yPos + 25);
+      doc.text(`${Math.round(progressValue)}%`, margin + (progressWidth / 2), yPos + 25, { align: 'center' });
+      doc.text('Fin de cultivo', margin + progressWidth, yPos + 25, { align: 'right' });
+      
+      // SECCIÓN 2: INSIGHTS (ESTADÍSTICAS)
+      yPos += 45;
+      
+      // Título de la sección
+      doc.setFillColor(67, 125, 63); // Color verde más oscuro
+      doc.rect(margin, yPos, 40, 8, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text('INSIGHTS', margin + 5, yPos + 5.5);
+
+      // Subtítulo
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(67, 125, 63);
+      doc.text('Estadísticas de Producción', margin + 45, yPos + 5.5);
+
+      yPos += 12;
+
+      // Verificar si tenemos datos de producción
+      if (this.productions && this.productions.length > 0) {
+        // Capturar la gráfica si existe
+        this.captureChartForPdf(doc, yPos, margin, contentWidth).then(() => {
+          // Este código se ejecutará después de capturar la gráfica
+          yPos += 80; // Espacio para la gráfica
+          
+          // Tabla de estadísticas de tramos
+          this.addProductionTable(doc, yPos, margin, contentWidth);
+          
+          // Finalizar el PDF
+          this.finalizePdf(doc, drawFooter);
+        }).catch(error => {
+          console.error('Error al capturar la gráfica:', error);
+          // Si hay error, continuar sin la gráfica
+          yPos += 10;
+          doc.text('No se pudo capturar la gráfica de estadísticas.', margin + 5, yPos);
+          yPos += 10;
+          
+          // Tabla de estadísticas de tramos
+          this.addProductionTable(doc, yPos, margin, contentWidth);
+          
+          // Finalizar el PDF
+          this.finalizePdf(doc, drawFooter);
+        });
+      } else {
+        // No hay datos de producción
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(100, 100, 100);
+        doc.text('No hay datos de producción disponibles para este cultivo.', margin + 5, yPos + 10);
+        
+        // Finalizar el PDF
+        this.finalizePdf(doc, drawFooter);
+      }
+    } catch (error) {
+      console.error('Error al generar el PDF:', error);
+      alert('No se pudo generar el PDF. Por favor, inténtelo de nuevo.');
+    }
+  }
+
+  // Método para capturar la gráfica y agregarla al PDF
+  private captureChartForPdf(doc: jsPDF, yPos: number, margin: number, contentWidth: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      try {
+        const chartContainer = document.querySelector('.insights-chart') as HTMLElement;
+        
+        if (!chartContainer) {
+          reject(new Error('No se encontró el elemento de la gráfica'));
+          return;
+        }
+        
+        // Usamos html2canvas con opciones adicionales para captura completa
+        html2canvas(chartContainer, {
+          scale: 2, // Mayor escala para mejor calidad
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: null,
+          height: chartContainer.scrollHeight, // Asegurar captura de altura completa
+          windowHeight: chartContainer.scrollHeight, // Altura de ventana suficiente
+          logging: true, // Ayuda a depurar problemas de captura
+          onclone: (documentClone) => {
+            // Modificar el clon para mejorar la captura
+            const clonedChart = documentClone.querySelector('.insights-chart');
+            if (clonedChart) {
+              // Asegurar que el contenedor es visible y tiene altura suficiente
+              (clonedChart as HTMLElement).style.height = 'auto';
+              (clonedChart as HTMLElement).style.overflow = 'visible';
+            }
+            return documentClone;
+          }
+        }).then(canvas => {
+          // Verificar las dimensiones de la captura
+          console.log(`Canvas capturado: ${canvas.width}x${canvas.height}`);
+          
+          const imgData = canvas.toDataURL('image/png');
+          // Mantener la relación de aspecto
+          const canvasRatio = canvas.height / canvas.width;
+          const height = contentWidth * canvasRatio;
+          
+          // Reducir un poco la altura en el PDF para evitar truncamiento
+          const pdfHeight = Math.min(height, 100); // Limitar altura máxima a 100mm
+          
+          doc.addImage(imgData, 'PNG', margin, yPos, contentWidth, pdfHeight);
+          resolve();
+        }).catch(error => {
+          console.error('Error al capturar con html2canvas:', error);
+          reject(error);
+        });
+      } catch (error) {
+        console.error('Error general en captura:', error);
+        reject(error);
+      }
+    });
+  }
+
+  // Método para agregar la tabla de producción al PDF
+  private addProductionTable(doc: jsPDF, yPos: number, margin: number, contentWidth: number): void {
+    // Crear una tabla para mostrar los datos de producción por tramos
+    const headers = ["Tramo", "Fecha Inicio", "Fecha Fin", "Duración (días)", "Prod. Estimada (kg)", "Estado"];
+    
+    // Determinar si necesitamos una nueva página
+    if (yPos > doc.internal.pageSize.getHeight() - 70) {
+      doc.addPage();
+      // Dibujar cabecera en la nueva página
+      const drawHeader = () => {
+        const docWidth = doc.internal.pageSize.getWidth();
+        const headerHeight = 30;
+        doc.setFillColor(67, 160, 34);
+        doc.rect(0, 0, docWidth, headerHeight, 'F');
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(22);
+        doc.text('Detalles del Cultivo', margin + 30, 15);
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        doc.text(`Informe generado el ${new Date().toLocaleDateString()}`, margin + 30, 22);
+      };
+      drawHeader();
+      yPos = 40;
+    }
+    
+    // Título de la tabla
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(60, 60, 60);
+    doc.text('Detalles de Producción por Tramos', margin, yPos);
+    
+    yPos += 6;
+    
+    // Calcular anchos de columna
+    const colWidths = [
+      contentWidth * 0.1,  // Tramo
+      contentWidth * 0.2,  // Fecha Inicio
+      contentWidth * 0.2,  // Fecha Fin
+      contentWidth * 0.15, // Duración
+      contentWidth * 0.2,  // Producción Estimada
+      contentWidth * 0.15  // Estado
+    ];
+    
+    const rowHeight = 8;
+    
+    // Dibujar encabezados
+    doc.setFillColor(67, 125, 63);
+    doc.rect(margin, yPos, contentWidth, rowHeight, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    
+    let xPos = margin;
+    headers.forEach((header, i) => {
+      doc.text(header, xPos + 2, yPos + 5.5);
+      xPos += colWidths[i];
+    });
+    
+    yPos += rowHeight;
+    
+    // Dibujar filas de datos
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    
+    // Formatear fechas
+    const formatDate = (dateStr: string): string => {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString();
+    };
+    
+    // Procesar y mostrar cada tramo de producción
+    this.productions.forEach((prod, index) => {
+      // Alternar colores de fondo
+      if (index % 2 === 0) {
+        doc.setFillColor(245, 247, 250);
+        doc.rect(margin, yPos, contentWidth, rowHeight, 'F');
+      }
+      
+      // Color del texto según estado
+      let estadoColor;
+      const estado = this.getEstadoTramo(index);
+      
+      if (estado === 'Pendiente') {
+        estadoColor = [204, 132, 0]; // Ámbar
+      } else if (estado === 'En progreso') {
+        estadoColor = [41, 98, 255]; // Azul
+      } else if (estado === 'Completado') {
+        estadoColor = [76, 175, 80]; // Verde
+      } else {
+        estadoColor = [100, 100, 100]; // Gris
+      }
+      
+      // Textos de la fila
+      doc.setTextColor(60, 60, 60);
+      
+      xPos = margin;
+      
+      // Columna: Tramo
+      doc.text(`T ${index + 1}`, xPos + 2, yPos + 5.5);
+      xPos += colWidths[0];
+      
+      // Columna: Fecha Inicio
+      doc.text(formatDate(prod.fechaInicio), xPos + 2, yPos + 5.5);
+      xPos += colWidths[1];
+      
+      // Columna: Fecha Fin
+      doc.text(formatDate(prod.fechaFin), xPos + 2, yPos + 5.5);
+      xPos += colWidths[2];
+      
+      // Columna: Duración
+      doc.text(`${this.getDuracionTramo(index)}`, xPos + 2, yPos + 5.5);
+      xPos += colWidths[3];
+      
+      // Columna: Producción Estimada
+      doc.text(`${this.formatNumber(this.getValorKilosAjustados(index))}`, xPos + 2, yPos + 5.5);
+      xPos += colWidths[4];
+      
+      // Columna: Estado
+      doc.setTextColor(estadoColor[0], estadoColor[1], estadoColor[2]);
+      doc.text(estado, xPos + 2, yPos + 5.5);
+      
+      yPos += rowHeight;
+      
+      // Comprobar si necesitamos una nueva página
+      if (yPos > doc.internal.pageSize.getHeight() - 25 && index < this.productions.length - 1) {
+        doc.addPage();
+        // Dibujar cabecera
+        const drawHeader = () => {
+          const docWidth = doc.internal.pageSize.getWidth();
+          const headerHeight = 30;
+          doc.setFillColor(67, 160, 34);
+          doc.rect(0, 0, docWidth, headerHeight, 'F');
+          
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(255, 255, 255);
+          doc.setFontSize(22);
+          doc.text('Detalles del Cultivo', margin + 30, 15);
+          
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(11);
+          doc.text(`Informe generado el ${new Date().toLocaleDateString()}`, margin + 30, 22);
+        };
+        drawHeader();
+        
+        // Reiniciar posición Y
+        yPos = 40;
+        
+        // Repetir encabezados en la nueva página
+        doc.setFillColor(67, 125, 63);
+        doc.rect(margin, yPos, contentWidth, rowHeight, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        
+        xPos = margin;
+        headers.forEach((header, i) => {
+          doc.text(header, xPos + 2, yPos + 5.5);
+          xPos += colWidths[i];
+        });
+        
+        yPos += rowHeight;
+        doc.setFont('helvetica', 'normal');
+      }
+    });
+    
+    // Agregar resumen estadístico después de la tabla
+    yPos += 5;
+    
+    // Añadir un cuadro resumen
+    doc.setFillColor(238, 247, 237);
+    doc.roundedRect(margin, yPos, contentWidth, 35, 3, 3, 'F');
+    
+    doc.setTextColor(67, 125, 63);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.text('RESUMEN DE PRODUCCIÓN', margin + 5, yPos + 7);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(80, 80, 80);
+    
+    // Mostrar estadísticas generales
+    const resumenY = yPos + 15;
+    doc.text(`Total Tramos: ${this.productions.length}`, margin + 10, resumenY);
+    doc.text(`Producción Total Estimada: ${this.formatNumber(this.getTotalProduccionEstimada())} kg`, margin + 10, resumenY + 8);
+    doc.text(`Duración Total: ${this.getTotalDuracion()} días`, margin + contentWidth/2, resumenY);
+    doc.text(`Estado General: ${this.getCultivoState()}`, margin + contentWidth/2, resumenY + 8);
+  }
+
+  // Método para finalizar y mostrar el PDF
+  private finalizePdf(doc: jsPDF, drawFooter: (pageNum: number, totalPages: number) => void): void {
+    const totalPages = doc.internal.pages.length - 1;
+    
+    // Añadir pie de página a todas las páginas
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      drawFooter(i, totalPages);
+    }
+    
+    // Mostrar vista previa del PDF
+    this.showPdfPreview(doc);
+  }
+
+  // Método para mostrar la vista previa del PDF
+  private showPdfPreview(pdfDoc: jsPDF): void {
+    // Generar blob y URL de datos para el PDF
+    const pdfBlob = pdfDoc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+
+    // Crear modal para la vista previa
+    const modalOverlay = document.createElement('div');
+    modalOverlay.style.position = 'fixed';
+    modalOverlay.style.top = '0';
+    modalOverlay.style.left = '0';
+    modalOverlay.style.right = '0';
+    modalOverlay.style.bottom = '0';
+    modalOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    modalOverlay.style.zIndex = '10000';
+    modalOverlay.style.display = 'flex';
+    modalOverlay.style.flexDirection = 'column';
+    modalOverlay.style.alignItems = 'center';
+    modalOverlay.style.justifyContent = 'center';
+
+    // Header del modal con título y botón de cerrar
+    const modalHeader = document.createElement('div');
+    modalHeader.style.width = '80%';
+    modalHeader.style.backgroundColor = '#437d3f';
+    modalHeader.style.color = 'white';
+    modalHeader.style.padding = '10px 20px';
+    modalHeader.style.display = 'flex';
+    modalHeader.style.justifyContent = 'space-between';
+    modalHeader.style.alignItems = 'center';
+    modalHeader.style.borderTopLeftRadius = '8px';
+    modalHeader.style.borderTopRightRadius = '8px';
+
+    const modalTitle = document.createElement('h3');
+    modalTitle.textContent = 'Vista previa del PDF';
+    modalTitle.style.margin = '0';
+
+    const closeButton = document.createElement('button');
+    closeButton.textContent = '×';
+    closeButton.style.background = 'none';
+    closeButton.style.border = 'none';
+    closeButton.style.color = 'white';
+    closeButton.style.fontSize = '24px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.padding = '0 5px';
+    closeButton.onclick = () => {
+      document.body.removeChild(modalOverlay);
+      // Liberar la URL del objeto para evitar fugas de memoria
+      URL.revokeObjectURL(pdfUrl);
+    };
+
+    modalHeader.appendChild(modalTitle);
+    modalHeader.appendChild(closeButton);
+
+    // Contenido del modal - iframe para mostrar el PDF
+    const modalContent = document.createElement('div');
+    modalContent.style.width = '80%';
+    modalContent.style.height = '80vh';
+    modalContent.style.backgroundColor = 'white';
+
+    const pdfIframe = document.createElement('iframe');
+    pdfIframe.style.width = '100%';
+    pdfIframe.style.height = '100%';
+    pdfIframe.style.border = 'none';
+    pdfIframe.src = pdfUrl;
+
+    modalContent.appendChild(pdfIframe);
+
+    // Footer del modal con botones
+    const modalFooter = document.createElement('div');
+    modalFooter.style.width = '80%';
+    modalFooter.style.backgroundColor = 'white';
+    modalFooter.style.padding = '15px 20px';
+    modalFooter.style.display = 'flex';
+    modalFooter.style.justifyContent = 'flex-end';
+    modalFooter.style.gap = '10px';
+    modalFooter.style.borderBottomLeftRadius = '8px';
+    modalFooter.style.borderBottomRightRadius = '8px';
+    modalFooter.style.borderTop = '1px solid #e2e8f0';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'Cancelar';
+    cancelButton.style.padding = '8px 16px';
+    cancelButton.style.backgroundColor = '#e2e8f0';
+    cancelButton.style.color = '#1e293b';
+    cancelButton.style.border = 'none';
+    cancelButton.style.borderRadius = '4px';
+    cancelButton.style.cursor = 'pointer';
+    cancelButton.onclick = () => {
+      document.body.removeChild(modalOverlay);
+      URL.revokeObjectURL(pdfUrl);
+    };
+
+    const downloadButton = document.createElement('button');
+    downloadButton.textContent = 'Descargar PDF';
+    downloadButton.style.padding = '8px 16px';
+    downloadButton.style.backgroundColor = '#437d3f';
+    downloadButton.style.color = 'white';
+    downloadButton.style.border = 'none';
+    downloadButton.style.borderRadius = '4px';
+    downloadButton.style.cursor = 'pointer';
+    downloadButton.onclick = () => {
+      // Descargar el PDF
+      pdfDoc.save(`cultivo-${this.cultivo?.id || 'detalle'}.pdf`);
+      document.body.removeChild(modalOverlay);
+      URL.revokeObjectURL(pdfUrl);
+    };
+
+    modalFooter.appendChild(cancelButton);
+    modalFooter.appendChild(downloadButton);
+
+    // Ensamblar el modal completo
+    modalOverlay.appendChild(modalHeader);
+    modalOverlay.appendChild(modalContent);
+    modalOverlay.appendChild(modalFooter);
+
+    // Añadir el modal al body
+    document.body.appendChild(modalOverlay);
   }
 }
