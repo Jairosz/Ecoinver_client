@@ -763,8 +763,6 @@ cargarPlanificacion(): void {
   
     // 5) Abro el modal
     this.showCultivoModal = true;
-    //bug scroll
-    document.body.style.overflow = 'hidden';
     
     console.log('Lista de cultivos filtrados cargada:', this.filteredCultivos.length);
     console.log('Cultivos seleccionados al abrir modal:', this.tempSelectedCultivosIds);
@@ -772,8 +770,6 @@ cargarPlanificacion(): void {
 
   closeCultivoModal(): void {
     this.showCultivoModal = false;
-    //bug scroll
-    document.body.style.overflow = '';
   }
 
   // Método modificado para añadir cultivos seleccionados con NgSelect
