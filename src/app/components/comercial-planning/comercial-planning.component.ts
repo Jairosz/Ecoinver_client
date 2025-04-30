@@ -128,12 +128,19 @@ export class ComercialPlanningComponent {
           let fin;
           let numSemanas = 0;
           //Calculo del número de semana
-          const primerDia = new Date(inicio.getFullYear(), 0, 1);
-          let semana = Math.floor((inicio.getTime() - primerDia.getTime()) / (1000 * 60 * 60 * 24));
-          semana = Math.ceil(semana / 7);
+          const primerDia = new Date(inicio.getFullYear(), 0, 1); // 1 de enero
+          const diaSemana = primerDia.getDay(); // 0 = domingo, 1 = lunes, ...
+
+          // Ajustamos el inicio para que la semana comience correctamente
+          const diasDesdePrimerDia = Math.floor((inicio.getTime() - primerDia.getTime()) / (1000 * 60 * 60 * 24));
+          const diasAjustados = diasDesdePrimerDia + diaSemana; // Ajuste si semana inicia en domingo
+
+          let semana = Math.floor(diasAjustados / 7) + 1;
 
           for (let i = new Date(startDate); i <= endDate; i.setDate(i.getDate() + 1)) {//Se recorren las fechas
-
+            if (inicio.getFullYear() !== i.getFullYear()) {
+              semana = 1;
+            }
             if (i.getDay() == 0) {//Si el dia de la fecha es igual a domingo
               fin = new Date(i.getFullYear(), i.getMonth(), i.getDate());
               numSemanas++;//Sumamos una semana
@@ -154,6 +161,7 @@ export class ComercialPlanningComponent {
                 fin: new Date(fin.getFullYear(), fin.getMonth(), fin.getDate(), 12, 0, 0)
               });
               inicio = new Date(i.getFullYear(), i.getMonth(), i.getDate() + 1);
+
 
               semana++;
             }
@@ -177,6 +185,7 @@ export class ComercialPlanningComponent {
                   inicio: new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate(), 12, 0, 0),
                   fin: new Date(fin.getFullYear(), fin.getMonth(), fin.getDate(), 12, 0, 0)
                 });
+
                 numSemanas++;//Sumamos una semana
                 semana++;
               }
@@ -388,11 +397,12 @@ export class ComercialPlanningComponent {
     if (editar) {
       this.comercialDetails.put(editar.id, editar).subscribe(
         (data) => {
-          console.log('Se ha editado correctamente');
+          console.log(data);
 
           this.editarPlanning = true;
           this.validar = null;
           this.editarBoton = false;
+          this.semanasFormArray.controls[indice].disable();
         },
         (error) => {
           console.log('Error al editar' + error);

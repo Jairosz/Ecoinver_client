@@ -869,319 +869,176 @@ export class CultiveDetailsComponent
 
   // Método para exportar los datos a PDF
   exportToPdf(): void {
-    try {
-      // Crear documento PDF con orientación horizontal para mejor presentación
-      const doc = new jsPDF('l', 'mm', 'a4');
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 15;
-      const contentWidth = pageWidth - (margin * 2);
+  // Detectar si es móvil
+  const isMobile = window.innerWidth < 600;
+  // Elegir formato y orientación
+  const orientation: 'p' | 'l' = isMobile ? 'p' : 'l';
+  const format: 'a4' | 'a5' = isMobile ? 'a5' : 'a4';
 
-      // Variable para seguir la página actual
-      let currentPage = 1;
+  // Crear documento
+  const doc = new jsPDF({ orientation, unit: 'mm', format });
+  const pw = doc.internal.pageSize.getWidth();
+  const ph = doc.internal.pageSize.getHeight();
+  const margin = isMobile ? 5 : 15;
+  const cw = pw - margin * 2;
 
-      // Referencia al contexto this para usar dentro de funciones
-      const self = this;
+  // Función de encabezado
+  const drawHeader = () => {
+    const headerH = isMobile ? 20 : 30;
+    doc
+      .setFillColor(67, 160, 34)
+      .rect(0, 0, pw, headerH, 'F')
+      .setFont('helvetica', 'bold')
+      .setTextColor(255, 255, 255)
+      .setFontSize(isMobile ? 14 : 22)
+      .text('Detalles del Cultivo', margin, headerH / 2 + (isMobile ? 4 : 5))
+      .setFont('helvetica', 'normal')
+      .setFontSize(isMobile ? 7 : 11)
+      .text(
+        `Generado: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
+        margin,
+        headerH - (isMobile ? 2 : 5)
+      );
+  };
 
-      // Diseño de cabecera personalizada
-      const drawHeader = () => {
-        // Fondo verde
-        const docWidth = doc.internal.pageSize.getWidth();
-        const headerHeight = 30; // Altura del header en mm
-        doc.setFillColor(67, 160, 34); // Color principal verde
-        doc.rect(0, 0, docWidth, headerHeight, 'F');
-        
-        // Texto - Título del informe
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(22);
-        doc.text('Detalles del Cultivo', margin + 30, 15); 
+  // Función de pie de página
+  const drawFooter = (pg: number, total: number) => {
+    const footerY = ph - (isMobile ? 8 : 10);
+    doc
+      .setDrawColor(200, 200, 200)
+      .setLineWidth(0.5)
+      .line(margin, footerY, pw - margin, footerY)
+      .setFont('helvetica', 'normal')
+      .setTextColor(150, 150, 150)
+      .setFontSize(isMobile ? 6 : 8)
+      .text(`Página ${pg}/${total}`, pw / 2, ph - (isMobile ? 4 : 7), { align: 'center' });
+  };
 
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(11);
-        doc.text(
-          `Informe generado el ${new Date().toLocaleDateString()} a las ${new Date().toLocaleTimeString()}`,
-          margin + 30, 
-          22
-        );
-      };
+  // Helper de fechas
+  const fmt = (d: Date | null | undefined): string => (d ? d.toLocaleDateString() : 'No especificada');
 
-      // Diseño de pie de página
-      const drawFooter = (pageNum: number, totalPages: number) => {
-        // Línea decorativa
-        doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.5);
-        doc.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
+  // === Página 1: DATOS DEL CULTIVO ===
+  drawHeader();
+  let y = isMobile ? 25 : 40;
 
-        // Texto de pie de página
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
+  // Título de sección
+  doc
+    .setFillColor(67, 125, 63)
+    .rect(margin, y, 60, isMobile ? 6 : 8, 'F')
+    .setFont('helvetica', 'bold')
+    .setTextColor(255, 255, 255)
+    .setFontSize(isMobile ? 10 : 12)
+    .text('DATOS DEL CULTIVO', margin + 2, y + (isMobile ? 4 : 6));
 
-        // Numeración de página
-        doc.text(
-          `Página ${pageNum} de ${totalPages}`,
-          pageWidth / 2,
-          pageHeight - 7,
-          { align: 'center' }
-        );
+  // Bloque de datos
+  y += isMobile ? 8 : 12;
+  doc
+    .setFillColor(245, 247, 250)
+    .setDrawColor(220, 220, 220)
+    .roundedRect(margin, y, cw, isMobile ? 45 : 65, 3, 3, 'FD');
 
-        // Información de la empresa
-        doc.text('© 2025 · Ecoinver', margin, pageHeight - 7);
+  const colW = cw / 2;
+  const rowH = isMobile ? 12 : 15;
+  let cy = y;
 
-        // Timestamp en la esquina derecha
-        doc.text(
-          `Generado: ${new Date().toLocaleTimeString()}`,
-          pageWidth - margin,
-          pageHeight - 7,
-          { align: 'right' }
-        );
-      };
+  // Función para añadir filas de datos
+  const addRow = (label1: string, value1: string, label2: string, value2: string) => {
+    doc
+      .setFont('helvetica', 'normal')
+      .setFontSize(isMobile ? 7 : 9)
+      .setTextColor(100, 100, 100)
+      .text(label1, margin + 2, cy + (isMobile ? 6 : 8))
+      .text(label2, margin + colW + 2, cy + (isMobile ? 6 : 8))
+      .setFont('helvetica', 'bold')
+      .setFontSize(isMobile ? 8 : 10)
+      .setTextColor(50, 50, 50)
+      .text(value1, margin + 2, cy + (isMobile ? 10 : 14))
+      .text(value2, margin + colW + 2, cy + (isMobile ? 10 : 14));
+    cy += rowH;
+  };
 
-      // Dibujar encabezado en primera página
-      drawHeader();
+  addRow('Agricultor:', this.cultivo?.nombreAgricultor || '–', 'Finca:', this.cultivo?.nombreFinca || '–');
+  addRow('Género:', this.cultivo?.nombreGenero || '–', 'Variedad:', this.cultivo?.nombreVariedad || '–');
+  addRow('Nave:', this.cultivo?.nombreNave || '–', 'Superficie:', `${this.cultivo?.superficie || 0} ha`);
+  addRow('Siembra:', fmt(this.cultivo?.fechaSiembra), 'Fin:', fmt(this.cultivo?.fechaFin));
 
-      // Posición inicial para el contenido después de la cabecera
-      let yPos = 40;
+  // Separación extra antes de la barra de estado
+  cy += isMobile ? 10 : 15;
+  doc
+    .setFillColor(238, 247, 237)
+    .roundedRect(margin, cy, cw, isMobile ? 18 : 30, 3, 3, 'F')
+    .setFont('helvetica', 'normal')
+    .setFontSize(isMobile ? 7 : 9)
+    .setTextColor(100, 100, 100)
+    .text('Estado del cultivo:', margin + 2, cy + (isMobile ? 6 : 8));
 
-      // SECCIÓN 1: DATOS DEL CULTIVO
-      // Título de la sección
-      doc.setFillColor(67, 125, 63); // Color verde más oscuro
-      doc.rect(margin, yPos, 40, 8, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(12);
-      doc.text('DATOS DEL CULTIVO', margin + 5, yPos + 5.5);
+  const estado = this.getCultivoState();
+  if (estado === 'Activo') {
+    doc.setFont('helvetica', 'bold').setTextColor(67, 160, 71).setFontSize(isMobile ? 8 : 10);
+  } else {
+    doc.setFont('helvetica', 'bold').setTextColor(120, 120, 120).setFontSize(isMobile ? 8 : 10);
+  }
+  doc.text(estado, margin + (isMobile ? 50 : 45), cy + (isMobile ? 6 : 8));
 
-      // Subtítulo
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(67, 125, 63);
-      doc.text(`${this.cultivo?.nombreGenero || ''} - ${this.cultivo?.nombreVariedad || ''}`, margin + 45, yPos + 5.5);
+  // Barra de progreso
+  const prog = this.getProgressPercentage();
+  const barW = cw - 10;
+  const barY = cy + (isMobile ? 8 : 15);
+  doc
+    .setDrawColor(230, 230, 230)
+    .setFillColor(230, 230, 230)
+    .roundedRect(margin + 5, barY, barW, isMobile ? 3 : 5, 2, 2, 'F')
+    .setFillColor(67, 125, 63)
+    .roundedRect(margin + 5, barY, (prog / 100) * barW, isMobile ? 3 : 5, 2, 2, 'F');
 
-      yPos += 12;
+  // === Página 2: Tabla de insights ===
+  doc.addPage();
+  drawHeader();
+  this.addProductionTable(doc, isMobile ? 30 : 40, margin, cw);
 
-      // Crear cuadro para datos generales
-      doc.setFillColor(245, 247, 250);
-      doc.setDrawColor(220, 220, 220);
-      doc.roundedRect(margin, yPos, contentWidth, 65, 3, 3, 'FD');
-
-      // Datos del cultivo en forma de tabla (2 columnas x 4 filas)
-      const colWidth = contentWidth / 2;
-      const rowHeight = 15;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(100, 100, 100);
-
-      // Fila 1
-      doc.text('Agricultor:', margin + 5, yPos + 8);
-      doc.text('Finca:', margin + colWidth + 5, yPos + 8);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(50, 50, 50);
-      doc.text(this.cultivo?.nombreAgricultor || 'No especificado', margin + 5, yPos + 14);
-      doc.text(this.cultivo?.nombreFinca || 'No especificada', margin + colWidth + 5, yPos + 14);
-
-      // Fila 2
-      yPos += rowHeight;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(100, 100, 100);
-      doc.text('Género:', margin + 5, yPos + 8);
-      doc.text('Variedad:', margin + colWidth + 5, yPos + 8);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(50, 50, 50);
-      doc.text(this.cultivo?.nombreGenero || 'No especificado', margin + 5, yPos + 14);
-      doc.text(this.cultivo?.nombreVariedad || 'No especificada', margin + colWidth + 5, yPos + 14);
-
-      // Fila 3
-      yPos += rowHeight;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(100, 100, 100);
-      doc.text('Nave:', margin + 5, yPos + 8);
-      doc.text('Superficie:', margin + colWidth + 5, yPos + 8);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(50, 50, 50);
-      doc.text(this.cultivo?.nombreNave || 'No especificada', margin + 5, yPos + 14);
-      doc.text(`${this.cultivo?.superficie || 0} ha`, margin + colWidth + 5, yPos + 14);
-
-      // Fila 4
-      yPos += rowHeight;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(100, 100, 100);
-      doc.text('Fecha siembra:', margin + 5, yPos + 8);
-      doc.text('Fecha fin:', margin + colWidth + 5, yPos + 8);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(50, 50, 50);
-
-      // Formatear fechas
-      const formatDate = (date: Date | null | undefined): string => {
-        if (!date) return 'No especificada';
-        return new Date(date).toLocaleDateString();
-      };
-
-      doc.text(formatDate(this.cultivo?.fechaSiembra), margin + 5, yPos + 14);
-      doc.text(formatDate(this.cultivo?.fechaFin), margin + colWidth + 5, yPos + 14);
-
-      // Estado del cultivo y barra de progreso
-      yPos += rowHeight + 5;
-
-      // Agregar cuadro de estado
-      doc.setFillColor(238, 247, 237); // Color verde claro
-      doc.roundedRect(margin, yPos, contentWidth, 30, 3, 3, 'F');
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(100, 100, 100);
-      doc.text('Estado del cultivo:', margin + 5, yPos + 8);
-
-      // Estado actual
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      const estadoCultivo = this.getCultivoState();
-      if (estadoCultivo === 'Activo') {
-        doc.setTextColor(67, 160, 71); // Verde
-      } else {
-        doc.setTextColor(120, 120, 120); // Gris
-      }
-      doc.text(estadoCultivo, margin + 40, yPos + 8);
-
-      // Barra de progreso
-      const progressWidth = contentWidth - 10;
-      doc.setDrawColor(230, 230, 230);
-      doc.setFillColor(230, 230, 230);
-      doc.roundedRect(margin + 5, yPos + 15, progressWidth, 5, 2, 2, 'F');
-
-      // Progreso actual
-      const progressValue = this.getProgressPercentage();
-      const filledWidth = (progressValue / 100) * progressWidth;
-      doc.setFillColor(67, 125, 63); // Verde más oscuro
-      doc.roundedRect(margin + 5, yPos + 15, filledWidth, 5, 2, 2, 'F');
-
-      // Etiquetas de progreso
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7);
-      doc.setTextColor(120, 120, 120);
-      doc.text('Trasplante', margin + 5, yPos + 25);
-      doc.text(`${Math.round(progressValue)}%`, margin + (progressWidth / 2), yPos + 25, { align: 'center' });
-      doc.text('Fin de cultivo', margin + progressWidth, yPos + 25, { align: 'right' });
-      
-      // SECCIÓN 2: INSIGHTS (ESTADÍSTICAS)
-      yPos += 45;
-      
-      // Título de la sección
-      doc.setFillColor(67, 125, 63); // Color verde más oscuro
-      doc.rect(margin, yPos, 40, 8, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(12);
-      doc.text('INSIGHTS', margin + 5, yPos + 5.5);
-
-      // Subtítulo
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(67, 125, 63);
-      doc.text('Estadísticas de Producción', margin + 45, yPos + 5.5);
-
-      yPos += 12;
-
-      // Verificar si tenemos datos de producción
-      if (this.productions && this.productions.length > 0) {
-        // Capturar la gráfica si existe
-        this.captureChartForPdf(doc, yPos, margin, contentWidth).then(() => {
-          // Este código se ejecutará después de capturar la gráfica
-          yPos += 80; // Espacio para la gráfica
-          
-          // Tabla de estadísticas de tramos
-          this.addProductionTable(doc, yPos, margin, contentWidth);
-          
-          // Finalizar el PDF
-          this.finalizePdf(doc, drawFooter);
-        }).catch(error => {
-          console.error('Error al capturar la gráfica:', error);
-          // Si hay error, continuar sin la gráfica
-          yPos += 10;
-          doc.text('No se pudo capturar la gráfica de estadísticas.', margin + 5, yPos);
-          yPos += 10;
-          
-          // Tabla de estadísticas de tramos
-          this.addProductionTable(doc, yPos, margin, contentWidth);
-          
-          // Finalizar el PDF
-          this.finalizePdf(doc, drawFooter);
-        });
-      } else {
-        // No hay datos de producción
-        doc.setFont('helvetica', 'italic');
-        doc.setTextColor(100, 100, 100);
-        doc.text('No hay datos de producción disponibles para este cultivo.', margin + 5, yPos + 10);
-        
-        // Finalizar el PDF
-        this.finalizePdf(doc, drawFooter);
-      }
-    } catch (error) {
-      console.error('Error al generar el PDF:', error);
-      alert('No se pudo generar el PDF. Por favor, inténtelo de nuevo.');
-    }
+  // === Página 3: Gráfica sola ===
+  doc.addPage();
+  drawHeader();
+  const container = document.querySelector('.insights-chart');
+  const canvas = container?.querySelector('canvas') as HTMLCanvasElement | null;
+  if (canvas) {
+    const img = canvas.toDataURL('image/png');
+    const imgH = ph - (isMobile ? 50 : 80);
+    doc.addImage(img, 'PNG', margin, isMobile ? 25 : 40, cw, imgH);
+  } else {
+    doc
+      .setFont('helvetica', 'italic')
+      .setFontSize(isMobile ? 8 : 12)
+      .setTextColor(150, 150, 150)
+      .text('Gráfico no disponible', margin, isMobile ? 40 : 60);
   }
 
-  // Método para capturar la gráfica y agregarla al PDF
-  private captureChartForPdf(doc: jsPDF, yPos: number, margin: number, contentWidth: number): Promise<void> {
+  // Añadir pie a todas las páginas y mostrar PDF
+  this.finalizePdf(doc, drawFooter);
+}
+
+  
+  // Captura el <canvas> del gráfico y lo añade al PDF
+  private captureChartForPdf(
+    doc: jsPDF,
+    yPos: number,
+    margin: number,
+    contentWidth: number
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
-      try {
-        const chartContainer = document.querySelector('.insights-chart') as HTMLElement;
-        
-        if (!chartContainer) {
-          reject(new Error('No se encontró el elemento de la gráfica'));
-          return;
-        }
-        
-        // Usamos html2canvas con opciones adicionales para captura completa
-        html2canvas(chartContainer, {
-          scale: 2, // Mayor escala para mejor calidad
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: null,
-          height: chartContainer.scrollHeight, // Asegurar captura de altura completa
-          windowHeight: chartContainer.scrollHeight, // Altura de ventana suficiente
-          logging: true, // Ayuda a depurar problemas de captura
-          onclone: (documentClone) => {
-            // Modificar el clon para mejorar la captura
-            const clonedChart = documentClone.querySelector('.insights-chart');
-            if (clonedChart) {
-              // Asegurar que el contenedor es visible y tiene altura suficiente
-              (clonedChart as HTMLElement).style.height = 'auto';
-              (clonedChart as HTMLElement).style.overflow = 'visible';
-            }
-            return documentClone;
-          }
-        }).then(canvas => {
-          // Verificar las dimensiones de la captura
-          console.log(`Canvas capturado: ${canvas.width}x${canvas.height}`);
-          
-          const imgData = canvas.toDataURL('image/png');
-          // Mantener la relación de aspecto
-          const canvasRatio = canvas.height / canvas.width;
-          const height = contentWidth * canvasRatio;
-          
-          // Reducir un poco la altura en el PDF para evitar truncamiento
-          const pdfHeight = Math.min(height, 100); // Limitar altura máxima a 100mm
-          
-          doc.addImage(imgData, 'PNG', margin, yPos, contentWidth, pdfHeight);
-          resolve();
-        }).catch(error => {
-          console.error('Error al capturar con html2canvas:', error);
-          reject(error);
-        });
-      } catch (error) {
-        console.error('Error general en captura:', error);
-        reject(error);
-      }
+      const container = document.querySelector('.insights-chart');
+      if (!container) return reject('No encontré .insights-chart');
+      const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+      if (!canvas) return reject('No encontré el <canvas> del gráfico');
+  
+      const imgData = canvas.toDataURL('image/png');
+      const imgHeight = 80; // mm
+      doc.addImage(imgData, 'PNG', margin, yPos, contentWidth, imgHeight);
+      resolve();
     });
   }
+  
+  
 
   // Método para agregar la tabla de producción al PDF
   private addProductionTable(doc: jsPDF, yPos: number, margin: number, contentWidth: number): void {
