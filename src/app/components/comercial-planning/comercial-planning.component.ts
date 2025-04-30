@@ -393,7 +393,16 @@ export class ComercialPlanningComponent {
 
   editar(indice: number) {//Para editar cada Card.
     const editar = this.planningEditar[indice];
+    for (let i = 0; i < this.semanasFormArray.length; i++) {
+      if (this.semanasFormArray.controls[i].invalid && i===indice) {
 
+        this.validForm = true;
+        setTimeout(()=>{
+          this.validForm=false;
+        },2000)
+        return;
+      }
+    }
     if (editar) {
       this.comercialDetails.put(editar.id, editar).subscribe(
         (data) => {
@@ -414,15 +423,19 @@ export class ComercialPlanningComponent {
 
       const input = document.querySelectorAll('input[type="number"]') as NodeListOf<HTMLInputElement>;
 
-
+      if(this.semanasFormArray.controls[indice].invalid){
+        this.validForm = true;
+        setTimeout(()=>{
+          this.validForm=false;
+        },2000);
+        return;
+      }
       this.guardarPlanning = {
         idCommercialNeedsPlanning: id?.id || 0,
         kilos: Number(input[indice].value),
         fechaDesde: this.rangoSemana[indice].inicio,
         fechaHasta: this.rangoSemana[indice].fin,
         numeroSemana: indice + 1
-
-
       };
 
 
