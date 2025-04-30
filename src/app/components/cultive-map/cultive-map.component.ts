@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GenderService } from '../../services/Gender.service';
+import { CultivoService } from '../../services/Cultivo.service';
+import { Cultive } from '../../types/Cultive';
 
 interface GenreItem {
   id: number;
@@ -24,18 +26,25 @@ export class CultiveMapComponent implements OnInit {
   texto = '';
   familiaSeleccionada = 'todas';
 
-  // El servicio debe devolver algo como { idGenero: number, nombreFamilia: string, nombreGenero: string }
   genders: { idGenero: number; nombreFamilia: string; nombreGenero: string }[] = [];
-
-  // Ahora cada nombre de género es un objeto con id y nombre
   family: FamilyItem[] = [];
 
-  constructor(private generoServicio: GenderService) {}
+  cultivos: Cultive[] = [];
+  superficieTotal: number = 0;
+
+  constructor(
+    private generoServicio: GenderService,
+    private cultivoService: CultivoService
+  ) {}
 
   ngOnInit() {
     this.generoServicio.get().subscribe(data => {
       this.genders = data;
       this.buildFamilyList();
+    });
+
+    this.cultivoService.getAll().subscribe(data => {
+      this.cultivos = data;
     });
   }
 
@@ -45,7 +54,6 @@ export class CultiveMapComponent implements OnInit {
       const genre: GenreItem = { id: g.idGenero, nombre: g.nombreGenero };
       const existing = this.family.find(f => f.familia === g.nombreFamilia);
       if (existing) {
-        // Evitamos duplicados por id
         if (!existing.nombreGenero.some(x => x.id === genre.id)) {
           existing.nombreGenero.push(genre);
         }
@@ -77,7 +85,10 @@ export class CultiveMapComponent implements OnInit {
     });
   }
 
-  onGeneroSelect(id: number) {
-    console.log('ID género seleccionado:', id);
+  onGeneroSelect(idGenero: number) {
+    console.log('ID género seleccionado:', idGenero);
+    this.superficieTotal = this.cultivos
+      .filter(c => c.idGenero === idGenero)
+      .reduce((acc, c) => acc + (c.superficie || 0), 0);
   }
 }
