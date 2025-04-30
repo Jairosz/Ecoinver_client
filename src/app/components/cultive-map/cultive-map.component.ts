@@ -35,7 +35,7 @@ export class CultiveMapComponent implements OnInit {
   constructor(
     private generoServicio: GenderService,
     private cultivoService: CultivoService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.generoServicio.get().subscribe(data => {
@@ -87,8 +87,17 @@ export class CultiveMapComponent implements OnInit {
 
   onGeneroSelect(idGenero: number) {
     console.log('ID género seleccionado:', idGenero);
-    this.superficieTotal = this.cultivos
-      .filter(c => c.idGenero === idGenero)
-      .reduce((acc, c) => acc + (c.superficie || 0), 0);
+
+    const cultivosFiltrados = this.cultivos.filter(c => c.idGenero === idGenero);
+
+    this.superficieTotal = cultivosFiltrados.reduce((acc, c) => acc + (c.superficie || 0), 0);
+    console.log('Superficie total del género seleccionado:', this.superficieTotal);
+
+    console.log('Detalle de superficie por cultivo:');
+    cultivosFiltrados.forEach((c, i) => {
+      console.log(`Cultivo ${i + 1}: ID = ${c.id}, Superficie = ${c.superficie}`);
+    });
   }
+
+
 }
