@@ -329,7 +329,7 @@
       <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
         <!-- Gráfico principal - Añadir clase insights-chart para la exportación PDF -->
         <div class="w-full lg:w-[65%] xl:w-[70%] bg-white dark:bg-gray-700 p-4 rounded-lg shadow insights-chart">
-          <p-chart type="line" [data]="data" [options]="options" class="h-[300px] md:h-[350px]"></p-chart>
+          <p-chart #insightsChart type="line" [data]="data" [options]="options" class="h-[300px] md:h-[350px]"></p-chart>
         </div>
 
         <!-- Cuadro de información lateral -->
