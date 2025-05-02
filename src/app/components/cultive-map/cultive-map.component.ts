@@ -1,24 +1,45 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+// Usamos el standalone directive en lugar de NgxEchartsModule.forRoot()
+import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
+// Importamos ECharts core + sólo los charts/componentes necesarios
+import * as echarts from 'echarts/core';
+import { PieChart, TreemapChart } from 'echarts/charts';
+import { TooltipComponent, TitleComponent, LegendComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+
+import type { EChartsOption } from 'echarts';
+
+// Póntelo en marcha: registramos sólo lo que necesitamos
+echarts.use([
+  PieChart,
+  TreemapChart,
+  TooltipComponent,
+  TitleComponent,
+  LegendComponent,
+  CanvasRenderer
+]);
+
 import { GenderService } from '../../services/Gender.service';
 import { CultivoService } from '../../services/Cultivo.service';
 import { Cultive } from '../../types/Cultive';
 
-interface GenreItem {
-  id: number;
-  nombre: string;
-}
-
-interface FamilyItem {
-  familia: string;
-  nombreGenero: GenreItem[];
-}
+interface GenreItem { id: number; nombre: string; }
+interface FamilyItem { familia: string; nombreGenero: GenreItem[]; }
 
 @Component({
   selector: 'app-cultive-map',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NgxEchartsDirective    // <-- la directiva standalone
+  ],
+  providers: [
+    // Proveedor para NGX_ECHARTS_CONFIG
+    provideEchartsCore({ echarts })
+  ],
   templateUrl: './cultive-map.component.html',
   styleUrls: ['./cultive-map.component.css']
 })
@@ -30,19 +51,22 @@ export class CultiveMapComponent implements OnInit {
   family: FamilyItem[] = [];
 
   cultivos: Cultive[] = [];
-  superficieTotal: number = 0;
+  superficieTotal = 0;
+
+  view: 'pie' | 'tree' = 'pie';
+  optionsPie: EChartsOption = {};
+  optionsTree: EChartsOption = {};
 
   constructor(
     private generoServicio: GenderService,
     private cultivoService: CultivoService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.generoServicio.get().subscribe(data => {
       this.genders = data;
       this.buildFamilyList();
     });
-
     this.cultivoService.getAll().subscribe(data => {
       this.cultivos = data;
     });
@@ -69,12 +93,9 @@ export class CultiveMapComponent implements OnInit {
   get busquedaFamilia(): FamilyItem[] {
     const term = this.texto.toLowerCase().trim();
     const famSel = this.familiaSeleccionada.toLowerCase();
-
     return this.family.filter(f => {
-      const matchFam = famSel === 'todas'
-        || f.familia.toLowerCase().includes(famSel);
+      const matchFam = famSel === 'todas' || f.familia.toLowerCase().includes(famSel);
       if (!matchFam) return false;
-
       if (term) {
         return (
           f.familia.toLowerCase().includes(term) ||
@@ -86,18 +107,45 @@ export class CultiveMapComponent implements OnInit {
   }
 
   onGeneroSelect(idGenero: number) {
-    console.log('ID género seleccionado:', idGenero);
-
     const cultivosFiltrados = this.cultivos.filter(c => c.idGenero === idGenero);
+    this.superficieTotal = cultivosFiltrados.reduce((sum, c) => sum + (c.superficie || 0), 0);
 
-    this.superficieTotal = cultivosFiltrados.reduce((acc, c) => acc + (c.superficie || 0), 0);
-    console.log('Superficie total del género seleccionado:', this.superficieTotal);
+    const serie = cultivosFiltrados.map((c, i) => ({
+      name: c.nombreVariedad || `Cultivo ${i + 1}`,
+      value: c.superficie
+    }));
 
-    console.log('Detalle de superficie por cultivo:');
-    cultivosFiltrados.forEach((c, i) => {
-      console.log(`Cultivo ${i + 1}: ID = ${c.id}, Superficie = ${c.superficie}`);
-    });
+    this.optionsPie = {
+      title: {
+        text: `Superficie total: ${this.superficieTotal}`,
+        left: 'center', top: 10,
+        textStyle: { fontSize: 14 }
+      },
+      tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+      series: [{
+        name: 'Cultivos',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        label: { formatter: '{b} ({d}%)' },
+        data: serie
+      }]
+    };
+
+    this.optionsTree = {
+      title: {
+        text: `Superficie total: ${this.superficieTotal}`,
+        left: 'center', top: 10,
+        textStyle: { fontSize: 14 }
+      },
+      tooltip: { formatter: '{b}: {c} ({d}%)' },
+      series: [{
+        name: 'Cultivos',
+        type: 'treemap',
+        roam: false,
+        nodeClick: false,
+        label: { show: true, formatter: '{b} ({d}%)' },
+        data: serie
+      }]
+    };
   }
-
-
 }
