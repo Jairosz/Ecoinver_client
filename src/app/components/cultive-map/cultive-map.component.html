@@ -2,7 +2,9 @@
             dark:from-gray-900 dark:to-gray-800 p-4">
   <div class="max-w-7xl mx-auto space-y-4">
 
+    <!-- ======================= -->
     <!-- Selector de Género -->
+    <!-- ======================= -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border
                 border-gray-200 dark:border-gray-700 overflow-hidden">
 
@@ -22,7 +24,7 @@
             <line x1="3" y1="18" x2="3.01" y2="18"></line>
           </svg>
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-            Géneros de Cultivos
+            Cultivos
           </h2>
         </div>
         <div class="inline-flex bg-gray-100 dark:bg-gray-700 rounded-md p-1 text-sm">
@@ -39,6 +41,7 @@
       <!-- Filtros -->
       <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700
                   grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Búsqueda -->
         <div class="relative">
           <svg xmlns="http://www.w3.org/2000/svg"
                class="absolute left-3 top-3 h-4 w-4 text-gray-400 dark:text-gray-500"
@@ -47,14 +50,16 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text"
-                 [(ngModel)]="texto"
-                 placeholder="Buscar cultivos..."
-                 class="pl-10 pr-3 h-10 w-full bg-gray-50 dark:bg-gray-700
-                        border border-gray-200 dark:border-gray-600 rounded-md
-                        focus:outline-none focus:ring-2 focus:ring-indigo-500
-                        dark:focus:ring-indigo-400 text-gray-900 dark:text-white" />
+          <input
+            type="text"
+            [(ngModel)]="texto"
+            placeholder="Buscar cultivos..."
+            class="pl-10 pr-3 h-10 w-full bg-gray-50 dark:bg-gray-700
+                   border border-gray-200 dark:border-gray-600 rounded-md
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500
+                   dark:focus:ring-indigo-400 text-gray-900 dark:text-white" />
         </div>
+        <!-- Select de familia y botón limpiar -->
         <div class="flex gap-2">
           <div class="relative w-full">
             <select
@@ -116,7 +121,7 @@
         </div>
       </div>
 
-      <!-- Footer -->
+      <!-- Footer del selector -->
       <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700
                   bg-gray-50 dark:bg-gray-800 text-xs text-gray-500 dark:text-gray-300">
         Filtrando por:
@@ -126,7 +131,9 @@
       </div>
     </div>
 
+    <!-- ======================= -->
     <!-- Panel de Gráficos -->
+    <!-- ======================= -->
     <div *ngIf="superficieTotal > 0"
          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mt-6">
 
@@ -134,19 +141,47 @@
       <div class="inline-flex bg-gray-100 dark:bg-gray-700 rounded-md p-1 text-sm mb-4">
         <button
           class="px-3 py-1 rounded-md focus:outline-none"
-          [ngClass]="{'bg-indigo-600 text-white': view==='pie','text-gray-600 dark:text-gray-300': view!=='pie'}"
+          [ngClass]="{
+            'bg-indigo-600 text-white': view==='pie',
+            'text-gray-600 dark:text-gray-300': view!=='pie'
+          }"
           (click)="view='pie'">
           Gráfico Circular
         </button>
         <button
           class="px-3 py-1 rounded-md focus:outline-none"
-          [ngClass]="{'bg-indigo-600 text-white': view==='tree','text-gray-600 dark:text-gray-300': view!=='tree'}"
+          [ngClass]="{
+            'bg-indigo-600 text-white': view==='tree',
+            'text-gray-600 dark:text-gray-300': view!=='tree'
+          }"
           (click)="view='tree'">
           Treemap
         </button>
       </div>
 
-      <!-- ECharts Containers -->
+      <!-- Botones de Agrupación -->
+      <div class="inline-flex gap-2 mb-4">
+        <button
+          (click)="groupBy='variedad'; updateChart()"
+          [ngClass]="{
+            'bg-indigo-600 text-white': groupBy==='variedad',
+            'bg-gray-200 text-gray-800': groupBy!=='variedad'
+          }"
+          class="px-3 py-1 rounded-md text-sm">
+          Agrupar por Variedad
+        </button>
+        <button
+          (click)="groupBy='agricultor'; updateChart()"
+          [ngClass]="{
+            'bg-indigo-600 text-white': groupBy==='agricultor',
+            'bg-gray-200 text-gray-800': groupBy!=='agricultor'
+          }"
+          class="px-3 py-1 rounded-md text-sm">
+          Agrupar por Agricultor
+        </button>
+      </div>
+
+      <!-- Contenedores ECharts -->
       <div echarts
            [options]="optionsPie"
            class="w-full h-80"
@@ -157,7 +192,7 @@
            class="w-full h-80"
            *ngIf="view==='tree'">
       </div>
-    </div>
 
+    </div>
   </div>
 </div>
