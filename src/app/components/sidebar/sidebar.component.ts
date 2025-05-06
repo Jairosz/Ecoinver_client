@@ -29,6 +29,12 @@ export class SidebarComponent {
   }
 
   isActive(routes: string[]): boolean {
-    return routes.some(route => this.router.url.includes(route));
+    return routes.some(route => {
+      // Verificar coincidencia exacta o que sea el inicio de la ruta seguido por un slash o el final de la URL
+      const currentUrl = this.router.url;
+      return currentUrl === route || 
+             currentUrl.startsWith(route + '/') || 
+             (route !== '/' && currentUrl === route);
+    });
   }
 }
