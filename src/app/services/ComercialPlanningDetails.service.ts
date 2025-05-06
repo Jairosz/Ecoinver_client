@@ -3,15 +3,9 @@ import { environment } from '../environment/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ComercialPlanningDetails } from '../types/ComercialPlanningDetails';
+import { ComercialPlanningDetailsWithId } from '../types/ComercialPlanningDetailsWithId';
 
-export interface ComercialPlanningDetailsWithId {
-  id:number;
-  idCommercialNeedsPlanning:number;
-  kilos:number;
-  fechaDesde:Date;
-  fechaHasta:Date;
-  numeroSemana:number;
-}
+
 
 @Injectable({
   providedIn: 'root'

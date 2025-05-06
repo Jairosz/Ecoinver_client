@@ -8,16 +8,9 @@ import { ComercialPlanning } from '../../types/ComercialPlanning';
 import { ComercialPlanningDetailsService } from '../../services/ComercialPlanningDetails.service';
 import { ComercialPlanningDetails } from '../../types/ComercialPlanningDetails';
 import { ComercialPlanningPost } from '../../types/ComercialPlanningPost';
+import { ComercialPlanningDetailsWithId } from '../../types/ComercialPlanningDetailsWithId';
 
 
-export interface ComercialPlanningDetailsWithId {
-  id: number;
-  idCommercialNeedsPlanning: number;
-  kilos: number;
-  fechaDesde: Date;
-  fechaHasta: Date;
-  numeroSemana: number;
-}
 
 @Component({
   selector: 'app-comercial-planning',
@@ -135,17 +128,18 @@ export class ComercialPlanningComponent {
           const diasDesdePrimerDia = Math.floor((inicio.getTime() - primerDia.getTime()) / (1000 * 60 * 60 * 24));
           const diasAjustados = diasDesdePrimerDia + diaSemana; // Ajuste si semana inicia en domingo
 
-          let semana = Math.floor(diasAjustados / 7) + 1;
+          let semana = [];
+          semana.push(Math.floor(diasAjustados / 7) + 1);
 
           for (let i = new Date(startDate); i <= endDate; i.setDate(i.getDate() + 1)) {//Se recorren las fechas
             if (inicio.getFullYear() !== i.getFullYear()) {
-              semana = 1;
+              semana.push(1);
             }
             if (i.getDay() == 0) {//Si el dia de la fecha es igual a domingo
               fin = new Date(i.getFullYear(), i.getMonth(), i.getDate());
               numSemanas++;//Sumamos una semana
               this.semanas.push({
-                semana: semana, fecha: inicio.toLocaleDateString('es-ES', {
+                semana: semana[semana.length - 1], fecha: inicio.toLocaleDateString('es-ES', {
                   day: '2-digit',   // Asegura que el día tenga 2 dígitos
                   month: '2-digit', // Asegura que el mes tenga 2 dígitos
                   year: 'numeric',
@@ -163,7 +157,7 @@ export class ComercialPlanningComponent {
               inicio = new Date(i.getFullYear(), i.getMonth(), i.getDate() + 1);
 
 
-              semana++;
+              semana.push(semana[semana.length - 1] + 1);
             }
             if (i.getTime() === endDate.getTime()) {
               fin = new Date(i.getFullYear(), i.getMonth(), i.getDate());
@@ -171,7 +165,7 @@ export class ComercialPlanningComponent {
               if (i.getDay() != 0) {//Si hemos entrado en una nueva semana aunque no sea domingo.
 
                 this.semanas.push({
-                  semana: semana, fecha: inicio.toLocaleDateString('es-ES', {
+                  semana: semana[semana.length - 1], fecha: inicio.toLocaleDateString('es-ES', {
                     day: '2-digit',   // Asegura que el día tenga 2 dígitos
                     month: '2-digit', // Asegura que el mes tenga 2 dígitos
                     year: 'numeric',
@@ -187,7 +181,7 @@ export class ComercialPlanningComponent {
                 });
 
                 numSemanas++;//Sumamos una semana
-                semana++;
+                semana.push(semana[semana.length - 1] + 1)
               }
 
             }
@@ -226,20 +220,55 @@ export class ComercialPlanningComponent {
           }
           if (this.planning.find(item => item.idCommercialNeed == evento.id)) {
             const edit = this.planning.find(item => item.idCommercialNeed == evento.id);
-
+            let j = 0;
+            this.plannigDetails = this.plannigDetails.sort((a, b) => {
+              return new Date(a.fechaDesde).getTime() - new Date(b.fechaDesde).getTime();
+            });
             for (let i = 0; i < this.plannigDetails.length; i++) {
               if (this.plannigDetails[i].idCommercialNeedsPlanning == edit?.id) {//Si encuentra el comercial ya planificado se guardan los valores
+                const fecha = new Date(this.plannigDetails[i].fechaDesde);
+                fecha.setHours(12, 0, 0, 0); // Evitar errores de zona horaria
 
-                this.planningEditar.push({
-                  id: this.plannigDetails[i].id,
-                  idCommercialNeedsPlanning: this.plannigDetails[i].idCommercialNeedsPlanning,
-                  numeroSemana: this.plannigDetails[i].numeroSemana,
-                  kilos: this.plannigDetails[i].kilos,
-                  fechaDesde: this.plannigDetails[i].fechaDesde,
-                  fechaHasta: this.plannigDetails[i].fechaHasta
-                });
+                const primerDia = new Date(fecha.getFullYear(), 0, 1); // 1 de enero del mismo año
+                const diff = (fecha.getTime() - primerDia.getTime()) / (1000 * 60 * 60 * 24); // Diferencia en días
+                const ajuste = primerDia.getDay(); // Día de la semana del 1 de enero (0=domingo, 1=lunes, etc.)
 
-                this.distribuido += this.plannigDetails[i].kilos;
+                let sem = Math.floor((diff + ajuste) / 7)+1; // Semana del año
+                
+                
+                if (sem === semana[j]) {
+                 
+                  this.planningEditar.push({
+                    id: this.plannigDetails[i].id,
+                    idCommercialNeedsPlanning: this.plannigDetails[i].idCommercialNeedsPlanning,
+                    numeroSemana: this.plannigDetails[i].numeroSemana,
+                    kilos: this.plannigDetails[i].kilos,
+                    fechaDesde: this.plannigDetails[i].fechaDesde,
+                    fechaHasta: this.plannigDetails[i].fechaHasta
+                  });
+
+                  if (this.plannigDetails[i]) {
+                    this.distribuido += this.plannigDetails[i]!.kilos ?? 0;
+                  }
+                }
+                else {
+                 
+                  this.planningEditar.push({
+                    id: undefined,
+                    idCommercialNeedsPlanning: this.plannigDetails[i].idCommercialNeedsPlanning,
+                    numeroSemana: semana[j],
+                    kilos: 0,
+                    fechaDesde: this.plannigDetails[i].fechaDesde,
+                    fechaHasta: this.plannigDetails[i].fechaHasta
+                  });
+                  i--;
+                }
+
+                j++;
+                if (semana[j] == undefined) {
+                  break;
+                }
+
               }
             }
 
@@ -392,52 +421,115 @@ export class ComercialPlanningComponent {
   }
 
   editar(indice: number) {//Para editar cada Card.
+
     const editar = this.planningEditar[indice];
+
     for (let i = 0; i < this.semanasFormArray.length; i++) {
-      if (this.semanasFormArray.controls[i].invalid && i===indice) {
+
+      if (this.semanasFormArray.controls[i].invalid && i === indice) {
 
         this.validForm = true;
-        setTimeout(()=>{
-          this.validForm=false;
-        },2000)
+        setTimeout(() => {
+          this.validForm = false;
+        }, 2000)
         return;
       }
     }
     if (editar) {
-      this.comercialDetails.put(editar.id, editar).subscribe(
-        (data) => {
-          console.log(data);
+      if (editar.id) {
 
-          this.editarPlanning = true;
-          this.validar = null;
-          this.editarBoton = false;
-          this.semanasFormArray.controls[indice].disable();
-        },
-        (error) => {
-          console.log('Error al editar' + error);
+        this.comercialDetails.put(editar.id, editar).subscribe(
+          (data) => {
+            console.log(data);
+
+            this.editarPlanning = true;
+            this.validar = null;
+            this.editarBoton = false;
+            this.semanasFormArray.controls[indice].disable();
+          },
+          (error) => {
+            console.log('Error al editar' + error);
+          }
+        );
+      }
+      else {
+        const id = this.planning.find(item => item.idCommercialNeed == this.selectedComercial.id);
+
+        const input = document.querySelectorAll('input[type="number"]') as NodeListOf<HTMLInputElement>;
+
+        if (this.semanasFormArray.controls[indice].invalid) {
+          this.validForm = true;
+          setTimeout(() => {
+            this.validForm = false;
+          }, 2000);
+          return;
         }
-      );
+        const fecha = new Date(this.rangoSemana[indice].inicio);
+        fecha.setHours(12, 0, 0, 0); // evitar problemas por zona horaria
+
+        const primerDia = new Date(fecha.getFullYear(), 0, 1);
+        const diff = (fecha.getTime() - primerDia.getTime()) / (1000 * 60 * 60 * 24);
+        const ajuste = primerDia.getDay(); // 0 = domingo, 1 = lunes, etc.
+        console.log(this.rangoSemana);
+        ;
+        const semana = Math.floor((diff + ajuste) / 7) + 1;
+
+        this.guardarPlanning = {
+          idCommercialNeedsPlanning: id?.id || 0,
+          kilos: Number(input[indice].value),
+          fechaDesde: this.rangoSemana[indice].inicio,
+          fechaHasta: this.rangoSemana[indice].fin,
+          numeroSemana: semana
+        };
+        console.log(this.rangoSemana);
+
+
+        this.comercialDetails.post(this.guardarPlanning).subscribe(
+          (data) => {
+            console.log(data);
+            this.editarPlanning = true;
+            this.validar = null;
+            this.editarBoton = false;
+            this.semanasFormArray.controls[indice].disable();
+          },
+          (error) => {
+            console.log(error);
+          }
+
+
+        )
+      }
     }
+
     else {
+     
       const id = this.planning.find(item => item.idCommercialNeed == this.selectedComercial.id);
 
       const input = document.querySelectorAll('input[type="number"]') as NodeListOf<HTMLInputElement>;
 
-      if(this.semanasFormArray.controls[indice].invalid){
+      if (this.semanasFormArray.controls[indice].invalid) {
         this.validForm = true;
-        setTimeout(()=>{
-          this.validForm=false;
-        },2000);
+        setTimeout(() => {
+          this.validForm = false;
+        }, 2000);
         return;
       }
+      const fecha = new Date(this.rangoSemana[indice].inicio);
+      fecha.setHours(12, 0, 0, 0); // evitar problemas por zona horaria
+
+      const primerDia = new Date(fecha.getFullYear(), 0, 1);
+      const diff = (fecha.getTime() - primerDia.getTime()) / (1000 * 60 * 60 * 24);
+      const ajuste = primerDia.getDay(); // 0 = domingo, 1 = lunes, etc.
+
+      const semana = Math.floor((diff + ajuste) / 7) + 1;
       this.guardarPlanning = {
         idCommercialNeedsPlanning: id?.id || 0,
         kilos: Number(input[indice].value),
         fechaDesde: this.rangoSemana[indice].inicio,
         fechaHasta: this.rangoSemana[indice].fin,
-        numeroSemana: indice + 1
+        numeroSemana: semana
       };
-
+      console.log(this.rangoSemana);
 
 
       this.comercialDetails.post(this.guardarPlanning).subscribe(
@@ -456,6 +548,7 @@ export class ComercialPlanningComponent {
       )
 
     }
+    console.log(this.planningEditar);
 
   }
 

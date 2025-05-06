@@ -1,15 +1,25 @@
 <!-- dashboard.component.html - Versión responsiva completa -->
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-2 sm:p-4 md:p-6">
+<div
+  class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-2 sm:p-4 md:p-6">
   <div class="max-w-7xl mx-auto space-y-4 sm:space-y-6">
     <!-- Header con logo y título -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-4 md:p-6">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-4 md:p-6">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <div class="flex items-center gap-2 sm:gap-3">
-          <div class="flex-shrink-0 w-10 sm:w-12 h-10 sm:h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
-            <svg class="w-6 sm:w-7 h-6 sm:h-7 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 13.125C3 12.504 3.504 12 4.125 12H6.375C6.996 12 7.5 12.504 7.5 13.125V19.875C7.5 20.496 6.996 21 6.375 21H4.125C3.504 21 3 20.496 3 19.875V13.125Z" fill="currentColor"/>
-              <path d="M9.75 8.625C9.75 8.004 10.254 7.5 10.875 7.5H13.125C13.746 7.5 14.25 8.004 14.25 8.625V19.875C14.25 20.496 13.746 21 13.125 21H10.875C10.254 21 9.75 20.496 9.75 19.875V8.625Z" fill="currentColor"/>
-              <path d="M16.5 4.125C16.5 3.504 17.004 3 17.625 3H19.875C20.496 3 21 3.504 21 4.125V19.875C21 20.496 20.496 21 19.875 21H17.625C17.004 21 16.5 20.496 16.5 19.875V4.125Z" fill="currentColor"/>
+          <div
+            class="flex-shrink-0 w-10 sm:w-12 h-10 sm:h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
+            <svg class="w-6 sm:w-7 h-6 sm:h-7 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M3 13.125C3 12.504 3.504 12 4.125 12H6.375C6.996 12 7.5 12.504 7.5 13.125V19.875C7.5 20.496 6.996 21 6.375 21H4.125C3.504 21 3 20.496 3 19.875V13.125Z"
+                fill="currentColor" />
+              <path
+                d="M9.75 8.625C9.75 8.004 10.254 7.5 10.875 7.5H13.125C13.746 7.5 14.25 8.004 14.25 8.625V19.875C14.25 20.496 13.746 21 13.125 21H10.875C10.254 21 9.75 20.496 9.75 19.875V8.625Z"
+                fill="currentColor" />
+              <path
+                d="M16.5 4.125C16.5 3.504 17.004 3 17.625 3H19.875C20.496 3 21 3.504 21 4.125V19.875C21 20.496 20.496 21 19.875 21H17.625C17.004 21 16.5 20.496 16.5 19.875V4.125Z"
+                fill="currentColor" />
             </svg>
           </div>
           <div>
@@ -17,11 +27,13 @@
             <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Monitoreo de rendimiento y proyecciones</p>
           </div>
         </div>
-        
+
         <div class="flex items-center gap-2 w-full sm:w-auto mt-3 sm:mt-0">
-          
-          <button class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-indigo-100 hover:text-indigo-600 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+          <button
+            class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-indigo-100 hover:text-indigo-600 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-4-4 4m0 0-4-4m4 4V4"></path>
             </svg>
           </button>
@@ -31,11 +43,15 @@
 
     <div class="container mx-auto">
       <!-- Panel de Géneros de Cultivos -->
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md w-full mx-auto">
-        <div class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md w-full mx-auto">
+        <div
+          class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
           <div class="flex items-center gap-2">
             <!-- Icono de lista -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
               <line x1="8" y1="6" x2="21" y2="6"></line>
               <line x1="8" y1="12" x2="21" y2="12"></line>
               <line x1="8" y1="18" x2="21" y2="18"></line>
@@ -48,45 +64,100 @@
           <div class="flex items-center gap-2 w-full sm:w-auto">
             <!-- Tabs -->
             <div class="bg-gray-100 dark:bg-gray-700 rounded-md p-0.5 flex text-xs w-full sm:w-auto">
-              <button class="py-1 px-3 rounded-md bg-white dark:bg-gray-600 shadow-sm font-medium dark:text-white flex-1 sm:flex-none">Todos</button>
-              <button class="py-1 px-3 rounded-md text-gray-600 dark:text-gray-300 flex-1 sm:flex-none">Seleccionados({{seleccionados}})</button>
+              <button
+                class="py-1 px-3 rounded-md bg-white dark:bg-gray-600 shadow-sm font-medium dark:text-white flex-1 sm:flex-none">Todos</button>
+              <button
+                class="py-1 px-3 rounded-md text-gray-600 dark:text-gray-300 flex-1 sm:flex-none">Seleccionados({{seleccionados}})</button>
             </div>
           </div>
         </div>
-        
+
+        <!-- NUEVA SECCIÓN: Botones para seleccionar tipo de gráfica -->
+        <div class="px-3 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
+            <button (click)="setChartType('commercial')"
+              class="py-2 px-4 rounded-md text-sm font-medium flex items-center gap-2" [ngClass]="{
+                'bg-indigo-600 text-white hover:bg-indigo-700': chartType === 'commercial',
+                'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600': chartType !== 'commercial'
+              }">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"></path>
+                <path d="m19 9-5 5-4-4-3 3"></path>
+              </svg>
+              <span>Comercial</span>
+            </button>
+            <button (click)="setChartType('production')"
+              class="py-2 px-4 rounded-md text-sm font-medium flex items-center gap-2" [ngClass]="{
+                'bg-indigo-600 text-white hover:bg-indigo-700': chartType === 'production',
+                'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600': chartType !== 'production'
+              }">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"></path>
+                <path d="M18 17V9"></path>
+                <path d="M13 17V5"></path>
+                <path d="M8 17v-3"></path>
+              </svg>
+              <span>Producción</span>
+            </button>
+            <button (click)="setChartType('combined')"
+              class="py-2 px-4 rounded-md text-sm font-medium flex items-center gap-2" [ngClass]="{
+                'bg-indigo-600 text-white hover:bg-indigo-700': chartType === 'combined',
+                'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600': chartType !== 'combined'
+              }">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+              </svg>
+              <span>Combinada</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Barra de búsqueda y filtros -->
-        <div class="px-3 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div
+          class="px-3 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-3">
           <!-- Búsqueda -->
           <div class="relative">
-            <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg"
+              class="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text"  
-            [(ngModel)]="texto"
-            placeholder="Buscar cultivos..." class="pl-8 h-9 w-full text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent dark:text-white dark:placeholder-gray-400">
+            <input type="text" [(ngModel)]="texto" placeholder="Buscar cultivos..."
+              class="pl-8 h-9 w-full text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent dark:text-white dark:placeholder-gray-400">
           </div>
-          
+
           <!-- Filtro por familia -->
           <div class="flex gap-2">
             <div class="relative w-full">
-              <select [(ngModel)]="familiaSeleccionada" class="h-9 w-full text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md pl-8 pr-10 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent dark:text-white">
+              <select [(ngModel)]="familiaSeleccionada"
+                class="h-9 w-full text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md pl-8 pr-10 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent dark:text-white">
                 <option value="todas">Todas las familias</option>
                 @for(familia of family;track familia){
-                  <option value={{familia.familia}}>{{familia.familia}}</option>
+                <option value={{familia.familia}}>{{familia.familia}}</option>
                 }
               </select>
-              <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                class="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
               </svg>
-              <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-2.5 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                class="absolute right-2.5 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </div>
-            <button (click)="borrarFiltros()" class="h-9 px-3 text-xs border border-gray-200 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300">Limpiar filtros</button>
+            <button (click)="borrarFiltros()"
+              class="h-9 px-3 text-xs border border-gray-200 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300">Limpiar
+              filtros</button>
           </div>
         </div>
-        
+
         <!-- Contenido - Vista de cuadrícula -->
         <div class="max-h-48 overflow-y-auto">
           <div class="px-3 sm:px-6 py-4">
@@ -97,9 +168,11 @@
               <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3">
                 @for(nombre of familia.nombreGenero; track nombre){
                 <div class="flex items-center group">
-                  <input type="radio" (click)="contarSeleccionados()" name="genero" [value]="nombre" class="form-checkbox h-4 w-4 text-indigo-600 dark:text-indigo-400 rounded border-gray-300 dark:border-gray-600 focus:ring-indigo-500 dark:focus:ring-indigo-400">
-                  <label for="gender_1" class="ml-2 text-sm text-gray-700 dark:text-gray-300 truncate flex-1">{{nombre}}</label>
-                 
+                  <input type="radio" (click)="contarSeleccionados()" name="genero" [value]="nombre"
+                    class="form-checkbox h-4 w-4 text-indigo-600 dark:text-indigo-400 rounded border-gray-300 dark:border-gray-600 focus:ring-indigo-500 dark:focus:ring-indigo-400">
+                  <label for="gender_1"
+                    class="ml-2 text-sm text-gray-700 dark:text-gray-300 truncate flex-1">{{nombre}}</label>
+
                 </div>
                 }
               </div>
@@ -107,48 +180,14 @@
             }
           </div>
         </div>
-        
-        <!-- Contenido - Vista de seleccionados (oculto por defecto) -->
-        <div class="max-h-48 overflow-y-auto hidden"><!--Más adelante cuando podamos seleccionar varios géneros-->
-          <div class="px-3 sm:px-6 py-4">
-            <div class="flex flex-wrap gap-2">
-              <!-- Maíz -->
-              <span class="inline-flex items-center px-3 py-1 rounded-md text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                Maíz
-                <button class="ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-              </span>
-              <!-- Tomate -->
-              <span class="inline-flex items-center px-3 py-1 rounded-md text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                Tomate
-                <button class="ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-              </span>
-              <!-- Lechuga -->
-              <span class="inline-flex items-center px-3 py-1 rounded-md text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                Lechuga
-                <button class="ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-              </span>
-            </div>
-          </div>
-        </div>
-        
+
+
+
         <!-- Footer con contador -->
-        <div class="px-3 sm:px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-500 dark:text-gray-400 flex justify-between items-center">
-          <span class="text-indigo-600 dark:text-indigo-400">Filtrando por: {{familiaSeleccionada || 'Ningún filtro'}}</span>
+        <div
+          class="px-3 sm:px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-500 dark:text-gray-400 flex justify-between items-center">
+          <span class="text-indigo-600 dark:text-indigo-400">Filtrando por: {{familiaSeleccionada || 'Ningún
+            filtro'}}</span>
         </div>
       </div>
     </div>
@@ -157,9 +196,13 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
 
       <!-- Métrica 1: Géneros seleccionados -->
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-5 flex items-center gap-3 sm:gap-4 transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-        <div class="flex-shrink-0 bg-indigo-100 dark:bg-indigo-900/30 w-10 sm:w-12 h-10 sm:h-12 rounded-lg flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 sm:h-6 w-5 sm:w-6 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-5 flex items-center gap-3 sm:gap-4 transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <div
+          class="flex-shrink-0 bg-indigo-100 dark:bg-indigo-900/30 w-10 sm:w-12 h-10 sm:h-12 rounded-lg flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 sm:h-6 w-5 sm:w-6 text-indigo-600 dark:text-indigo-400"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
             <circle cx="9" cy="7" r="4"></circle>
             <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -171,12 +214,16 @@
           <p class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">{{ seleccionados || 'Ninguno' }}</p>
         </div>
       </div>
-      
-     
+
+
       <!-- Métrica 2: Total KGs -->
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-5 flex items-center gap-3 sm:gap-4 transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-        <div class="flex-shrink-0 bg-amber-100 dark:bg-amber-900/30 w-10 sm:w-12 h-10 sm:h-12 rounded-lg flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 sm:h-6 w-5 sm:w-6 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-5 flex items-center gap-3 sm:gap-4 transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <div
+          class="flex-shrink-0 bg-amber-100 dark:bg-amber-900/30 w-10 sm:w-12 h-10 sm:h-12 rounded-lg flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 sm:h-6 w-5 sm:w-6 text-amber-600 dark:text-amber-400"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
             <line x1="12" y1="1" x2="12" y2="23"></line>
             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
           </svg>
@@ -191,48 +238,42 @@
     <!-- Gráfico principal y panel de información -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-6">
       <!-- Gráfico principal - Ajuste para responsividad -->
-      <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md">
-        <div class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+      <div
+        class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md">
+        <div
+          class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
               <line x1="12" y1="20" x2="12" y2="10"></line>
               <line x1="18" y1="20" x2="18" y2="4"></line>
               <line x1="6" y1="20" x2="6" y2="16"></line>
+              
             </svg>
             <h2 class="text-base font-semibold text-gray-900 dark:text-white">Evolución General</h2>
           </div>
           <div class="inline-flex p-0.5 bg-gray-100 dark:bg-gray-700 rounded-lg w-full sm:w-auto">
-            <button 
-              (click)="actualizarGrafica('semana')"
-              [ngClass]="{
+            <button (click)="actualizarGrafica('semana')" [ngClass]="{
                 'bg-white dark:bg-gray-800 text-indigo-600 shadow-sm': vistaSeleccionada === 'semana',
                 'text-gray-700 dark:text-gray-300': vistaSeleccionada !== 'semana'
-              }"
-              class="py-1.5 px-2 sm:px-3 text-xs font-medium rounded-md flex-1 sm:flex-none"
-              value="semana">
+              }" class="py-1.5 px-2 sm:px-3 text-xs font-medium rounded-md flex-1 sm:flex-none" value="semana">
               Semana
             </button>
-            
-            <button 
-              (click)="actualizarGrafica('mes')"
-              [ngClass]="{
+
+            <button (click)="actualizarGrafica('mes')" [ngClass]="{
                 'bg-white dark:bg-gray-800 text-indigo-600 shadow-sm': vistaSeleccionada === 'mes',
                 'text-gray-700 dark:text-gray-300': vistaSeleccionada !== 'mes'
-              }"
-              class="py-1.5 px-2 sm:px-3 text-xs font-medium rounded-md flex-1 sm:flex-none"
-              value="mes">
+              }" class="py-1.5 px-2 sm:px-3 text-xs font-medium rounded-md flex-1 sm:flex-none" value="mes">
               Mes
             </button>
-            
-            <button 
-              (click)="actualizarGrafica('año')"
-              [ngClass]="{
+
+            <button (click)="actualizarGrafica('año')" [ngClass]="{
                 'bg-white dark:bg-gray-800 text-indigo-600 shadow-sm': vistaSeleccionada === 'año',
                 'text-gray-700 dark:text-gray-300': vistaSeleccionada !== 'año'
-              }"
-              class="py-1.5 px-2 sm:px-3 text-xs font-medium rounded-md flex-1 sm:flex-none"
-              value="año">
+              }" class="py-1.5 px-2 sm:px-3 text-xs font-medium rounded-md flex-1 sm:flex-none" value="año">
               Año
+              
             </button>
           </div>
         </div>
@@ -240,115 +281,155 @@
         <div class="p-2 sm:p-4 md:p-6">
           <!-- Altura ajustable según dispositivo y contenedor respetando ratio -->
           <div class="w-full h-60 sm:h-72 md:h-80 overflow-hidden">
-            <p-chart type="line" [data]="data" [options]="options" class="w-full h-full" />
+            <!-- Mostrar la gráfica según el tipo seleccionado -->
+            <p-chart *ngIf="chartType === 'commercial'" type="line" [data]="commercialData" [options]="options"
+              class="w-full h-full" />
+            <p-chart *ngIf="chartType === 'production'" type="line" [data]="productionData" [options]="options"
+              class="w-full h-full" />
+            <p-chart *ngIf="chartType === 'combined'" type="line" [data]="data" [options]="options"
+              class="w-full h-full" />
           </div>
         </div>
       </div>
 
       <!-- Panel informativo -->
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col transition-all duration-200 hover:shadow-md">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col transition-all duration-200 hover:shadow-md">
         <div class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="16" x2="12" y2="12"></line>
             <line x1="12" y1="8" x2="12.01" y2="8"></line>
           </svg>
-          <h2 class="text-base font-semibold text-gray-900 dark:text-white">Información de Filtros</h2>
+          <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{getInfoPanelData().title}}</h2>
         </div>
-        
+
         <div class="flex-1 p-3 sm:p-6 space-y-3 sm:space-y-4">
-          <!-- Item 1 -->
+          <!-- Item 1 - Género seleccionado -->
           <div class="flex items-center gap-3">
-            <div class="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div
+              class="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5 text-indigo-600 dark:text-indigo-400"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
                 <path d="M9 6a3 3 0 100 6h.01a3 3 0 100-6H9z" />
-                <path d="M2 9.5A3.5 3.5 0 005.5 13H9v2.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 15.586V13h2.5a4.5 4.5 0 10-.616-8.958 4.002 4.002 0 10-7.753 1.977A3.5 3.5 0 002 9.5zm9 3.5H9V8a1 1 0 012 0v5z" />
+                <path
+                  d="M2 9.5A3.5 3.5 0 005.5 13H9v2.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 15.586V13h2.5a4.5 4.5 0 10-.616-8.958 4.002 4.002 0 10-7.753 1.977A3.5 3.5 0 002 9.5zm9 3.5H9V8a1 1 0 012 0v5z" />
               </svg>
             </div>
             <div>
-              <p class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Géneros seleccionados</p>
-              <p class="text-sm sm:text-base font-semibold text-indigo-600 dark:text-indigo-400">{{ selectedGenderIds|| 'Sin género' }}</p>
+              <p class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
+                {{getInfoPanelData().item1.label}}</p>
+              <p class="text-sm sm:text-base font-semibold text-indigo-600 dark:text-indigo-400">
+                {{getInfoPanelData().item1.value}}</p>
             </div>
           </div>
-          
-          <!-- Item 2 -->
+
+          <!-- Item 2 - Necesidades seleccionadas / Fincas -->
           <div class="flex items-center gap-3">
-            <div class="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" />
+            <div
+              class="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-4 sm:h-5 w-4 sm:w-5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" />
               </svg>
             </div>
             <div>
-              <p class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Necesidades seleccionadas</p>
-              <p class="text-sm sm:text-base font-semibold text-emerald-600 dark:text-emerald-400">{{ nombreComerciales|| 'No existen necesidades comerciales para el género seleccionado' }}</p>
+              <p class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
+                {{getInfoPanelData().item2.label}}</p>
+              <p class="text-sm sm:text-base font-semibold text-emerald-600 dark:text-emerald-400">
+                {{getInfoPanelData().item2.value}}</p>
             </div>
           </div>
-          
-          <!-- Item 3 -->
+
+          <!-- Item 3 - Total KGs -->
           <div class="flex items-center gap-3">
-            <div class="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" />
+            <div
+              class="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5 text-amber-600 dark:text-amber-400"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path
+                  d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" />
               </svg>
             </div>
             <div>
-              <p class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total KGs</p>
-              <p class="text-sm sm:text-base font-semibold text-amber-600 dark:text-amber-400">{{ getTotalKgs() | number:'1.0-0' }}</p>
+              <p class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
+                {{getInfoPanelData().item3.label}}</p>
+              <p class="text-sm sm:text-base font-semibold text-amber-600 dark:text-amber-400">
+                {{getInfoPanelData().item3.value}}</p>
             </div>
           </div>
-          
-          <!-- Item 4 -->
+
+          <!-- Item 4 - Total registros / Balance -->
           <div class="flex items-center gap-3">
-            <div class="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+            <div
+              class="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5 text-blue-600 dark:text-blue-400"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path
+                  d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
               </svg>
             </div>
             <div>
-              <p class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total registros</p>
-              <p class="text-sm sm:text-base font-semibold text-blue-600 dark:text-blue-400">{{ filteredComNeeds.length }}</p><!--Esto se tiene que corregir-->
+              <p class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
+                {{getInfoPanelData().item4.label}}</p>
+              <p class="text-sm sm:text-base font-semibold text-blue-600 dark:text-blue-400">
+                {{getInfoPanelData().item4.value}}</p>
             </div>
           </div>
         </div>
-        
-        <!-- Reemplaza el botón actual de exportación en el panel informativo -->
-<div class="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-gray-700">
-  <div class="space-y-2">
-    <button (click)="exportToPdf()" class="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
-        <polyline points="7 10 12 15 17 10"></polyline>
-        <line x1="12" y1="15" x2="12" y2="3"></line>
-      </svg>
-      Exportar dashboard completo
-    </button>
-    
-    
-  </div>
-</div>
+
+        <!-- Botón de exportación en el panel -->
+        <div class="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-gray-700">
+          <div class="space-y-2">
+            <button (click)="exportToPdf()"
+              class="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Exportar dashboard completo
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Comparativa Teórica vs Real -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md">
-      <div class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md">
+      <div
+        class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <div class="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+            </path>
             <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
             <line x1="12" y1="22.08" x2="12" y2="12"></line>
           </svg>
           <h2 class="text-base font-semibold text-gray-900 dark:text-white">Comparativa Teórica vs Real</h2>
         </div>
-        <button 
-          (click)="toggleView()"
-          class="px-3 sm:px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-800/40 font-medium rounded-lg transition-colors flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start"
-        >
-          <svg *ngIf="showCombined" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button (click)="toggleView()"
+          class="px-3 sm:px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-800/40 font-medium rounded-lg transition-colors flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
+          <svg *ngIf="showCombined" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="12" y1="3" x2="12" y2="21"></line>
           </svg>
-          <svg *ngIf="!showCombined" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg *ngIf="!showCombined" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
             <line x1="21" y1="10" x2="3" y2="10"></line>
             <line x1="21" y1="6" x2="3" y2="6"></line>
             <line x1="21" y1="14" x2="3" y2="14"></line>
@@ -357,7 +438,7 @@
           <span class="text-xs sm:text-sm">{{ showCombined ? 'Separar Gráficas' : 'Comparar Gráficas' }}</span>
         </button>
       </div>
-      
+
       <!-- Contenedor responsivo para las gráficas de comparación -->
       <div class="p-2 sm:p-4 md:p-6">
         <div *ngIf="showCombined; else separateCharts">
@@ -369,11 +450,15 @@
 
         <ng-template #separateCharts>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
-            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <div class="px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <div
+              class="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div
+                class="px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                 <h3 class="text-sm font-medium text-gray-900 dark:text-white">Teórica</h3>
-                <div class="flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-medium rounded-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div
+                  class="flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-medium rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
                     <polyline points="17 6 23 6 23 12"></polyline>
                   </svg>
@@ -387,12 +472,16 @@
                 </div>
               </div>
             </div>
-            
-            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <div class="px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+
+            <div
+              class="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div
+                class="px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                 <h3 class="text-sm font-medium text-gray-900 dark:text-white">Real</h3>
-                <div class="flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-medium rounded-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div
+                  class="flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-medium rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
                     <polyline points="17 18 23 18 23 12"></polyline>
                   </svg>

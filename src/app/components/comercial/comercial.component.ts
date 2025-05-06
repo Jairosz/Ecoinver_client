@@ -227,9 +227,13 @@ export class ComercialComponent implements OnInit {
 
     //Comprobación de la fecha fechaInicio>fechaFin
     if (this.clientData.startDate && this.clientData.endDate) {
-      const startDate = new Date(this.clientData.startDate);
-      const endDate = new Date(this.clientData.endDate);
+      let startDate = new Date(this.clientData.startDate);
+      let endDate = new Date(this.clientData.endDate);
+      startDate=new Date(startDate.setHours(12,0,0,0));
+      endDate=new Date(endDate.setHours(12,0,0,0));
 
+      this.clientData.startDate=startDate;
+      this.clientData.endDate=endDate;
       if (startDate.getTime() > endDate.getTime()) {
         this.validarFechas = true;
       }
@@ -338,10 +342,12 @@ export class ComercialComponent implements OnInit {
     this.miFormulario.get('generoNombre')?.setValue(this.selectedComercial.nombreGenero);
 
     let dateObj = new Date(this.selectedComercial.startDate);
+    dateObj=new Date(dateObj.setHours(12,0,0,0))
     let formattedDate = dateObj.toISOString().slice(0, 10); // "YYYY-MM-DD"
     this.miFormulario.get('startDate')?.setValue(formattedDate);
 
     dateObj = new Date(this.selectedComercial.endDate);
+    dateObj=new Date(dateObj.setHours(12,0,0,0))
     formattedDate = dateObj.toISOString().slice(0, 10); // "YYYY-MM-DD"
     this.miFormulario.get('endDate')?.setValue(formattedDate);
     this.miFormulario.get('kgs')?.setValue(this.selectedComercial.kgs);
