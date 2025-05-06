@@ -7,6 +7,7 @@ import { environment } from '../environment/environment';
 import { CreateCultivePlanningDto, UpdateCultivePlanningDto } from '../types/CultivePlanningTypes';
 
 export interface CultivePlanning {
+  idGenero: null;
   id: string;
   nombre: string;
   fechaInicio: Date | null;
