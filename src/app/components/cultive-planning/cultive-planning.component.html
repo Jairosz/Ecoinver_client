@@ -63,6 +63,8 @@
           <input 
             type="text" 
             placeholder="Buscar cultivos..." 
+            [(ngModel)]="searchGeneroTerm"
+    (ngModelChange)="onSearchGenero()"
             class="pl-10 h-10 w-full text-sm bg-gray-50 dark:bg-gray-700/70 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent dark:text-white dark:placeholder-gray-400 transition-all"
           />
         </div>
@@ -74,10 +76,12 @@
               <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
             </svg>
             <select 
+            [(ngModel)]="selectedFamilia"
+    (change)="onFamilyChange()"
               class="pl-10 h-10 w-full text-sm bg-gray-50 dark:bg-gray-700/70 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent dark:text-white appearance-none transition-all"
             >
               <option value="todas">Todas las familias</option>
-              <option *ngFor="let genero of generos" [value]="genero">{{ genero }}</option>
+              <option *ngFor="let fam of familias" [value]="fam">{{ fam }}</option>
             </select>
             <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 12 15 18 9"></polyline>
@@ -102,7 +106,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             <!-- Crop genre items from genderOptions -->
             <div
-              *ngFor="let genero of genderOptions"
+              *ngFor="let genero of filteredGenderOptions"
               class="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all"
               [class.opacity-50]="genero.disabled"
               [class.border-green-200]="selectedGeneroId === genero.idGenero"

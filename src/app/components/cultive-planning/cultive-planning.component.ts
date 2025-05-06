@@ -115,12 +115,21 @@ export class CultivePlanningComponent implements OnInit {
   filteredCultivos: Cultive[] = [];
   details: CultivePlanningDetails[] = [];
   genderList: GenderTypes[] = [];
-  genderOptions: (GenderTypes & { disabled: boolean })[] = [];
+  //: (GenderTypes & { disabled: boolean })[] = [];
   idGnero: number | undefined = 0;
   selectedGeneroId: number | undefined = undefined;
   produccionesList: CultiveProductionDto[] = [];
   private produccionesMap = new Map<string, CultiveProductionDto>();
   private selectedCultivosIdsBefore: number[] = [];
+
+
+  searchGeneroTerm: string = '';
+  genderOptions: (GenderTypes & { disabled: boolean; nombreFamilia: string })[] = [];
+
+  filteredGenderOptions: typeof this.genderOptions = [];
+
+  familias: string[] = [];
+  selectedFamilia: string = 'todas';
 
   constructor(
     private cultivoService: CultivoService,
@@ -147,6 +156,11 @@ export class CultivePlanningComponent implements OnInit {
     this.genderService.getWithId().subscribe(
       (data) => {
         this.genderList = data;
+
+        this.familias = Array.from(
+          new Set(this.genderList.map(g => g.nombreFamilia))
+        ).sort();
+        
         this.updateGenderOptions();
         console.log('primer género:', this.genderList[0]);
         console.log('Generos get:', this.genderList);
@@ -155,6 +169,9 @@ export class CultivePlanningComponent implements OnInit {
         console.error('Error cargando géneros', error);
       }
     );
+
+
+    this.filteredGenderOptions = [...this.genderOptions];
   }
 
   /**
@@ -181,6 +198,7 @@ export class CultivePlanningComponent implements OnInit {
     console.log(`Se asignaron fechas de siembra a ${contadorActualizados} cultivos`);
   }
 
+  
   /**
    * Genera las 24 quincenas del año actual (2 por mes)
    */
@@ -952,17 +970,48 @@ buscarCultivosEnQuincena(quincena: Quincena): void {
     });
   }
 
+
+
+
+  // 3. Cada vez que cambie el texto llamas a esto:
+  onSearchGenero(): void {
+    this.filterGeneros();
+  }
+
+  onFamilyChange(): void {
+    this.filterGeneros();
+  }
+
   /**
    * Actualiza las opciones de géneros
    */
   private updateGenderOptions(): void {
-    // Simplemente asignar todos los géneros disponibles sin bloquearlos
     this.genderOptions = this.genderList.map(g => ({
       ...g,
-      disabled: false  // Ningún género está deshabilitado
+      disabled: false,
+      nombreFamilia: g.nombreFamilia
     }));
-    
-    console.log('Géneros disponibles:', this.genderOptions.length);
+    // Aplica el filtro inicial (sin texto ni familia)
+    this.filterGeneros();
+  }
+
+  
+  /**
+   * Aplica ambos criterios (texto y familia) para poblar filteredGenderOptions.
+   */
+  private filterGeneros(): void {
+    const term = this.searchGeneroTerm.trim().toLowerCase();
+    this.filteredGenderOptions = this.genderOptions.filter(g => {
+      // 1) filtro por familia
+      if (this.selectedFamilia !== 'todas' && g.nombreFamilia !== this.selectedFamilia) {
+        return false;
+      }
+      // 2) filtro por texto en el nombre del género
+      if (term && !g.nombreGenero.toLowerCase().includes(term)) {
+        return false;
+      }
+      return true;
+    });
   }
 
   // Método para abrir el modal con los cultivos filtrados
@@ -1376,45 +1425,72 @@ private actualizarPlanificacionExistente(
   existingDetails: CultivePlanningDetails[],
   planificacionId: number | string
 ): void {
-  const updateObservables = existingDetails.map(detail => {
+  const updateObs = existingDetails.map(detail => {
     const idx = detail.tramo - 1;
     const card = this.cards[idx];
-    const updateData = {
-      id:          detail.id,
+    return this.cultivePlanningDetailsService.updateCultivePlanningDetails(detail.id, {
+      id: detail.id,
       fechaInicio: new Date(card.startDate!),
       fechaFin:    new Date(card.endDate!),
       kilos:       card.value || 0,
       tramo:       detail.tramo,
       cultivePlanningId: detail.cultivePlanningId
-    };
-    return this.cultivePlanningDetailsService
-               .updateCultivePlanningDetails(detail.id, updateData);
+    });
   });
 
-  forkJoin(updateObservables).subscribe(
-    (updatedDetails: CultivePlanningDetails[]) => {
+  forkJoin(updateObs).subscribe(
+    (updatedDetails) => {
       this.details = updatedDetails;
-      // ① Sincronizar producciones tras actualizar los tramos
-      this.syncAllProductions();
-      // ② Asociar cultivos a la planificación (opcional si ya lo haces en otro sitio)
+      // recargar producciones y luego sincronizar
+      this.loadAndSyncProductions(updatedDetails);
+      // re-asociar cultivos si lo necesitas
       this.asociarCultivosAPlanificacion(planificacionId);
       this.mostrarMensajeExito('Planificación actualizada correctamente');
     },
-    error => {
-      console.error('Error actualizando detalles:', error);
+    err => {
+      console.error('Error actualizando detalles:', err);
       this.mostrarMensajeExito('Error al guardar los cambios');
     }
   );
 }
 
+
+
+
+/**
+ * Carga en el map todas las producciones que ya existen
+ * para estos detalles, y luego lanza la sincronización.
+ */
+private loadAndSyncProductions(details: CultivePlanningDetails[]): void {
+  // Limpiar el map para no acumular de corridas anteriores
+  this.produccionesMap.clear();
+
+  // Primero traemos todas las producciones de la API
+  this.productionService.getAllCultiveProductions().subscribe(allProds => {
+    // Filtramos sólo las de nuestros details
+    const ids = new Set(details.map(d => d.id));
+    allProds
+      .filter(p => ids.has(p.cultivePlanningDetailsId))
+      .forEach(p => {
+        const key = `${p.cultivePlanningDetailsId}_${p.cultiveId}`;
+        this.produccionesMap.set(key, p);
+      });
+
+    // Una vez cargado el map, ejecutamos la sincronización
+    this.syncAllProductions();
+  });
+}
+
+
+
+
+
 /**
  * Crea los detalles (tramos) para una planificación recién creada
  * y luego sincroniza las producciones.
  */
-private crearDetallesParaPlanificacionExistente(
-  planificacion: CultivePlanning
-): void {
-  const planningId = planificacion.id?.toString() || '';
+private crearDetallesParaPlanificacionExistente(planificacion: CultivePlanning): void {
+  const planningId = planificacion.id!.toString();
   const tramosDetails = this.cards.map((card, idx) => ({
     fechaInicio: new Date(card.startDate!),
     fechaFin:    new Date(card.endDate!),
@@ -1425,16 +1501,16 @@ private crearDetallesParaPlanificacionExistente(
   this.cultivePlanningDetailsService
     .createMultiplePlanningDetails(planningId, tramosDetails)
     .subscribe(
-      (createdDetails: CultivePlanningDetails[]) => {
+      (createdDetails) => {
         this.details = createdDetails;
-        // ① Sincronizar producciones tras crear los tramos
-        this.syncAllProductions();
-        // ② Asociar cultivos a la planificación
+        // recargar producciones y luego sincronizar
+        this.loadAndSyncProductions(createdDetails);
+        // asociar cultivos a la planificación
         this.asociarCultivosAPlanificacion(planificacion.id!);
-        this.mostrarMensajeExito('Planificación guardada correctamente');
+        this.mostrarMensajeExito('Planificación y producciones creadas correctamente');
       },
-      error => {
-        console.error('Error creando detalles:', error);
+      err => {
+        console.error('Error creando detalles:', err);
         this.mostrarMensajeExito('Error al guardar los cambios');
       }
     );
@@ -1442,53 +1518,78 @@ private crearDetallesParaPlanificacionExistente(
 
 
   /**
-   * Crea una nueva planificación con sus detalles
-   */
-  crearNuevaPlanificacion(): void {
-    // Buscar objeto quincena
-    const quincena = this.quincenas.find(q => q.id === this.selectedQuincena);
-    
-    if (!quincena) {
-      console.error('No se encontró la quincena seleccionada');
-      return;
-    }
-    
-    const planificacionDto: CreateCultivePlanningDto = {
-      nombre: quincena.nombre +" "+ this.selectedGenre,
-      fechaInicio: quincena.fechaInicio,
-      fechaFin: quincena.fechaFin,
-      idGenero: this.idGnero || undefined
-    };
-    
-    this.cultivoPlanningService.createCultivePlanning(planificacionDto).subscribe(
-      (planificacion) => {
-        // Ahora creamos los detalles (tramos)
-        const tramosDetails = this.cards.map((card, index) => ({
-          fechaInicio: new Date(card.startDate || ''),
-          fechaFin: new Date(card.endDate || ''),
-          kilos: card.value || 0,
-          tramo: index + 1
-        }));
-        
-        this.cultivePlanningDetailsService.createMultiplePlanningDetails(
-          planificacion.id?.toString() || '', 
-          tramosDetails
-        ).subscribe(
-          () => {
-            // Después de crear detalles, asociar cultivos
-            this.asociarCultivosAPlanificacion(planificacion.id?.toString() || '');
-            this.mostrarMensajeExito('Datos de la quincena guardados correctamente');
+ * Crea una nueva planificación con sus detalles,
+ * asocia cultivos, y luego genera las producciones.
+ */
+private crearNuevaPlanificacion(): void {
+  const quincena = this.quincenas.find(q => q.id === this.selectedQuincena);
+  if (!quincena) {
+    console.error('No se encontró la quincena seleccionada');
+    return;
+  }
+
+  // 1️⃣ Crear la planificación
+  const planDto: CreateCultivePlanningDto = {
+    nombre:     `${quincena.nombre} ${this.selectedGenre}`,
+    fechaInicio: quincena.fechaInicio,
+    fechaFin:    quincena.fechaFin,
+    idGenero:    this.idGnero
+  };
+
+  this.cultivoPlanningService.createCultivePlanning(planDto)
+    .subscribe(planificacion => {
+      // 2️⃣ Crear los detalles (tramos)
+      const tramosDetails = this.cards.map((card, idx) => ({
+        fechaInicio: new Date(card.startDate!),
+        fechaFin:    new Date(card.endDate!),
+        kilos:       card.value || 0,
+        tramo:       idx + 1
+      }));
+
+      this.cultivePlanningDetailsService
+        .createMultiplePlanningDetails(planificacion.id!.toString(), tramosDetails)
+        .subscribe(
+          (createdDetails: CultivePlanningDetails[]) => {
+            this.details = createdDetails;
+
+            // 3️⃣ Asociar cultivos a la planificación
+            this.asociarCultivosAPlanificacion(planificacion.id!);
+
+            // 4️⃣ Generar producciones para cada detail + cultivo
+            this.details.forEach(detail => {
+              const card = this.cards[detail.tramo - 1];
+              const kilosStr = String(card.value ?? 0);
+
+              this.selectedCultivosIds.forEach(cultiveId => {
+                const dto: CreateCultiveProductionDto = {
+                  cultivePlanningDetailsId: detail.id,
+                  cultiveId:                cultiveId,
+                  kilos:                    kilosStr,
+                  fechaInicio:              card.startDate!,
+                  fechaFin:                 card.endDate!
+                };
+                // Crear sin comprobar, porque son todas nuevas
+                this.productionService
+                  .createCultiveProduction(dto)
+                  .subscribe(created => {
+                    const key = `${detail.id}_${cultiveId}`;
+                    this.produccionesMap.set(key, created);
+                  });
+              });
+            });
+
+            this.mostrarMensajeExito('Planificación, detalles y producciones creadas correctamente');
           },
-          (error) => {
-            console.error('Error al crear los detalles de la quincena:', error);
-            this.mostrarMensajeExito('Error al guardar los cambios');
+          error => {
+            console.error('Error creando detalles:', error);
+            this.mostrarMensajeExito('Error al guardar los detalles');
           }
         );
-      },
-      (error) => {
-        console.error('Error al crear la planificación para la quincena:', error);
-        this.mostrarMensajeExito('Error al guardar los cambios');
-      }
-    );
-  }
+    },
+    error => {
+      console.error('Error creando planificación:', error);
+      this.mostrarMensajeExito('Error al crear la planificación');
+    }
+  );
+}
 }
