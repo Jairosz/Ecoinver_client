@@ -17,4 +17,8 @@ export interface Cultive {
     latitud?: number;
     longitud?: number;
     idCultivePlanning: number | null; //ID DEL PLANING ASOCIADO
+    tecnico: string;
+    provincia: string;
+
+
   }

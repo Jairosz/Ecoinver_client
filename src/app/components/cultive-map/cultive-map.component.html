@@ -1,33 +1,29 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100
-            dark:from-gray-900 dark:to-gray-800 p-4">
+<!-- src/app/components/cultive-map/cultive-map.component.html -->
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
   <div class="max-w-7xl mx-auto space-y-4">
 
+    <!-- ======================= -->
     <!-- Selector de Género -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border
-                border-gray-200 dark:border-gray-700 overflow-hidden">
-
+    <!-- ======================= -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       <!-- Header -->
-      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700
-                  flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div
+        class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+      >
         <div class="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               class="h-5 w-5 text-indigo-600 dark:text-indigo-400"
-               fill="none" stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round">
-            <line x1="8" y1="6" x2="21" y2="6"></line>
-            <line x1="8" y1="12" x2="21" y2="12"></line>
-            <line x1="8" y1="18" x2="21" y2="18"></line>
-            <line x1="3" y1="6" x2="3.01" y2="6"></line>
-            <line x1="3" y1="12" x2="3.01" y2="12"></line>
-            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6" />
+            <line x1="8" y1="12" x2="21" y2="12" />
+            <line x1="8" y1="18" x2="21" y2="18" />
+            <line x1="3" y1="6" x2="3.01" y2="6" />
+            <line x1="3" y1="12" x2="3.01" y2="12" />
+            <line x1="3" y1="18" x2="3.01" y2="18" />
           </svg>
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-            Géneros de Cultivos
-          </h2>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Cultivos</h2>
         </div>
         <div class="inline-flex bg-gray-100 dark:bg-gray-700 rounded-md p-1 text-sm">
-          <button class="px-3 py-1 rounded-md bg-indigo-600 text-white font-medium shadow
-                         hover:bg-indigo-700 transition">
+          <button class="px-3 py-1 rounded-md bg-indigo-600 text-white font-medium shadow hover:bg-indigo-700 transition">
             Todos
           </button>
           <button class="px-3 py-1 rounded-md text-gray-600 dark:text-gray-300">
@@ -37,32 +33,30 @@
       </div>
 
       <!-- Filtros -->
-      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700
-                  grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Búsqueda -->
         <div class="relative">
           <svg xmlns="http://www.w3.org/2000/svg"
                class="absolute left-3 top-3 h-4 w-4 text-gray-400 dark:text-gray-500"
-               fill="none" stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+               stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input type="text"
-                 [(ngModel)]="texto"
-                 placeholder="Buscar cultivos..."
-                 class="pl-10 pr-3 h-10 w-full bg-gray-50 dark:bg-gray-700
-                        border border-gray-200 dark:border-gray-600 rounded-md
-                        focus:outline-none focus:ring-2 focus:ring-indigo-500
-                        dark:focus:ring-indigo-400 text-gray-900 dark:text-white" />
+          <input
+            type="text"
+            [(ngModel)]="texto"
+            placeholder="Buscar cultivos..."
+            class="pl-10 pr-3 h-10 w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 text-gray-900 dark:text-white"
+          />
         </div>
+        <!-- Select de familia y botón limpiar -->
         <div class="flex gap-2">
           <div class="relative w-full">
             <select
               [(ngModel)]="familiaSeleccionada"
-              class="appearance-none h-10 w-full bg-gray-50 dark:bg-gray-700
-                     border border-gray-200 dark:border-gray-600 rounded-md
-                     pl-3 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500
-                     dark:focus:ring-indigo-400 text-sm text-gray-900 dark:text-white">
+              class="appearance-none h-10 w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md pl-3 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 text-sm text-gray-900 dark:text-white"
+            >
               <option value="todas">Todas las familias</option>
               <option *ngFor="let fam of family" [value]="fam.familia">
                 {{ fam.familia }}
@@ -77,9 +71,8 @@
           </div>
           <button
             (click)="texto=''; familiaSeleccionada='todas'"
-            class="h-10 px-4 bg-gray-100 dark:bg-gray-700 border border-gray-300
-                   dark:border-gray-600 rounded-md text-sm hover:bg-gray-200
-                   dark:hover:bg-gray-600 transition text-gray-800 dark:text-white">
+            class="h-10 px-4 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition text-gray-800 dark:text-white"
+          >
             Limpiar filtros
           </button>
         </div>
@@ -102,10 +95,12 @@
                       [id]="'genero-'+gen.id"
                       [value]="gen.id"
                       (change)="onGeneroSelect(gen.id)"
-                      class="form-radio h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                      class="form-radio h-4 w-4 text-indigo-600 dark:text-indigo-400"
+                    />
                     <label
                       [for]="'genero-'+gen.id"
-                      class="ml-2 text-sm text-gray-700 dark:text-white truncate">
+                      class="ml-2 text-sm text-gray-700 dark:text-white truncate"
+                    >
                       {{ gen.nombre }}
                     </label>
                   </div>
@@ -116,9 +111,8 @@
         </div>
       </div>
 
-      <!-- Footer -->
-      <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700
-                  bg-gray-50 dark:bg-gray-800 text-xs text-gray-500 dark:text-gray-300">
+      <!-- Footer del selector -->
+      <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-500 dark:text-gray-300">
         Filtrando por:
         <span class="text-indigo-600 dark:text-indigo-400">
           {{ familiaSeleccionada || 'Ningún filtro' }}
@@ -126,37 +120,89 @@
       </div>
     </div>
 
+    <!-- ======================= -->
     <!-- Panel de Gráficos -->
-    <div *ngIf="superficieTotal > 0"
-         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mt-6">
+    <!-- ======================= -->
+    <div *ngIf="superficieTotal > 0" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mt-6">
 
-      <!-- Pestañas de Vista -->
-      <div class="inline-flex bg-gray-100 dark:bg-gray-700 rounded-md p-1 text-sm mb-4">
-        <button
-          class="px-3 py-1 rounded-md focus:outline-none"
-          [ngClass]="{'bg-indigo-600 text-white': view==='pie','text-gray-600 dark:text-gray-300': view!=='pie'}"
-          (click)="view='pie'">
-          Gráfico Circular
-        </button>
-        <button
-          class="px-3 py-1 rounded-md focus:outline-none"
-          [ngClass]="{'bg-indigo-600 text-white': view==='tree','text-gray-600 dark:text-gray-300': view!=='tree'}"
-          (click)="view='tree'">
-          Treemap
-        </button>
+      <!-- Controles de Vista y Agrupación -->
+      <div class="flex justify-between mb-4">
+        <!-- Pestañas de Vista -->
+        <div class="inline-flex bg-gray-100 dark:bg-gray-700 rounded-md p-1 text-sm">
+          <button
+            class="px-3 py-1 rounded-md focus:outline-none"
+            [ngClass]="{ 'bg-indigo-600 text-white': view==='pie', 'text-gray-600 dark:text-gray-300': view!=='pie' }"
+            (click)="view='pie'"
+          >
+            Gráfico Circular
+          </button>
+          <button
+            class="px-3 py-1 rounded-md focus:outline-none"
+            [ngClass]="{ 'bg-indigo-600 text-white': view==='tree', 'text-gray-600 dark:text-gray-300': view!=='tree' }"
+            (click)="view='tree'"
+          >
+            Treemap
+          </button>
+        </div>
+
+        <!-- Botones de Agrupación / Desagrupar -->
+        <div class="inline-flex bg-gray-100 dark:bg-gray-700 rounded-md p-1 text-sm">
+          <button
+            (click)="groupBy='variedad'; updateChart()"
+            class="px-3 py-1 rounded-md focus:outline-none"
+            [ngClass]="{
+              'bg-indigo-600 text-white': groupBy==='variedad',
+              'text-gray-600 dark:text-gray-300': groupBy!=='variedad'
+            }"
+          >
+            Variedad
+          </button>
+          <button
+            (click)="groupBy='agricultor'; updateChart()"
+            class="px-3 py-1 rounded-md focus:outline-none"
+            [ngClass]="{
+              'bg-indigo-600 text-white': groupBy==='agricultor',
+              'text-gray-600 dark:text-gray-300': groupBy!=='agricultor'
+            }"
+          >
+            Agricultor
+          </button>
+          <button
+            (click)="groupBy='individual'; updateChart()"
+            class="px-3 py-1 rounded-md focus:outline-none"
+            [ngClass]="{
+              'bg-indigo-600 text-white': groupBy==='individual',
+              'text-gray-600 dark:text-gray-300': groupBy!=='individual'
+            }"
+          >
+            Cultivo
+          </button>
+          <button
+            (click)="groupBy='tecnico'; updateChart()"
+            class="px-3 py-1 rounded-md focus:outline-none"
+            [ngClass]="{
+              'bg-indigo-600 text-white': groupBy==='tecnico',
+              'text-gray-600 dark:text-gray-300': groupBy!=='tecnico'
+            }"
+          >
+            Técnico
+          </button>
+          <button
+            (click)="groupBy='provincia'; updateChart()"
+            class="px-3 py-1 rounded-md focus:outline-none"
+            [ngClass]="{
+              'bg-indigo-600 text-white': groupBy==='provincia',
+              'text-gray-600 dark:text-gray-300': groupBy!=='provincia'
+            }"
+          >
+            Provincia
+          </button>
+        </div>
       </div>
 
-      <!-- ECharts Containers -->
-      <div echarts
-           [options]="optionsPie"
-           class="w-full h-80"
-           *ngIf="view==='pie'">
-      </div>
-      <div echarts
-           [options]="optionsTree"
-           class="w-full h-80"
-           *ngIf="view==='tree'">
-      </div>
+      <!-- Contenedores ECharts -->
+      <div echarts [options]="optionsPie" class="w-full h-80" *ngIf="view==='pie'"></div>
+      <div echarts [options]="optionsTree" class="w-full h-80" *ngIf="view==='tree'"></div>
     </div>
 
   </div>
