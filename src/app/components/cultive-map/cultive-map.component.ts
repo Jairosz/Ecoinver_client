@@ -1,3 +1,4 @@
+// src/app/components/cultive-map/cultive-map.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -53,14 +54,15 @@ export class CultiveMapComponent implements OnInit {
   optionsPie: EChartsOption = {};
   optionsTree: EChartsOption = {};
 
-  // --- NUEVOS ESTADOS ---
+  // --- Estados de selección ---
   selectedGeneroId: number | null = null;
-  groupBy: 'variedad' | 'agricultor' = 'variedad';
+  selectedGeneroName = '';
+  groupBy: 'variedad' | 'agricultor' | 'individual' | 'tecnico' | 'provincia' = 'variedad';
 
   constructor(
     private generoServicio: GenderService,
     private cultivoService: CultivoService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.generoServicio.get().subscribe(data => {
@@ -108,54 +110,103 @@ export class CultiveMapComponent implements OnInit {
 
   onGeneroSelect(idGenero: number) {
     this.selectedGeneroId = idGenero;
+    const found = this.genders.find(x => x.idGenero === idGenero);
+    this.selectedGeneroName = found ? found.nombreGenero : '';
     this.updateChart();
   }
 
-  // Construye y refresca optionsPie y optionsTree según selectedGeneroId y groupBy
+  /** Construye y refresca optionsPie y optionsTree según selectedGeneroId y groupBy */
   updateChart() {
-    if (this.selectedGeneroId == null) {
-      return;
-    }
+    if (this.selectedGeneroId == null) return;
 
-    // 1. Filtrar cultivos por género
-    const cultivosFiltrados = this.cultivos.filter(c => c.idGenero === this.selectedGeneroId);
+    // 1. Filtrar por género
+    const cultivosFiltrados = this.cultivos.filter(
+      c => c.idGenero === this.selectedGeneroId
+    );
 
     // 2. Calcular superficie total
-    this.superficieTotal = cultivosFiltrados.reduce((sum, c) => sum + (c.superficie || 0), 0);
+    this.superficieTotal = cultivosFiltrados.reduce(
+      (sum, c) => sum + (c.superficie || 0),
+      0
+    );
     const total = this.superficieTotal;
 
-    // 3. Agrupar por variedad o agricultor
-    interface Agg { value: number; agricultores: string[] }
-    const agrupados: Record<string, Agg> = {};
+    // 3. Armar la serie según modo de agrupación
+    let serie: Array<{ name: string; value: number; agricultores?: string[] }>;
 
-    for (const c of cultivosFiltrados) {
-      const key = this.groupBy === 'variedad'
-        ? (c.nombreVariedad || 'Sin variedad')
-        : (c.nombreAgricultor || 'Sin agricultor');
+    if (this.groupBy === 'individual') {
+      // Cada cultivo individual
+      serie = cultivosFiltrados.map(c => ({
+        name: c.nombreVariedad || 'Sin variedad',
+        value: c.superficie || 0,
+        agricultores: [c.nombreAgricultor]
+      }));
+    } else {
+      // Agregado general con normalización de clave
+      interface Agg { value: number; agricultores: string[] }
+      const agrupados: Record<string, Agg> = {};
+      const displayName: Record<string, string> = {};
 
-      if (!agrupados[key]) {
-        agrupados[key] = { value: 0, agricultores: [] };
+      for (const c of cultivosFiltrados) {
+        // Raw key según modo
+        let rawKey = '';
+        switch (this.groupBy) {
+          case 'variedad':
+            rawKey = c.nombreVariedad || 'Sin variedad';
+            break;
+          case 'agricultor':
+            rawKey = c.nombreAgricultor || 'Sin agricultor';
+            break;
+          case 'tecnico':
+            rawKey = c.tecnico       || 'Sin técnico';
+            break;
+          case 'provincia':
+            rawKey = c.provincia     || 'Sin provincia';
+            break;
+        }
+
+        // Normalizamos: quitamos acentos y bajamos a minúsculas
+        const normKey = rawKey
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase();
+
+        // Inicializar si no existe
+        if (!agrupados[normKey]) {
+          agrupados[normKey] = { value: 0, agricultores: [] };
+          // Guardamos el primer rawKey para mostrar
+          displayName[normKey] = rawKey;
+        }
+
+        // Sumar superficie
+        agrupados[normKey].value += (c.superficie || 0);
+
+        // Si agrupar por variedad, guardamos agricultores únicos
+        if (this.groupBy === 'variedad') {
+          const ag = c.nombreAgricultor;
+          if (ag && !agrupados[normKey].agricultores.includes(ag)) {
+            agrupados[normKey].agricultores.push(ag);
+          }
+        }
       }
-      agrupados[key].value += (c.superficie || 0);
-      if (this.groupBy === 'variedad') {
-        agrupados[key].agricultores.push(c.nombreAgricultor);
-      }
+
+      // Convertir a array para ECharts
+      serie = Object.entries(agrupados).map(
+        ([norm, { value, agricultores }]) => ({
+          name: displayName[norm],
+          value,
+          agricultores
+        })
+      );
     }
 
-    // 4. Construir la serie ECharts
-    const serie = Object.entries(agrupados).map(([name, { value, agricultores }]) => ({
-      name,
-      value,
-      agricultores
-    }));
-
-    // 5. Options para Pie
+    // 4. Configuración del Pie Chart
     this.optionsPie = {
       title: {
         text: `Superficie total: ${total} m²`,
         left: 'center',
         top: 10,
-        padding: [0, 0, 20, 0],
+        padding: [0, 0, 50, 0],
         textStyle: { fontSize: 14, color: '#fff' }
       },
       graphic: [{
@@ -167,27 +218,35 @@ export class CultiveMapComponent implements OnInit {
       }],
       tooltip: {
         trigger: 'item',
+        confine: true,
+        extraCssText: 'max-width: 200px; white-space: normal;',
         formatter: (p: any) => {
           const val = p.value as number;
           const pct = p.percent;
-          let extra = '';
-          if (this.groupBy === 'variedad') {
-            const unique = Array.from(new Set(p.data.agricultores)).join(', ');
-            extra = `<br/>Agricultor(es): ${unique}`;
+          const agrisArr = (p.data.agricultores || []).filter((v: string) => !!v);
+          if (agrisArr.length) {
+            return `${p.name}: ${val} m² (${pct}%)<br/>Agricultor(es):<br/>${agrisArr.join('<br/>')}`;
           }
-          return `${p.name}: ${val} m² (${pct}%)${extra}`;
+          return `${p.name}: ${val} m² (${pct}%)`;
         }
       },
       series: [{
         name: 'Cultivos',
         type: 'pie',
         radius: ['40%', '70%'],
-        label: { formatter: '{b}: {c} m² ({d}%)' },
+        label: {
+          formatter: '{b}: {c} m² ({d}%)',
+          color: '#fff',
+          textBorderWidth: 0,
+          textBorderColor: 'transparent',
+          textShadowBlur: 0,
+          textShadowColor: 'transparent'
+        },
         data: serie
       }]
     };
 
-    // 6. Options para Treemap
+    // 5. Configuración del Treemap
     this.optionsTree = {
       title: {
         text: `Superficie total: ${total} m²`,
@@ -204,15 +263,17 @@ export class CultiveMapComponent implements OnInit {
         style: { stroke: '#fff', lineWidth: 1 }
       }],
       tooltip: {
+        trigger: 'item',
+        confine: true,
+        extraCssText: 'max-width: 200px; white-space: normal;',
         formatter: (p: any) => {
           const val = p.value as number;
           const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0.0';
-          let extra = '';
-          if (this.groupBy === 'variedad') {
-            const unique = Array.from(new Set(p.data.agricultores)).join(', ');
-            extra = `<br/>Agricultor(es): ${unique}`;
+          const agrisArr = (p.data.agricultores || []).filter((v: string) => !!v);
+          if (agrisArr.length) {
+            return `${p.name}: ${val} m² (${pct}%)<br/>Agricultor(es):<br/>${agrisArr.join('<br/>')}`;
           }
-          return `${p.name}: ${val} m² (${pct}%)${extra}`;
+          return `${p.name}: ${val} m² (${pct}%)`;
         }
       },
       series: [{
@@ -220,7 +281,14 @@ export class CultiveMapComponent implements OnInit {
         type: 'treemap',
         roam: false,
         nodeClick: false,
-        label: { show: true, formatter: '{b}: {c} m²' },
+        label: {
+          show: true,
+          formatter: '{b}: {c} m²',
+          textBorderWidth: 0,
+          textBorderColor: 'transparent',
+          textShadowBlur: 0
+        },
+        breadcrumb: { show: false },
         data: serie
       }]
     };
