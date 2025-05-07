@@ -1,1 +1,218 @@
-<p>ranking works!</p>
+<div class="bg-gray-50 dark:bg-gray-900 theme-transition">
+  
+<!-- Género Selection Panel -->
+<div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200/50 dark:border-gray-700/50 overflow-hidden transition-all duration-200 hover:shadow-lg w-full mx-auto mb-6 backdrop-blur-sm backdrop-filter">
+  <div class="px-5 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-800/80">
+    <div class="flex items-center gap-3">
+      <div class="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 dark:text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Géneros de Cultivos</h2>
+    </div>
+    <div class="flex items-center gap-2 w-full sm:w-auto">
+      <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 flex text-xs w-full sm:w-auto shadow-sm">
+        <button 
+          (click)="mostrarTodos()" 
+          class="py-1.5 px-4 rounded-md" 
+          [ngClass]="{'bg-white dark:bg-gray-600 shadow-sm font-medium dark:text-white': filteredGenderOptions.length === genero.length || filteredGenderOptions.length > selectedCultivosIds.length, 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/70': filteredGenderOptions.length !== genero.length && filteredGenderOptions.length <= selectedCultivosIds.length}"
+          >
+          Todos
+        </button>
+        <button 
+          (click)="mostrarSeleccionados()" 
+          class="py-1.5 px-4 rounded-md transition-all"
+          [ngClass]="{'bg-white dark:bg-gray-600 shadow-sm font-medium dark:text-white': filteredGenderOptions.length === selectedCultivosIds.length && selectedCultivosIds.length > 0, 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/70': filteredGenderOptions.length !== selectedCultivosIds.length || selectedCultivosIds.length === 0}"
+          >
+          Seleccionados <span class="inline-flex items-center justify-center ml-1 w-5 h-5 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">{{selectedCultivosIds.length}}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search bar and filters -->
+  <div class="px-5 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Search -->
+    <div class="relative group">
+      <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 dark:group-focus-within:text-green-400 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input 
+        type="text" 
+        placeholder="Buscar cultivos..." 
+        [(ngModel)]="searchGeneroTerm"
+        (ngModelChange)="onSearchGenero()"
+        class="pl-10 h-10 w-full text-sm bg-gray-50 dark:bg-gray-700/70 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent dark:text-white dark:placeholder-gray-400 transition-all"
+      />
+    </div>
+
+    <!-- Family filter -->
+    <div class="flex gap-3">
+      <div class="relative flex-1 group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 dark:group-focus-within:text-green-400 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        <select 
+          [(ngModel)]="selectedFamilia"
+          (change)="onFamilyChange()"
+          class="pl-10 h-10 w-full text-sm bg-gray-50 dark:bg-gray-700/70 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent dark:text-white appearance-none transition-all"
+        >
+          <option value="todas">Todas las familias</option>
+          <option *ngFor="let fam of familias" [value]="fam">{{ fam }}</option>
+        </select>
+        <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+      <button 
+        (click)="limpiarFiltros()"
+        class="h-10 px-4 text-xs border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium transition-all flex items-center gap-1.5"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  <!-- Crop genres list -->
+  <div class="p-5 sm:px-6 py-4">
+    <!-- Scrollable container for crop genres -->
+    <div class="max-h-60 overflow-y-auto pr-1 custom-scrollbar">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        <!-- Crop genre items from genderOptions -->
+        <div
+          *ngFor="let genero of filteredGenderOptions"
+          class="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all cursor-pointer"
+          
+          [class.border-green-200]="selectedGeneroId === genero.idGenero"
+          [class.dark:border-green-700]="selectedGeneroId === genero.idGenero"
+          [class.bg-green-50]="selectedGeneroId === genero.idGenero"
+          [class.dark:bg-green-900]="selectedGeneroId === genero.idGenero"
+          (click)="selectGenero(genero.idGenero)"
+        >
+          <div class="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+            <span class="text-green-700 dark:text-green-400 font-medium text-sm">{{genero.nombreGenero.charAt(0).toUpperCase()}}</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white truncate">{{genero.nombreGenero}}</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{genero.nombreFamilia || 'Sin familia'}}</p>
+          </div>
+          <!-- Radio button style indicator -->
+          <div class="flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center"
+               [class.border-gray-300]="selectedGeneroId !== genero.idGenero"
+               [class.dark:border-gray-600]="selectedGeneroId !== genero.idGenero"
+               [class.border-green-500]="selectedGeneroId === genero.idGenero"
+               [class.dark:border-green-400]="selectedGeneroId === genero.idGenero">
+            <div *ngIf="selectedGeneroId === genero.idGenero" 
+                 class="w-3 h-3 bg-green-500 dark:bg-green-400 rounded-full">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="max-w-full mx-auto p-4 sm:p-6 main-container">
+    <div
+      class="bg-green-50 dark:bg-gray-800 rounded-lg shadow-sm border border-green-100 dark:border-gray-700 p-5 mb-6 card theme-transition">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+        <h1 class="text-2xl font-semibold text-green-800 dark:text-green-400 main-title">Ranking de Productividad
+          Agrícola</h1>
+
+        <div class="flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0">
+          
+
+          <div class="custom-select">
+            <select
+              class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md pl-4 pr-10 py-2 text-sm text-gray-800 dark:text-gray-200 focus:outline-none theme-transition">
+              <option>Ordenar por kg/m²</option>
+              <option>Ordenar por producción</option>
+              <option>Ordenar por área</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto table-container">
+        <table class="min-w-full bg-white dark:bg-gray-800 theme-transition">
+          <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm theme-transition">
+            <tr>
+              <th class="py-3 px-4 text-left font-medium theme-transition">Posición</th>
+              <th class="py-3 px-4 text-left font-medium theme-transition">Agricultor</th>
+              <th class="py-3 px-4 text-left font-medium theme-transition">Región</th>
+              <th class="py-3 px-4 text-left font-medium theme-transition">Cultivo</th>
+              <th class="py-3 px-4 text-left font-medium theme-transition">Área (m²)</th>
+              <th class="py-3 px-4 text-left font-medium theme-transition">Producción (kg)</th>
+              <th class="py-3 px-4 text-left font-medium theme-transition">kg/m²</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            @for(agricultor of agricultores;track agricultores){
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 theme-transition">
+              <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.pos}}</td>
+              <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.nombre}}</td>
+              <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.provincia}}</td>
+              <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.nombreCultivo}}</td>
+              <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.superficie}}</td>
+              <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.producc}}</td>
+              <td class="py-3 px-4">
+                <span class="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 font-medium px-2.5 py-1 rounded-md metric-badge theme-transition">{{agricultor.kgm2}}</span>
+              </td>
+            </tr>
+            }
+
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tarjetas de resumen con números alineados -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Producción Total -->
+      <div
+        class="bg-green-50 dark:bg-gray-800 rounded-lg shadow-sm border border-green-100 dark:border-gray-700 p-5 card summary-card theme-transition">
+        <h2 class="text-lg font-medium text-green-800 dark:text-green-400 mb-4 summary-title theme-transition">
+          Producción Total</h2>
+        <div class="summary-value-container">
+          <p class="text-3xl font-bold text-gray-800 dark:text-white summary-value theme-transition">192.100 kg</p>
+        </div>
+        <p class="text-sm text-gray-500 dark:text-gray-400 theme-transition">Producción total de todos los agricultores
+          mostrados</p>
+      </div>
+
+      <!-- Área Cultivada -->
+      <div
+        class="bg-green-50 dark:bg-gray-800 rounded-lg shadow-sm border border-green-100 dark:border-gray-700 p-5 card summary-card theme-transition">
+        <h2 class="text-lg font-medium text-green-800 dark:text-green-400 mb-4 summary-title theme-transition">Área
+          Cultivada</h2>
+        <div class="summary-value-container">
+          <p class="text-3xl font-bold text-gray-800 dark:text-white summary-value theme-transition">{{sumaArea}}
+            m<sup>2</sup></p>
+        </div>
+        <p class="text-sm text-gray-500 dark:text-gray-400 theme-transition">Área total cultivada por los agricultores
+          mostrados</p>
+      </div>
+
+      <!-- Promedio de Rendimiento -->
+      <div
+        class="bg-green-50 dark:bg-gray-800 rounded-lg shadow-sm border border-green-100 dark:border-gray-700 p-5 card summary-card theme-transition">
+        <h2 class="text-lg font-medium text-green-800 dark:text-green-400 mb-4 summary-title theme-transition">Promedio
+          de Rendimiento</h2>
+        <div class="summary-value-container">
+          <p class="text-3xl font-bold text-gray-800 dark:text-white summary-value theme-transition">6.83
+            kg/m<sup>2</sup></p>
+        </div>
+        <p class="text-sm text-gray-500 dark:text-gray-400 theme-transition">Rendimiento promedio de los agricultores
+          mostrados</p>
+      </div>
+    </div>
+  </div>
+</div>

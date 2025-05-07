@@ -1,11 +1,204 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Agricult } from '../../types/agricult';
+import { Cultive } from '../../types/Cultive';
+import { Gender } from '../../types/gender';
+import { GenderService } from '../../services/Gender.service';
+import { CultivoService } from '../../services/Cultivo.service';
 
 @Component({
   selector: 'app-ranking',
-  imports: [],
+  standalone: true,
+  imports: [FormsModule, CommonModule],
   templateUrl: './ranking.component.html',
   styleUrl: './ranking.component.css'
 })
-export class RankingComponent {
+export class RankingComponent implements OnInit {
+  // Variables
+  agricultores: Agricult[] = [];
+  cultivos: Cultive[] = [];
+  genero: Gender[] = [];
+  generoCargado: boolean = false;
+  cultivoCargado: boolean = false;
+  sumaArea:number=0;
 
+  // Variables para el filtrado y selección
+  searchGeneroTerm: string = '';
+  filteredGenderOptions: Gender[] = [];
+  selectedGeneroId: number | null = null;
+  selectedCultivosIds: number[] = [];
+  selectedFamilia: string = 'todas';
+  familias: string[] = [];
+
+  constructor(
+    private genderService: GenderService,
+    private cultivoService: CultivoService
+  ) {}
+
+  ngOnInit(): void {
+    // Cargamos los géneros
+    this.genderService.get().subscribe(
+      (data) => {
+        this.genero = data;
+        this.genero.sort((a, b) => a.nombreGenero.localeCompare(b.nombreGenero));
+        this.filteredGenderOptions = [...this.genero]; // Inicializamos lista filtrada
+        this.generoCargado = true;
+        
+        // Extraemos las familias únicas para el filtro
+        this.extractFamilias();
+        
+        this.checkDatos();
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+
+    // Cargamos los cultivos
+    this.cultivoService.getAll().subscribe(
+      (data) => {
+        this.cultivos = data;
+        this.cultivoCargado = true;
+        this.checkDatos();
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  }
+
+  // Extraer las familias únicas de los géneros cargados
+  extractFamilias() {
+    const familiasSet = new Set<string>();
+    this.genero.forEach(g => {
+      if (g.nombreFamilia) {
+        familiasSet.add(g.nombreFamilia);
+      }
+    });
+    this.familias = Array.from(familiasSet).sort();
+  }
+
+  // Verificar si los datos están cargados
+  checkDatos() {
+    if (!this.cultivoCargado || !this.generoCargado) {
+      return;
+    } else {
+      this.tabla();
+    }
+  }
+
+  // Maneja el cambio de búsqueda de géneros
+  onSearchGenero() {
+    this.applyFilters();
+  }
+
+  // Maneja el cambio de familia seleccionada
+  onFamilyChange() {
+    this.applyFilters();
+  }
+
+  // Aplicar filtros de búsqueda y familia
+  applyFilters() {
+    let filtered = [...this.genero];
+    
+    // Filtrar por término de búsqueda
+    if (this.searchGeneroTerm && this.searchGeneroTerm.trim() !== '') {
+      const searchTerm = this.searchGeneroTerm.toLowerCase().trim();
+      filtered = filtered.filter(g => 
+        g.nombreGenero.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    // Filtrar por familia seleccionada
+    if (this.selectedFamilia !== 'todas') {
+      filtered = filtered.filter(g => g.nombreFamilia === this.selectedFamilia);
+    }
+    
+    this.filteredGenderOptions = filtered;
+  }
+
+  // Maneja la selección de un género
+  selectGenero(generoId: number) {
+    this.selectedGeneroId = generoId;
+      this.selectedCultivosIds=[];
+    // Si no está en la lista de seleccionados, añadirlo
+    if (!this.selectedCultivosIds.includes(generoId)) {
+      this.selectedCultivosIds.push(generoId);
+    }
+    
+    // Actualizar la tabla con el género seleccionado
+    this.tabla();
+  }
+
+  // Limpiar filtros
+  limpiarFiltros() {
+    this.searchGeneroTerm = '';
+    this.selectedFamilia = 'todas';
+    this.filteredGenderOptions = [...this.genero];
+  }
+
+  // Métodos para la interfaz de usuario
+  toggleView(view: 'todos' | 'seleccionados') {
+    // Implementar cambio de vista entre todos los géneros y solo los seleccionados
+    if (view === 'seleccionados') {
+      this.filteredGenderOptions = this.genero.filter(g => 
+        this.selectedCultivosIds.includes(g.idGenero)
+      );
+    } else {
+      // Volver a aplicar los filtros actuales
+      this.applyFilters();
+    }
+  }
+
+  // Muestra sólo los generos seleccionados
+  // Esta función se llama cuando se hace clic en el botón "Seleccionados"
+  mostrarSeleccionados() {
+    this.toggleView('seleccionados');
+  }
+
+  // Muestra todos los géneros aplicando los filtros actuales
+  // Esta función se llama cuando se hace clic en el botón "Todos"
+  mostrarTodos() {
+    this.toggleView('todos');
+  }
+
+  // Genera la tabla con los datos filtrados - mantenida para compatibilidad
+  tabla() {
+   // Limpiamos la lista de agricultores
+   this.agricultores = [];
+
+   // Si se seleccionó 'todos' o no hay selección, mostrar todos
+   if (this.selectedGeneroId === null) {
+     for (let i = 0; i < this.cultivos.length; i++) {
+       this.agricultores.push({
+         pos: i + 1,
+         nombre: this.cultivos[i].nombreAgricultor,
+         provincia: this.cultivos[i].provincia,
+         nombreCultivo: this.cultivos[i].nombreGenero,
+         superficie: this.cultivos[i].superficie,
+         producc: this.cultivos[i].produccionEstimada,
+         kgm2:  this.cultivos[i].produccionEstimada ?? 0 / this.cultivos[i].superficie
+       });
+     }
+   } else {
+     // Filtrar cultivos por el género seleccionado
+     const cultivosFiltrados = this.cultivos.filter(
+       c => c.idGenero === this.selectedGeneroId
+     );
+     
+     for (let i = 0; i < cultivosFiltrados.length; i++) {
+       this.agricultores.push({
+         pos: i + 1,
+         nombre: cultivosFiltrados[i].nombreAgricultor,
+         provincia: cultivosFiltrados[i].provincia,
+         nombreCultivo: cultivosFiltrados[i].nombreGenero,
+         superficie: cultivosFiltrados[i].superficie,
+         producc: cultivosFiltrados[i].produccionEstimada,
+         kgm2: cultivosFiltrados[i].produccionEstimada ?? 0/ cultivosFiltrados[i].superficie 
+       });
+     }
+   }
+  this.sumaArea=this.agricultores.reduce((a,b)=>a+b.superficie,0)
+  }
 }

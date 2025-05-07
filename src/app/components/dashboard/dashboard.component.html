@@ -1,7 +1,7 @@
 <!-- dashboard.component.html - Versión responsiva completa -->
 <div
   class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-2 sm:p-4 md:p-6">
-  <div class="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+  <div class="max-w-full mx-auto space-y-4 sm:space-y-6">
     <!-- Header con logo y título -->
     <div
       class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-4 md:p-6">
@@ -41,7 +41,7 @@
       </div>
     </div>
 
-    <div class="container mx-auto">
+    <div class="container-fluid w-full mx-auto">
       <!-- Panel de Géneros de Cultivos -->
       <div
         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md w-full mx-auto">
@@ -153,7 +153,7 @@
               </svg>
             </div>
             <button (click)="borrarFiltros()"
-              class="h-9 px-3 text-xs border border-gray-200 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300">Limpiar
+              class="h-9 px-3 text-xs border border-gray-200 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300" [ngClass]="{'bg-indigo-600 text-white hover:bg-indigo-700':seleccionados>0}">Limpiar
               filtros</button>
           </div>
         </div>
@@ -165,7 +165,7 @@
             <!-- Categoría: Cereales -->
             <div class="mb-4">
               <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{{familia.familia}}</h3>
-              <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3">
+              <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 @for(nombre of familia.nombreGenero; track nombre){
                 <div class="flex items-center group">
                   <input type="radio" (click)="contarSeleccionados()" name="genero" [value]="nombre"
@@ -265,7 +265,7 @@
                 'bg-white dark:bg-gray-800 text-indigo-600 shadow-sm': vistaSeleccionada === 'mes',
                 'text-gray-700 dark:text-gray-300': vistaSeleccionada !== 'mes'
               }" class="py-1.5 px-2 sm:px-3 text-xs font-medium rounded-md flex-1 sm:flex-none" value="mes">
-              Mes
+              Semestre
             </button>
 
             <button (click)="actualizarGrafica('año')" [ngClass]="{

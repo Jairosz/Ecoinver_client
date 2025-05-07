@@ -200,7 +200,7 @@ export class DashboardComponent implements OnInit {
         genero = checkbox.value;
       }
     }
-    let cultivo: Cultive[];
+    let cultivo: Cultive[] = [];
     const generosSeleccionados = this.comNeeds.filter(item => item.nombreGenero == genero);//Obtenemos las necesidades con el nombre de género especificado
 
     if (generosSeleccionados[0]) {
@@ -371,11 +371,19 @@ export class DashboardComponent implements OnInit {
     };
 
     //Para saber los nombres de fincas de las producciones
-    let production: string[] = [];
-    for (let i = 0; i < this.cultive.length; i++) {
-      production[i] = this.cultive[i].nombreFinca;
+    let production: Cultive[] = [];
+    for (let i = 0; i < this.cultiveProductions.length; i++) {
+
+      const encontrados = cultivo.filter(item => item.id == this.cultiveProductions[i].cultiveId);
+
+      if (encontrados.length > 0 && !production.some(item => item.id == this.cultiveProductions[i].cultiveId)) {
+
+        production = production.concat(encontrados);
+      }
     }
 
+
+    console.log(production);
     // Gráfico principal (combinado)    
     this.data = {
       labels: label,
@@ -428,7 +436,7 @@ export class DashboardComponent implements OnInit {
         }
       ]
     };
-
+    const tipo = this.chartType;
     this.options = {
       responsive: true,
       maintainAspectRatio: false,
@@ -489,9 +497,21 @@ export class DashboardComponent implements OnInit {
               const dataValue = tooltipItem.raw;
               const index = tooltipItem.dataIndex;
               const datasetIndex = tooltipItem.datasetIndex;
-
               let tipoDato = datasetIndex === 0 ? 'Necesidades Comerciales' : 'Producción';
-              let cliente = datasetIndex === 0 ? clientes[index] : production;
+              let cliente = '';
+
+              if (tipo == 'combined') {
+                if (datasetIndex === 0) {
+                  cliente = clientes[index];
+                }
+                else {
+                  for (let i = 0; i < production.length; i++) {
+                    cliente += production[i].nombreFinca + '-';
+                  }
+                }
+              }
+
+
 
               if (dataValue === 0) {
                 return `${tipoDato} : Sin datos`;
@@ -749,11 +769,15 @@ export class DashboardComponent implements OnInit {
     this.familiaSeleccionada = '';
     this.nombreComerciales = '';
     this.selectedGenderIds = '';
+
+
     const checkboxes = document.querySelectorAll('input[type="radio"]');
     for (let i = 0; i < checkboxes.length; i++) {
       let checkbox = checkboxes[i] as HTMLInputElement;
       checkbox.checked = false;
     }
+    this.selectedProductions = [];
+    this.getInfoPanelData();
     this.seleccionados = 0;
     // Gráfico principal 
     switch (this.vistaSeleccionada) {
@@ -776,6 +800,32 @@ export class DashboardComponent implements OnInit {
               tension: 0.4,
               spanGaps: true,
               yAxisID: 'y1'
+            }
+          ]
+        };
+        this.commercialData = {
+          labels: ['Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio'],
+          datasets: [
+            {
+              label: 'Necesidad comercial',
+              data: [0, 0, 0, 0, 0, 0, 0],
+              borderColor: '#4f46e5', // Color indigo para Tailwind           
+              tension: 0.4,
+              spanGaps: true,
+              yAxisID: 'y'
+            }
+          ]
+        };
+        this.productionData = {
+          labels: ['Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio'],
+          datasets: [
+            {
+              label: 'Producción cultivo',
+              data: [0, 0, 0, 0, 0, 0, 0],
+              borderColor: '#10b981', // Color emerald para Tailwind           
+              tension: 0.4,
+              spanGaps: true,
+              yAxisID: 'y'
             }
           ]
         };
@@ -802,6 +852,32 @@ export class DashboardComponent implements OnInit {
             }
           ]
         };
+        this.commercialData = {
+          labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4', 'Semana 5'],
+          datasets: [
+            {
+              label: 'Necesidad comercial',
+              data: [0, 0, 0, 0, 0],
+              borderColor: '#4f46e5', // Color indigo para Tailwind           
+              tension: 0.4,
+              spanGaps: true,
+              yAxisID: 'y'
+            }
+          ]
+        };
+        this.productionData = {
+          labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4', 'Semana 5'],
+          datasets: [
+            {
+              label: 'Producción cultivo',
+              data: [0, 0, 0, 0, 0],
+              borderColor: '#10b981', // Color emerald para Tailwind           
+              tension: 0.4,
+              spanGaps: true,
+              yAxisID: 'y'
+            }
+          ]
+        };
         break;
       case 'año':
         this.data = {
@@ -822,6 +898,32 @@ export class DashboardComponent implements OnInit {
               tension: 0.4,
               spanGaps: true,
               yAxisID: 'y1'
+            }
+          ]
+        };
+        this.commercialData = {
+          labels: ['Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto'],
+          datasets: [
+            {
+              label: 'Necesidad comercial',
+              data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              borderColor: '#4f46e5', // Color indigo para Tailwind           
+              tension: 0.4,
+              spanGaps: true,
+              yAxisID: 'y'
+            }
+          ]
+        };
+        this.productionData = {
+          labels: ['Septiembre', 'Octubre', 'Noviembre', 'Diciembre', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto'],
+          datasets: [
+            {
+              label: 'Producción cultivo',
+              data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              borderColor: '#10b981', // Color emerald para Tailwind           
+              tension: 0.4,
+              spanGaps: true,
+              yAxisID: 'y'
             }
           ]
         };
@@ -857,11 +959,11 @@ export class DashboardComponent implements OnInit {
         genero = checkbox.value;
       }
     }
-
+    let cultivo: Cultive[] = [];
     const generosSeleccionados = this.comNeeds.filter(item => item.nombreGenero == genero);//Obtenemos las necesidades con el nombre de género especificado
-
+    const tipo = this.chartType;
     if (generosSeleccionados[0]) {
-      this.cultive = this.cultive.filter(item => item.idGenero == generosSeleccionados[0].idGenero);
+      cultivo = this.cultive.filter(item => item.idGenero == generosSeleccionados[0].idGenero);
 
       for (let i = 0; i < this.cultive.length; i++) {
         if (this.cultiveProductions.filter(item => item.cultiveId == this.cultive[i].id && !this.selectedProductions.some(p => p.cultiveId === item.cultiveId))) {
@@ -891,9 +993,16 @@ export class DashboardComponent implements OnInit {
     }
 
     //Para saber los nombres de fincas de las producciones
-    let production: string[] = [];
-    for (let i = 0; i < this.cultive.length; i++) {
-      production[i] = this.cultive[i].nombreFinca;
+    //Para saber los nombres de fincas de las producciones
+    let production: Cultive[] = [];
+    for (let i = 0; i < this.cultiveProductions.length; i++) {
+
+      const encontrados = cultivo.filter(item => item.id == this.cultiveProductions[i].cultiveId);
+
+      if (encontrados.length > 0 && !production.some(item => item.id == this.cultiveProductions[i].cultiveId)) {
+
+        production = production.concat(encontrados);
+      }
     }
 
     switch (vista) {
@@ -1095,9 +1204,29 @@ export class DashboardComponent implements OnInit {
                   const dataValue = tooltipItem.raw;
                   const index = tooltipItem.dataIndex;
                   const datasetIndex = tooltipItem.datasetIndex;
-
                   let tipoDato = datasetIndex === 0 ? 'Necesidades Comerciales' : 'Producción';
-                  let cliente = datasetIndex === 0 ? clientes[index] : production[index];
+                  let cliente = '';
+                  if (tipo == 'commercial') {
+                    tipoDato = 'Necesidades Comerciales';
+                    cliente = clientes[index];
+                  }
+                  else if (tipo == 'production') {
+                    tipoDato = 'Producción';
+                    for (let i = 0; i < production.length; i++) {
+                      cliente += production[i].nombreFinca + '-';
+                    }
+
+                  }
+                  else if (tipo == 'combined') {
+                    if (datasetIndex === 0) {
+                      cliente = clientes[index];
+                    }
+                    else {
+                      for (let i = 0; i < production.length; i++) {
+                        cliente += production[i].nombreFinca + '-';
+                      }
+                    }
+                  }
 
                   if (dataValue === 0) {
                     return `${tipoDato} : Sin datos`;
@@ -1317,9 +1446,32 @@ export class DashboardComponent implements OnInit {
                   const dataValue = tooltipItem.raw;
                   const index = tooltipItem.dataIndex;
                   const datasetIndex = tooltipItem.datasetIndex;
-
                   let tipoDato = datasetIndex === 0 ? 'Necesidades Comerciales' : 'Producción';
-                  let cliente = datasetIndex === 0 ? clientes2[index] : production[0];
+
+                  let cliente = '';
+                  if (tipo == 'commercial') {
+
+                    cliente = clientes2[index];
+                  }
+                  else if (tipo == 'production') {
+
+                    for (let i = 0; i < production.length; i++) {
+                      cliente += production[i].nombreFinca + '-';
+                    }
+
+                  }
+                  else if (tipo == 'combined') {
+                    if (datasetIndex === 0) {
+                      cliente = clientes2[index];
+                    }
+
+                    else {
+                      for (let i = 0; i < production.length; i++) {
+                        cliente += production[i].nombreFinca + '-';
+                      }
+                    }
+                  }
+
 
                   if (dataValue === 0) {
                     return `${tipoDato} : Sin datos`;
@@ -1529,9 +1681,32 @@ export class DashboardComponent implements OnInit {
                   const dataValue = tooltipItem.raw;
                   const index = tooltipItem.dataIndex;
                   const datasetIndex = tooltipItem.datasetIndex;
-
                   let tipoDato = datasetIndex === 0 ? 'Necesidades Comerciales' : 'Producción';
-                  let cliente = datasetIndex === 0 ? clientes3[index] : production[0];
+
+                  let cliente = '';
+                  if (tipo == 'commercial') {
+
+                    cliente = clientes3[index];
+                  }
+                  else if (tipo == 'production') {
+
+                    for (let i = 0; i < production.length; i++) {
+                      cliente += production[i].nombreFinca + '-';
+                    }
+
+                  }
+                  else if (tipo == 'combined') {
+                    if (datasetIndex == 0) {
+                      cliente = clientes3[index];
+                    }
+                    else {
+                      for (let i = 0; i < production.length; i++) {
+                        cliente += production[i].nombreFinca + '-';
+                      }
+                    }
+                  }
+
+
 
                   if (dataValue === 0) {
                     return `${tipoDato} : Sin datos`;
@@ -1677,8 +1852,9 @@ export class DashboardComponent implements OnInit {
       console.log('Ya se está exportando un PDF, por favor espere...');
       return;
     }
-  
+
     this.isExporting = true;
+
     try {
       // Crear documento PDF con orientación horizontal para mejor presentación
       const doc = new jsPDF('l', 'mm', 'a4');
@@ -1686,13 +1862,13 @@ export class DashboardComponent implements OnInit {
       const pageHeight = doc.internal.pageSize.getHeight();
       const margin = 15;
       const contentWidth = pageWidth - (margin * 2);
-  
+
       // Variable para seguir la página actual
       let currentPage = 1;
-  
+
       // Referencia al contexto this para usar dentro de funciones
       const self = this;
-  
+
       // --- Diseño de cabecera personalizada ---
       const drawHeader = () => {
         // Fondo verde
@@ -1702,32 +1878,32 @@ export class DashboardComponent implements OnInit {
         doc.rect(0, 0, docWidth, headerHeight, 'F');
         var logoWidth = 20;
         var logoHeight = 20;
-  
+
         var logoX = margin;
         var logoY = 4;
-  
+
         // Placeholder para el logo (simplificado)
         const logoData = 'PLACEHOLDER_LOGO';
-  
+
         // Primero dibujamos un círculo/rectángulo blanco como fondo del logo
         var padding = 3; // Tamaño del borde blanco alrededor del logo
         doc.setFillColor(255, 255, 255); // Color blanco
         doc.roundedRect(logoX - padding, logoY - padding,
           logoWidth + (padding * 2), logoHeight + (padding * 2),
           2, 2, 'F');
-  
+
         // Ahora agregamos el logo como texto (placeholder)
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(67, 160, 34);
         doc.setFontSize(10);
         doc.text("LOGO", logoX + 5, logoY + 12);
-  
+
         // Texto - Nota que hemos aumentado la posición X para dejar espacio después del logo
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(22);
         doc.text('Analytics Dashboard', margin + logoWidth + 15, 15); // Ajustado el espacio
-  
+
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(11);
         doc.text(
@@ -1736,19 +1912,19 @@ export class DashboardComponent implements OnInit {
           22
         );
       };
-  
+
       // --- Diseño de pie de página ---
       const drawFooter = (pageNum: number, totalPages: number) => {
         // Línea decorativa
         doc.setDrawColor(200, 200, 200);
         doc.setLineWidth(0.5);
         doc.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
-  
+
         // Texto de pie de página
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(8);
         doc.setTextColor(150, 150, 150);
-  
+
         // Numeración de página
         doc.text(
           `Página ${pageNum} de ${totalPages}`,
@@ -1756,10 +1932,10 @@ export class DashboardComponent implements OnInit {
           pageHeight - 7,
           { align: 'center' }
         );
-  
+
         // Información de la empresa
         doc.text('© 2025 · Ecoinver Dashboard', margin, pageHeight - 7);
-  
+
         // Timestamp en la esquina derecha
         doc.text(
           `Generado: ${new Date().toLocaleTimeString()}`,
@@ -1768,31 +1944,31 @@ export class DashboardComponent implements OnInit {
           { align: 'right' }
         );
       };
-  
+
       // Dibujar la cabecera en la primera página
       drawHeader();
-  
+
       // Posición inicial para el contenido después de la cabecera
       let yPos = 40;
-  
+
       // --- SECCIÓN 1: RESUMEN DE DATOS ---
       // Cuadro resumen con los principales indicadores
       doc.setFillColor(245, 247, 250);
       doc.setDrawColor(220, 220, 220);
       doc.roundedRect(margin, yPos, contentWidth, 40, 3, 3, 'FD'); // Aumentado la altura para incluir datos de producción
-  
+
       // Título de la sección
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(12);
       doc.setTextColor(79, 70, 229);
       doc.text('RESUMEN DE DATOS', margin + 5, yPos + 7);
-  
+
       // Dividir el espacio para los indicadores
       const boxWidth = contentWidth / 4;
-  
+
       // Corregir familia seleccionada para asegurar que muestre un valor
       const familiaSeleccionadaText = this.familiaSeleccionada ? this.familiaSeleccionada : 'Todas';
-  
+
       // Indicador 1: Familia seleccionada
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
@@ -1802,12 +1978,12 @@ export class DashboardComponent implements OnInit {
       doc.setFontSize(11);
       doc.setTextColor(50, 50, 50);
       doc.text(familiaSeleccionadaText, margin + 5, yPos + 22);
-  
+
       // Determinar el género seleccionado basado en el ID o usar "Todos" si no hay selección
       const generoSeleccionado = this.selectedGenderIds ?
         (this.genders.find(g => g.nombreGenero === this.selectedGenderIds)?.nombreGenero || this.selectedGenderIds) :
         'Todos';
-  
+
       // Indicador 2: Géneros seleccionados
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
@@ -1817,7 +1993,7 @@ export class DashboardComponent implements OnInit {
       doc.setFontSize(11);
       doc.setTextColor(50, 50, 50);
       doc.text(generoSeleccionado, margin + boxWidth, yPos + 22);
-  
+
       // Indicador 3: Total KGs Necesidades
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
@@ -1827,7 +2003,7 @@ export class DashboardComponent implements OnInit {
       doc.setFontSize(11);
       doc.setTextColor(50, 50, 50);
       doc.text(this.getTotalKgs().toLocaleString(), margin + boxWidth * 2, yPos + 22);
-  
+
       // Indicador 4: Total registros
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
@@ -1837,7 +2013,7 @@ export class DashboardComponent implements OnInit {
       doc.setFontSize(11);
       doc.setTextColor(50, 50, 50);
       doc.text((this.filteredComNeeds ? this.filteredComNeeds.length : 0).toString(), margin + boxWidth * 3, yPos + 22);
-  
+
       // NUEVOS INDICADORES DE PRODUCCIÓN (segunda fila)
       // Indicador 5: Total Producciones
       doc.setFont('helvetica', 'normal');
@@ -1848,7 +2024,7 @@ export class DashboardComponent implements OnInit {
       doc.setFontSize(11);
       doc.setTextColor(50, 50, 50);
       doc.text((this.selectedProductions ? this.selectedProductions.length : 0).toString(), margin + 5, yPos + 37);
-  
+
       // Indicador 6: Total KGs Producción
       // Calcular la suma de kilos ajustados de producción
       let totalKgsProduccion = 0;
@@ -1857,7 +2033,7 @@ export class DashboardComponent implements OnInit {
           return sum + (parseFloat(item.kilosAjustados) || 0);
         }, 0);
       }
-  
+
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(100, 100, 100);
@@ -1866,7 +2042,7 @@ export class DashboardComponent implements OnInit {
       doc.setFontSize(11);
       doc.setTextColor(50, 50, 50);
       doc.text(totalKgsProduccion.toLocaleString(), margin + boxWidth, yPos + 37);
-  
+
       // Indicador 7: Vista seleccionada
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
@@ -1876,7 +2052,7 @@ export class DashboardComponent implements OnInit {
       doc.setFontSize(11);
       doc.setTextColor(50, 50, 50);
       doc.text(this.vistaSeleccionada.toUpperCase(), margin + boxWidth * 2, yPos + 37);
-  
+
       // Indicador 8: Balance (Producción - Necesidades)
       const balance = totalKgsProduccion - this.getTotalKgs();
       doc.setFont('helvetica', 'normal');
@@ -1885,7 +2061,7 @@ export class DashboardComponent implements OnInit {
       doc.text('Balance (Prod. - Nec.):', margin + boxWidth * 3, yPos + 30);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
-  
+
       // Color verde para balance positivo, rojo para negativo
       if (balance >= 0) {
         doc.setTextColor(16, 185, 129); // Verde
@@ -1894,13 +2070,13 @@ export class DashboardComponent implements OnInit {
         doc.setTextColor(239, 68, 68); // Rojo
         doc.text(balance.toLocaleString(), margin + boxWidth * 3, yPos + 37);
       }
-  
+
       yPos += 50; // Aumentado para dar espacio al resumen ampliado
-  
+
       // --- SECCIÓN 2: TABLAS DE DATOS ---
       // Definir el color principal para las tablas
       const colorPrincipal = [79, 70, 229]; // Color principal (indigo)
-  
+
       // Mostrar tablas según el tipo de gráfica seleccionado
       if (this.chartType === 'commercial' || this.chartType === 'combined') {
         // --- TABLA 1: RANKING DE CLIENTES COMERCIALES ---
@@ -1913,34 +2089,34 @@ export class DashboardComponent implements OnInit {
           doc.setFont('helvetica', 'bold');
           doc.setFontSize(12);
           doc.text('RANKING DE CLIENTES COMERCIALES', margin + 5, yPos + 5.5);
-          
+
           // Subtítulo con el género seleccionado
           doc.setFont('helvetica', 'normal');
           doc.setTextColor(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2]);
           doc.text(`Género: ${self.selectedGenderIds}`, margin + contentWidth - 100, yPos + 5.5);
-          
+
           yPos += 12;
-          
+
           // Filtrar solo los comerciales del género seleccionado
           const comercialesGeneroSeleccionado = self.filteredComNeeds.filter(
             item => item.nombreGenero === self.selectedGenderIds
           );
-          
+
           if (comercialesGeneroSeleccionado.length > 0) {
             // Calcular el total de KGs para el género seleccionado
             const totalKgsGenero = comercialesGeneroSeleccionado.reduce(
               (sum, item) => sum + (item.kgs || 0), 0
             );
-            
+
             // Diseño de la tabla de ranking
             const rankHeaders = ["Puesto", "Código Cliente", "KGs", "% del Género", "Nombre Comercial"];
-            
+
             // Preparar datos con porcentajes y ordenar por demanda (descendente)
             const rankData = comercialesGeneroSeleccionado.map(item => {
-              const porcentaje = totalKgsGenero > 0 
-                ? ((item.kgs || 0) / totalKgsGenero * 100).toFixed(2) + '%' 
+              const porcentaje = totalKgsGenero > 0
+                ? ((item.kgs || 0) / totalKgsGenero * 100).toFixed(2) + '%'
                 : '0%';
-                
+
               return [
                 "", // Puesto (se rellena después de ordenar)
                 item.clientCode?.toString() || '-',
@@ -1949,19 +2125,19 @@ export class DashboardComponent implements OnInit {
                 item.clientName || '-'
               ];
             });
-            
+
             // Ordenar por KGs (descendente)
             rankData.sort((a, b) => {
               const kgsA = parseFloat(a[2]);
               const kgsB = parseFloat(b[2]);
               return kgsB - kgsA;
             });
-            
+
             // Asignar puesto en el ranking
             rankData.forEach((row, index) => {
               row[0] = (index + 1).toString();
             });
-            
+
             // Anchos de columna optimizados para ranking
             const rankColWidths = [
               Math.round(contentWidth * 0.10), // 10% para Puesto
@@ -1970,28 +2146,28 @@ export class DashboardComponent implements OnInit {
               Math.round(contentWidth * 0.15), // 15% para % del Género
               Math.round(contentWidth * 0.45)  // 45% para Nombre Comercial
             ];
-            
+
             const rowHeight = 10;
-            
+
             // Estilo para la fila de encabezados
             doc.setFillColor(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2]);
             doc.rect(margin, yPos, contentWidth, rowHeight, 'F');
             doc.setTextColor(255, 255, 255);
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(9);
-            
+
             // Dibujar encabezados
             let xPos = margin;
             rankHeaders.forEach((header, i) => {
               doc.text(header, xPos + 3, yPos + 6.5);
               xPos += rankColWidths[i];
             });
-            
+
             // Dibujar filas de datos
             yPos += rowHeight;
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(8);
-            
+
             rankData.forEach((row, rowIndex) => {
               // Destacar visualmente los tres primeros puestos
               if (rowIndex < 3) {
@@ -2004,7 +2180,7 @@ export class DashboardComponent implements OnInit {
                   doc.setFillColor(205, 127, 50); // Bronce para el 3er puesto
                 }
                 doc.rect(margin, yPos, rankColWidths[0], rowHeight, 'F');
-                
+
                 // Fondo alternado para el resto de la fila
                 doc.setFillColor(240, 242, 251);
                 doc.rect(margin + rankColWidths[0], yPos, contentWidth - rankColWidths[0], rowHeight, 'F');
@@ -2013,13 +2189,13 @@ export class DashboardComponent implements OnInit {
                 doc.setFillColor(240, 242, 251);
                 doc.rect(margin, yPos, contentWidth, rowHeight, 'F');
               }
-              
+
               // Texto de la fila
               xPos = margin;
-              
+
               row.forEach((cell, colIndex) => {
                 const text = String(cell);
-                
+
                 // Dar más énfasis al puesto en el ranking
                 if (colIndex === 0) {
                   doc.setFont('helvetica', 'bold');
@@ -2043,39 +2219,39 @@ export class DashboardComponent implements OnInit {
                   doc.setFont('helvetica', 'normal');
                   doc.setTextColor(70, 70, 70);
                 }
-                
+
                 doc.text(text, xPos + 3, yPos + 6.5);
                 xPos += rankColWidths[colIndex];
               });
-              
+
               yPos += rowHeight;
-              
+
               // Comprobar si necesitamos una nueva página
               if (yPos > pageHeight - 25) {
                 doc.addPage();
                 currentPage++;
                 drawHeader();
                 yPos = 40;
-                
+
                 // Repetir encabezados en la nueva página
                 doc.setFillColor(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2]);
                 doc.rect(margin, yPos, contentWidth, rowHeight, 'F');
                 doc.setTextColor(255, 255, 255);
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(9);
-                
+
                 xPos = margin;
                 rankHeaders.forEach((header, i) => {
                   doc.text(header, xPos + 3, yPos + 6.5);
                   xPos += rankColWidths[i];
                 });
-                
+
                 yPos += rowHeight;
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(8);
               }
             });
-            
+
             // Añadir espacio después de la tabla de ranking
             yPos += 15;
           } else {
@@ -2093,7 +2269,7 @@ export class DashboardComponent implements OnInit {
           yPos += 20;
         }
       }
-  
+
       // Tabla de producción de cultivos (mostrar solo si la vista es producción o combinada)
       if (this.chartType === 'production' || this.chartType === 'combined') {
         // Comprobar si necesitamos una nueva página para la tabla de producción
@@ -2103,7 +2279,7 @@ export class DashboardComponent implements OnInit {
           drawHeader();
           yPos = 40;
         }
-  
+
         // Título de la sección de producción
         doc.setFillColor(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2]);
         doc.rect(margin, yPos, 70, 8, 'F');
@@ -2111,30 +2287,30 @@ export class DashboardComponent implements OnInit {
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(12);
         doc.text('PRODUCCIÓN DE CULTIVOS', margin + 5, yPos + 5.5);
-  
+
         // Subtítulo con el género si está disponible
         if (self.selectedGenderIds) {
           doc.setFont('helvetica', 'normal');
           doc.setTextColor(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2]);
           doc.text(`Género: ${self.selectedGenderIds}`, margin + contentWidth - 100, yPos + 5.5);
         }
-  
+
         yPos += 12;
-  
+
         if (self.selectedProductions && self.selectedProductions.length > 0) {
           // Diseño de la tabla
           const produccionHeaders = ["ID Cultivo", "Finca", "Fecha Inicio", "Fecha Fin", "KGs Ajustados"];
-  
+
           // Procesar datos de producción
           const produccionData = self.selectedProductions.map(item => {
             // Buscar el nombre de la finca asociada al cultivo
             const cultivoInfo = self.cultive.find(c => c.id === item.cultiveId);
             const nombreFinca = cultivoInfo ? cultivoInfo.nombreFinca : '-';
-  
+
             // Formatear fechas
             const fechaInicio = item.fechaInicio ? new Date(item.fechaInicio).toLocaleDateString() : '-';
             const fechaFin = item.fechaFin ? new Date(item.fechaFin).toLocaleDateString() : '-';
-  
+
             return [
               item.cultiveId?.toString() || '-',
               nombreFinca,
@@ -2143,7 +2319,7 @@ export class DashboardComponent implements OnInit {
               item.kilosAjustados?.toString() || '0'
             ];
           });
-  
+
           // Anchos de columna para tabla de producción
           const produccionColWidths = [
             Math.round(contentWidth * 0.15), // 15% para ID Cultivo
@@ -2152,68 +2328,68 @@ export class DashboardComponent implements OnInit {
             Math.round(contentWidth * 0.20), // 20% para Fecha Fin
             Math.round(contentWidth * 0.15)  // 15% para KGs Ajustados
           ];
-  
+
           const rowHeight = 10; // Altura de fila
-  
+
           // Estilo para la fila de encabezados
           doc.setFillColor(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2]);
           doc.rect(margin, yPos, contentWidth, rowHeight, 'F');
           doc.setTextColor(255, 255, 255);
           doc.setFont('helvetica', 'bold');
           doc.setFontSize(9);
-  
+
           // Dibujar encabezados de producción
           let xPos = margin;
           produccionHeaders.forEach((header, i) => {
             doc.text(header, xPos + 3, yPos + 6.5);
             xPos += produccionColWidths[i];
           });
-  
+
           // Dibujar filas de datos de producción
           yPos += rowHeight;
           doc.setFont('helvetica', 'normal');
           doc.setFontSize(8);
-  
+
           produccionData.forEach((row, rowIndex) => {
             // Alternar color de fondo para las filas
             if (rowIndex % 2 === 0) {
               doc.setFillColor(240, 242, 251);
               doc.rect(margin, yPos, contentWidth, rowHeight, 'F');
             }
-  
+
             // Texto de la fila
             doc.setTextColor(70, 70, 70);
             xPos = margin;
-  
+
             // Procesar todas las columnas
             row.forEach((cell, colIndex) => {
               const text = String(cell);
               doc.text(text, xPos + 3, yPos + 6.5);
               xPos += produccionColWidths[colIndex];
             });
-  
+
             yPos += rowHeight;
-  
+
             // Comprobar si necesitamos una nueva página
             if (yPos > pageHeight - 25) {
               doc.addPage();
               currentPage++;
               drawHeader();
               yPos = 40;
-  
+
               // Repetir encabezados en la nueva página
               doc.setFillColor(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2]);
               doc.rect(margin, yPos, contentWidth, rowHeight, 'F');
               doc.setTextColor(255, 255, 255);
               doc.setFont('helvetica', 'bold');
               doc.setFontSize(9);
-  
+
               xPos = margin;
               produccionHeaders.forEach((header, i) => {
                 doc.text(header, xPos + 3, yPos + 6.5);
                 xPos += produccionColWidths[i];
               });
-  
+
               yPos += rowHeight;
               doc.setFont('helvetica', 'normal');
               doc.setFontSize(8);
@@ -2227,24 +2403,24 @@ export class DashboardComponent implements OnInit {
           yPos += 20;
         }
       }
-  
+
       // --- SECCIÓN 3: GRÁFICA (AL FINAL DEL PDF) ---
       // Agregar nueva página dedicada a la gráfica para aprovechar todo el espacio
       doc.addPage();
       currentPage++;
       drawHeader();
       yPos = 40;
-  
+
       // Título de sección para la gráfica
       doc.setFillColor(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2]);
       doc.rect(margin, yPos, contentWidth, 10, 'F');
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
-      
+
       // Ajustar el título según el tipo de gráfica seleccionado
       let tipoGrafica = '';
-      switch(this.chartType) {
+      switch (this.chartType) {
         case 'commercial':
           tipoGrafica = 'COMERCIAL';
           break;
@@ -2257,20 +2433,20 @@ export class DashboardComponent implements OnInit {
         default:
           tipoGrafica = '';
       }
-      
+
       doc.text(`VISUALIZACIÓN GRÁFICA ${tipoGrafica} - ${this.vistaSeleccionada.toUpperCase()}`, pageWidth / 2, yPos + 6.5, { align: 'center' });
-  
+
       yPos += 15;
-  
+
       // Crear un contenedor más amplio para la gráfica que aproveche todo el ancho
       const graphHeight = 120; // Altura aumentada para mejor visualización
       doc.setDrawColor(220, 220, 220);
       doc.setLineWidth(0.5);
       doc.rect(margin, yPos, contentWidth, graphHeight, 'S');
-  
+
       // Determinar qué canvas capturar según el tipo de gráfica
       let chartSelector = '';
-      switch(this.chartType) {
+      switch (this.chartType) {
         case 'commercial':
           chartSelector = '.commercial-chart canvas';
           break;
@@ -2281,18 +2457,18 @@ export class DashboardComponent implements OnInit {
         default:
           chartSelector = '.w-full.h-60.sm\\:h-72.md\\:h-80 > canvas';
       }
-  
+
       // Capturar e insertar la gráfica apropiada
       const chartCanvas = document.querySelector(chartSelector) as HTMLCanvasElement;
       const chartContainer = document.querySelector('.w-full.h-60.sm\\:h-72.md\\:h-80') as HTMLElement;
-  
+
       if (chartCanvas || chartContainer) {
         // Si tenemos acceso al canvas directamente
         if (chartCanvas) {
           try {
             const imgData = chartCanvas.toDataURL('image/png');
             doc.addImage(imgData, 'PNG', margin + 2, yPos + 2, contentWidth - 4, graphHeight - 4);
-  
+
             finalizarPDF();
           } catch (e) {
             console.error('Error al capturar el canvas de la gráfica:', e);
@@ -2308,12 +2484,12 @@ export class DashboardComponent implements OnInit {
         doc.text('No se pudo encontrar la gráfica para incluir en el informe.', margin + 5, yPos + graphHeight / 2);
         finalizarPDF();
       }
-  
+
       // Función para capturar la gráfica con html2canvas
       function capturarGraficaConHtml2Canvas() {
         // Mensaje de estado mientras se procesa
         doc.text('Procesando gráfica...', margin + 5, yPos + graphHeight / 2);
-  
+
         // Intentar capturar la gráfica
         html2canvas(chartContainer, {
           scale: 3,
@@ -2327,181 +2503,185 @@ export class DashboardComponent implements OnInit {
               try {
                 const htmlEl = el as HTMLElement;
                 const style = window.getComputedStyle(htmlEl);
-  
+
                 // Propiedades que podrían usar
-                  // Propiedades que podrían usar oklch
-              ['color', 'backgroundColor', 'borderColor'].forEach(prop => {
-                const value = style[prop as keyof CSSStyleDeclaration];
-                if (typeof value === 'string' && value.includes('oklch')) {
-                  if (prop === 'color') htmlEl.style.color = '#333333';
-                  if (prop === 'backgroundColor') htmlEl.style.backgroundColor = '#ffffff';
-                  if (prop === 'borderColor') htmlEl.style.borderColor = '#cccccc';
-                }
-              });
-            } catch (e) {
-              console.log('Error: ' + e);
-            }
-          });
-          return documentClone;
-        }
-      }).then(canvas => {
-        // Añadir la imagen capturada al PDF
-        const imgData = canvas.toDataURL('image/png');
+                // Propiedades que podrían usar oklch
+                ['color', 'backgroundColor', 'borderColor'].forEach(prop => {
+                  const value = style[prop as keyof CSSStyleDeclaration];
+                  if (typeof value === 'string' && value.includes('oklch')) {
+                    if (prop === 'color') htmlEl.style.color = '#333333';
+                    if (prop === 'backgroundColor') htmlEl.style.backgroundColor = '#ffffff';
+                    if (prop === 'borderColor') htmlEl.style.borderColor = '#cccccc';
+                  }
+                });
+              } catch (e) {
+                console.log('Error: ' + e);
+              }
+            });
+            return documentClone;
+          }
+        }).then(canvas => {
+          // Añadir la imagen capturada al PDF
+          const imgData = canvas.toDataURL('image/png');
 
-        // Limpiar el mensaje de "Procesando..."
-        doc.setFillColor(255, 255, 255);
-        doc.rect(margin + 5, yPos + graphHeight / 2 - 5, 100, 10, 'F');
+          // Limpiar el mensaje de "Procesando..."
+          doc.setFillColor(255, 255, 255);
+          doc.rect(margin + 5, yPos + graphHeight / 2 - 5, 100, 10, 'F');
 
-        // Añadir la imagen aprovechando todo el espacio disponible
-        doc.addImage(imgData, 'PNG', margin + 2, yPos + 2, contentWidth - 4, graphHeight - 4);
+          // Añadir la imagen aprovechando todo el espacio disponible
+          doc.addImage(imgData, 'PNG', margin + 2, yPos + 2, contentWidth - 4, graphHeight - 4);
 
-        finalizarPDF();
-      }).catch(e => {
-        console.error('Error al capturar la gráfica con html2canvas:', e);
-        doc.text('No se pudo incluir la gráfica debido a un error técnico.', margin + 5, yPos + graphHeight / 2);
-        finalizarPDF();
-      });
-    }
-
-    // Función para finalizar el PDF
-    function finalizarPDF() {
-      // --- Finalizar PDF con pies de página ---
-      const totalPages = doc.internal.pages.length - 1;
-
-      // Añadir pie de página a todas las páginas
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        drawFooter(i, totalPages);
+          finalizarPDF();
+        }).catch(e => {
+          console.error('Error al capturar la gráfica con html2canvas:', e);
+          doc.text('No se pudo incluir la gráfica debido a un error técnico.', margin + 5, yPos + graphHeight / 2);
+          finalizarPDF();
+        });
       }
 
-      // Mostrar la vista previa
-      self.showPdfPreview(doc);
+      // Función para finalizar el PDF
+      function finalizarPDF() {
+        // --- Finalizar PDF con pies de página ---
+        const totalPages = doc.internal.pages.length - 1;
+
+        // Añadir pie de página a todas las páginas
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          drawFooter(i, totalPages);
+        }
+
+        // Mostrar la vista previa
+        self.showPdfPreview(doc);
+      }
+    } catch (error) {
+      console.error('Error al generar el PDF:', error);
+      alert('No se pudo generar el PDF. Por favor, inténtelo de nuevo.');
     }
-  } catch (error) {
-    console.error('Error al generar el PDF:', error);
-    alert('No se pudo generar el PDF. Por favor, inténtelo de nuevo.');
+    finally {
+      setTimeout(() => {
+        this.isExporting = false;
+      }, 3000);
+
+
+    }
   }
-  finally {
-    this.isExporting = false;
+
+  // Método para mostrar la vista previa del PDF
+  showPdfPreview(pdfDoc: jsPDF): void {
+    // Generar blob y URL de datos para el PDF
+    const pdfBlob = pdfDoc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+
+    // Crear modal para la vista previa
+    const modalOverlay = document.createElement('div');
+    modalOverlay.style.position = 'fixed';
+    modalOverlay.style.top = '0';
+    modalOverlay.style.left = '0';
+    modalOverlay.style.right = '0';
+    modalOverlay.style.bottom = '0';
+    modalOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    modalOverlay.style.zIndex = '10000';
+    modalOverlay.style.display = 'flex';
+    modalOverlay.style.flexDirection = 'column';
+    modalOverlay.style.alignItems = 'center';
+    modalOverlay.style.justifyContent = 'center';
+
+    // Header del modal con título y botón de cerrar
+    const modalHeader = document.createElement('div');
+    modalHeader.style.width = '80%';
+    modalHeader.style.backgroundColor = '#437d3f';
+    modalHeader.style.color = 'white';
+    modalHeader.style.padding = '10px 20px';
+    modalHeader.style.display = 'flex';
+    modalHeader.style.justifyContent = 'space-between';
+    modalHeader.style.alignItems = 'center';
+    modalHeader.style.borderTopLeftRadius = '8px';
+    modalHeader.style.borderTopRightRadius = '8px';
+
+    const modalTitle = document.createElement('h3');
+    modalTitle.textContent = 'Vista previa del PDF';
+    modalTitle.style.margin = '0';
+
+    const closeButton = document.createElement('button');
+    closeButton.textContent = '×';
+    closeButton.style.background = 'none';
+    closeButton.style.border = 'none';
+    closeButton.style.color = 'white';
+    closeButton.style.fontSize = '24px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.padding = '0 5px';
+    closeButton.onclick = () => {
+      document.body.removeChild(modalOverlay);
+      // Liberar la URL del objeto para evitar fugas de memoria
+      URL.revokeObjectURL(pdfUrl);
+    };
+
+    modalHeader.appendChild(modalTitle);
+    modalHeader.appendChild(closeButton);
+
+    // Contenido del modal - iframe para mostrar el PDF
+    const modalContent = document.createElement('div');
+    modalContent.style.width = '80%';
+    modalContent.style.height = '80vh';
+    modalContent.style.backgroundColor = 'white';
+
+    const pdfIframe = document.createElement('iframe');
+    pdfIframe.style.width = '100%';
+    pdfIframe.style.height = '100%';
+    pdfIframe.style.border = 'none';
+    pdfIframe.src = pdfUrl;
+
+    modalContent.appendChild(pdfIframe);
+
+    // Footer del modal con botones
+    const modalFooter = document.createElement('div');
+    modalFooter.style.width = '80%';
+    modalFooter.style.backgroundColor = 'white';
+    modalFooter.style.padding = '15px 20px';
+    modalFooter.style.display = 'flex';
+    modalFooter.style.justifyContent = 'flex-end';
+    modalFooter.style.gap = '10px';
+    modalFooter.style.borderBottomLeftRadius = '8px';
+    modalFooter.style.borderBottomRightRadius = '8px';
+    modalFooter.style.borderTop = '1px solid #e2e8f0';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'Cancelar';
+    cancelButton.style.padding = '8px 16px';
+    cancelButton.style.backgroundColor = '#e2e8f0';
+    cancelButton.style.color = '#1e293b';
+    cancelButton.style.border = 'none';
+    cancelButton.style.borderRadius = '4px';
+    cancelButton.style.cursor = 'pointer';
+    cancelButton.onclick = () => {
+      document.body.removeChild(modalOverlay);
+      URL.revokeObjectURL(pdfUrl);
+    };
+
+    const downloadButton = document.createElement('button');
+    downloadButton.textContent = 'Descargar PDF';
+    downloadButton.style.padding = '8px 16px';
+    downloadButton.style.backgroundColor = '#437d3f';
+    downloadButton.style.color = 'white';
+    downloadButton.style.border = 'none';
+    downloadButton.style.borderRadius = '4px';
+    downloadButton.style.cursor = 'pointer';
+    downloadButton.onclick = () => {
+      // Descargar el PDF
+      pdfDoc.save('analytics-dashboard.pdf');
+      document.body.removeChild(modalOverlay);
+      URL.revokeObjectURL(pdfUrl);
+    };
+
+    modalFooter.appendChild(cancelButton);
+    modalFooter.appendChild(downloadButton);
+
+    // Ensamblar el modal completo
+    modalOverlay.appendChild(modalHeader);
+    modalOverlay.appendChild(modalContent);
+    modalOverlay.appendChild(modalFooter);
+
+    // Añadir el modal al body
+    document.body.appendChild(modalOverlay);
   }
-}
-
-// Método para mostrar la vista previa del PDF
-showPdfPreview(pdfDoc: jsPDF): void {
-  // Generar blob y URL de datos para el PDF
-  const pdfBlob = pdfDoc.output('blob');
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-
-  // Crear modal para la vista previa
-  const modalOverlay = document.createElement('div');
-  modalOverlay.style.position = 'fixed';
-  modalOverlay.style.top = '0';
-  modalOverlay.style.left = '0';
-  modalOverlay.style.right = '0';
-  modalOverlay.style.bottom = '0';
-  modalOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-  modalOverlay.style.zIndex = '10000';
-  modalOverlay.style.display = 'flex';
-  modalOverlay.style.flexDirection = 'column';
-  modalOverlay.style.alignItems = 'center';
-  modalOverlay.style.justifyContent = 'center';
-
-  // Header del modal con título y botón de cerrar
-  const modalHeader = document.createElement('div');
-  modalHeader.style.width = '80%';
-  modalHeader.style.backgroundColor = '#437d3f';
-  modalHeader.style.color = 'white';
-  modalHeader.style.padding = '10px 20px';
-  modalHeader.style.display = 'flex';
-  modalHeader.style.justifyContent = 'space-between';
-  modalHeader.style.alignItems = 'center';
-  modalHeader.style.borderTopLeftRadius = '8px';
-  modalHeader.style.borderTopRightRadius = '8px';
-
-  const modalTitle = document.createElement('h3');
-  modalTitle.textContent = 'Vista previa del PDF';
-  modalTitle.style.margin = '0';
-
-  const closeButton = document.createElement('button');
-  closeButton.textContent = '×';
-  closeButton.style.background = 'none';
-  closeButton.style.border = 'none';
-  closeButton.style.color = 'white';
-  closeButton.style.fontSize = '24px';
-  closeButton.style.cursor = 'pointer';
-  closeButton.style.padding = '0 5px';
-  closeButton.onclick = () => {
-    document.body.removeChild(modalOverlay);
-    // Liberar la URL del objeto para evitar fugas de memoria
-    URL.revokeObjectURL(pdfUrl);
-  };
-
-  modalHeader.appendChild(modalTitle);
-  modalHeader.appendChild(closeButton);
-
-  // Contenido del modal - iframe para mostrar el PDF
-  const modalContent = document.createElement('div');
-  modalContent.style.width = '80%';
-  modalContent.style.height = '80vh';
-  modalContent.style.backgroundColor = 'white';
-
-  const pdfIframe = document.createElement('iframe');
-  pdfIframe.style.width = '100%';
-  pdfIframe.style.height = '100%';
-  pdfIframe.style.border = 'none';
-  pdfIframe.src = pdfUrl;
-
-  modalContent.appendChild(pdfIframe);
-
-  // Footer del modal con botones
-  const modalFooter = document.createElement('div');
-  modalFooter.style.width = '80%';
-  modalFooter.style.backgroundColor = 'white';
-  modalFooter.style.padding = '15px 20px';
-  modalFooter.style.display = 'flex';
-  modalFooter.style.justifyContent = 'flex-end';
-  modalFooter.style.gap = '10px';
-  modalFooter.style.borderBottomLeftRadius = '8px';
-  modalFooter.style.borderBottomRightRadius = '8px';
-  modalFooter.style.borderTop = '1px solid #e2e8f0';
-
-  const cancelButton = document.createElement('button');
-  cancelButton.textContent = 'Cancelar';
-  cancelButton.style.padding = '8px 16px';
-  cancelButton.style.backgroundColor = '#e2e8f0';
-  cancelButton.style.color = '#1e293b';
-  cancelButton.style.border = 'none';
-  cancelButton.style.borderRadius = '4px';
-  cancelButton.style.cursor = 'pointer';
-  cancelButton.onclick = () => {
-    document.body.removeChild(modalOverlay);
-    URL.revokeObjectURL(pdfUrl);
-  };
-
-  const downloadButton = document.createElement('button');
-  downloadButton.textContent = 'Descargar PDF';
-  downloadButton.style.padding = '8px 16px';
-  downloadButton.style.backgroundColor = '#437d3f';
-  downloadButton.style.color = 'white';
-  downloadButton.style.border = 'none';
-  downloadButton.style.borderRadius = '4px';
-  downloadButton.style.cursor = 'pointer';
-  downloadButton.onclick = () => {
-    // Descargar el PDF
-    pdfDoc.save('analytics-dashboard.pdf');
-    document.body.removeChild(modalOverlay);
-    URL.revokeObjectURL(pdfUrl);
-  };
-
-  modalFooter.appendChild(cancelButton);
-  modalFooter.appendChild(downloadButton);
-
-  // Ensamblar el modal completo
-  modalOverlay.appendChild(modalHeader);
-  modalOverlay.appendChild(modalContent);
-  modalOverlay.appendChild(modalFooter);
-
-  // Añadir el modal al body
-  document.body.appendChild(modalOverlay);
-}
 }

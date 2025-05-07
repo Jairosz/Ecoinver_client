@@ -91,7 +91,7 @@
             fill="none" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"></circle>
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M8 12l2 2 6-6"/>
+              d="M8 12l2 2 6-6" />
           </svg>
           <h3 class="mb-5 text-lg font-normal text-gray-700 dark:text-gray-300">Los datos se han guardado correctamente
           </h3>
@@ -280,7 +280,7 @@
               Kilogramos a planificar
             </label>
             <div class="relative">
-              
+
               <input type="number" placeholder="0" [formControlName]="i" (input)="resumen()"
                 [value]="planningEditar[i] ? planningEditar[i].kilos:''"
                 class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg w-full p-2.5 pr-12 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-800 dark:focus:border-indigo-700" />
@@ -301,9 +301,9 @@
             Guardar
           </button>
           }
-          @if((planningEditar[i] && planningEditar[i].kilos) || (planningEditar.length > 0 && planningEditar.length != semanas.length)) {
-            
-            
+          @if((planningEditar[i] && planningEditar[i].kilos!==undefined) || (planningEditar.length > 0 &&
+          planningEditar.length !=
+          semanas.length)) {
           <button type="button"
             class="hover:cursor-pointer px-3 py-1.5 bg-indigo-50 text-indigo-700 text-sm font-medium rounded-lg hover:bg-indigo-100 transition-colors dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50"
             (click)="habilitarBoton(i)">
@@ -315,7 +315,7 @@
       </div>
       }
     </div>
-  }
+    }
   </form>
   <!-- Mensaje cuando no hay semanas - más atractivo -->
   <div *ngIf="!semanas?.length"
