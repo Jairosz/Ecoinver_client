@@ -539,65 +539,75 @@ buscarCultivosEnQuincena(quincena: Quincena): void {
    * Busca si existen datos guardados para la quincena seleccionada
    * y los carga si existen
    */
-  buscarDatosQuincena(): void {
-    // Buscamos si existe una planificación con el mismo ID que la quincena
-    const planificacionId = this.selectedQuincena;
-    
-    // Verificar si existe una planificación numérica con el mismo nombre que la quincena
-    this.cultivoPlanningService.getAllCultivePlannings().subscribe(
-      (planificaciones) => {
-        // Buscar una planificación cuyo nombre coincida con la quincena seleccionada
-        const quincena = this.quincenas.find(q => q.id === this.selectedQuincena);
-        if (!quincena) {
-          console.error('No se encontró la quincena seleccionada');
-          return;
-        }
-        
-        // Encontrar planificación por nombre
-        const planificacion = planificaciones.find(p => p.nombre === quincena.nombre);
-        
-        if (planificacion && planificacion.id) {
-          // Si existe una planificación, cargar sus detalles usando el ID numérico
-          console.log(`Encontrada planificación con ID ${planificacion.id} para la quincena ${quincena.nombre}`);
-          
-          this.cultivePlanningDetailsService.getDetailsByPlanningId(planificacion.id.toString()).subscribe(
-            (details) => {
-              if (details && details.length > 0) {
-                console.log(`Encontrados ${details.length} detalles para la quincena`);
-                
-                // Actualizar los valores de los tramos con los datos guardados
-                this.details = details;
-                
-                details.forEach(detail => {
-                  const idx = detail.tramo - 1;
-                  if (idx >= 0 && idx < this.cards.length) {
-                    // Actualizamos el valor de kilos pero mantenemos las fechas que ya 
-                    // generamos para la quincena
-                    this.cards[idx].value = detail.kilos;
-                  }
-                });
-                
-                this.mostrarMensajeExito('Datos de la quincena cargados correctamente');
-                
-                // Cargar cultivos asociados a esta planificación
-                this.cargarCultivosAsociados(planificacion.id);
-              } else {
-                console.log('No hay datos guardados para esta quincena');
+  /**
+ * Busca si existen datos guardados para la quincena seleccionada
+ * y los carga si existen. Además ajusta el número de tramos
+ * al count real de detalles guardados.
+ */
+buscarDatosQuincena(): void {
+  // El ID de la planificación coincide con el ID de la quincena
+  const planificacionId = this.selectedQuincena;
+
+  // Cargamos todas las planificaciones para encontrar la que coincide
+  this.cultivoPlanningService.getAllCultivePlannings().subscribe(
+    planificaciones => {
+      const quincena = this.quincenas.find(q => q.id === planificacionId);
+      if (!quincena) {
+        console.error('No se encontró la quincena seleccionada');
+        return;
+      }
+
+      // Encontrar planificación por nombre (incluye el género)
+      const nombrePlan = `${quincena.nombre} ${this.selectedGenre}`;
+      const planExist = planificaciones.find(p => p.nombre === nombrePlan);
+
+      if (planExist && planExist.id) {
+        // Si existe, cargamos sus detalles
+        this.cultivePlanningDetailsService
+          .getDetailsByPlanningId(planExist.id.toString())
+          .subscribe(
+            details => {
+              if (!details || details.length === 0) {
+                console.log('No hay detalles guardados para esta planificación');
+                return;
               }
+
+              // 1️⃣ Asignamos detalles al componente
+              this.details = details;
+
+              // 2️⃣ Ajustamos el número de tramos al tamaño real de los detalles
+              this.numTramosInput = details.length;
+              this.numTramos      = details.length;
+
+              // 3️⃣ Re-generamos los cards con el nuevo número de tramos
+              this.initializeTramosPorQuincena(quincena);
+
+              // 4️⃣ Asignamos los valores de kilos de cada detail a su card
+              details.forEach(detail => {
+                const idx = detail.tramo - 1;
+                if (this.cards[idx]) {
+                  this.cards[idx].value = detail.kilos;
+                }
+              });
+
+              // 5️⃣ Mensaje de éxito y carga de cultivos asociados
+              this.mostrarMensajeExito('Datos de la quincena cargados correctamente');
+              this.cargarCultivosAsociados(planExist.id);
             },
-            (error) => {
-              console.error('Error al cargar los detalles de la quincena:', error);
+            error => {
+              console.error('Error al cargar los detalles de la planificación:', error);
             }
           );
-        } else {
-          console.log(`No existe planificación para la quincena ${quincena.nombre}, se creará una nueva al guardar`);
-        }
-      },
-      (error) => {
-        console.error('Error al buscar planificaciones:', error);
+      } else {
+        console.log(`No existe planificación para la quincena ${quincena.nombre}`);
       }
-    );
-  }
+    },
+    error => {
+      console.error('Error al buscar planificaciones:', error);
+    }
+  );
+}
+
   
   /**
    * Carga los cultivos asociados a una planificación
