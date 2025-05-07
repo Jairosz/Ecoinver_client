@@ -1,5 +1,6 @@
-import { Component, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, AfterViewInit, OnDestroy, OnInit,NgModule, LOCALE_ID } from '@angular/core';
+import { CommonModule, registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { DatePipe } from '@angular/common';
@@ -52,6 +53,9 @@ interface ProductionData {
   estimatedProduction: number; // Estimated production in kilos (from kilosAjustados)
 }
 
+
+
+
 @Component({
   selector: 'app-cultive-details',
   standalone: true,
@@ -94,6 +98,10 @@ export class CultiveDetailsComponent
   actualizarProgreso(): void {
     this.progressPercentage = this.getProgressPercentage();
   }
+
+
+  
+
 
   //mapping y tiempo
   weatherForecast: WeatherForecast[] = [];
@@ -362,14 +370,19 @@ export class CultiveDetailsComponent
   
   // Método para obtener el valor de kilosAjustados del tramo seleccionado
   getValorKilosAjustados(tramoIndex: number): number {
-    if (this.productions.length === 0 || tramoIndex < 0 || 
-        tramoIndex >= this.productions.length) {
+    const prod = this.productions?.[tramoIndex];
+    if (!prod) {
+      console.warn(`Tramo ${tramoIndex} no encontrado (productions.length=${this.productions?.length})`);
       return 0;
     }
-    
-    const tramo = this.productions[tramoIndex];
-    return this.parseNumericValue(tramo.kilosAjustados);
+  
+    //console.log(`⏩ getValorKilosAjustados: tramo ${tramoIndex}, raw kilosAjustados =`, prod.kilosAjustados);
+    const parsed = this.parseNumericValue(prod.kilosAjustados);
+    //console.log(`⏩ getValorKilosAjustados: tramo ${tramoIndex}, parsed =`, parsed);
+  
+    return parsed;
   }
+  
   
   // Método para determinar si un tramo está pendiente (fecha inicio en el futuro)
   isPendingTramo(tramoIndex: number): boolean {

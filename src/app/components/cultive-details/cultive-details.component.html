@@ -132,7 +132,7 @@
             <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg flex-1">
               <p class="text-xs text-gray-500 dark:text-gray-400">Superficie</p>
               <p class="text-base font-medium text-gray-800 dark:text-white">
-                {{ cultivo.superficie }} ha
+                {{ cultivo.superficie | number:'1.0-0' }} m²
               </p>
             </div>
 
@@ -141,7 +141,7 @@
                 Producción Est.
               </p>
               <p class="text-base font-medium text-gray-800 dark:text-white">
-                {{ cultivo.produccionEstimada }} t
+                {{ cultivo.produccionEstimada | number:'1.0-0' }} kg
               </p>
             </div>
           </div>
@@ -405,7 +405,7 @@
                   Producción Estimada
                 </p>
                 <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]" *ngIf="productions.length > 0 && selectedTramoIndex >= 0">
-                  {{ formatNumber(getValorKilosAjustados(selectedTramoIndex)) }} kg
+                  {{ getValorKilosAjustados(selectedTramoIndex) }} kg
                 </p>
                 <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]" *ngIf="productions.length === 0 || selectedTramoIndex < 0">
                   No disponible
@@ -447,7 +447,7 @@
                 Producción Total Estimada
               </p>
               <p class="text-xl font-bold text-[#437d3f] dark:text-[#65b15f]">
-                {{ formatNumber(getTotalProduccionEstimada()) }} kg
+                {{ formatNumber(getTotalProduccionEstimada()) | number:'1.0-0'}} kg
               </p>
             </div>
             <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
