@@ -54,9 +54,9 @@ export class RolesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadRoles();
     this.currentUser = this.authService.getCurrentUser();
-    console.log("prueba");
+    console.log("Current user from auth service:", this.currentUser);
+    this.loadRoles();
   }
 
   private loadRoles(): void {
@@ -76,11 +76,29 @@ export class RolesComponent implements OnInit {
   }
 
   private setCurrentUserLevel(): void {
-    if (this.currentUser) {
-      const userRole = this.data.find(r => r.name === this.currentUser?.role);
-      this.currentUserLevel = userRole?.level || 99;
+  if (this.currentUser && this.currentUser.role) {
+    // Make sure we're comparing the same format of strings
+    const userRoleName = this.currentUser.role.toLowerCase().trim();
+    
+    // Find the role by name (case-insensitive comparison)
+    const userRole = this.data.find(r => 
+      r.name.toLowerCase().trim() === userRoleName
+    );
+    
+    if (userRole && userRole.level !== undefined) {
+      this.currentUserLevel = userRole.level;
+    } else {
+      console.warn('Role level not found for:', this.currentUser.role);
+      this.currentUserLevel = 99; // Default if not found
     }
+    
+    console.log('Current user details:', {
+      role: this.currentUser.role,
+      foundRole: userRole,
+      level: this.currentUserLevel
+    });
   }
+}
 
   // Métodos de paginación
   get totalPages(): number {
@@ -212,14 +230,27 @@ export class RolesComponent implements OnInit {
 
   // Helpers
   selectRow(role: Rol): void {
-    this.selectedRol = role;
-    this.numId = this.selectedRol.id;
+    console.log("Selected role:", role);
+  this.selectedRol = role;
+  this.numId = this.selectedRol.id;
+  console.log("Is selectedRol set?", this.selectedRol !== null);
   }
 
   canManageRole(targetRole: Rol): boolean {
+    console.log("canManageRole check:", {
+      targetRole,
+      currentUser: this.currentUser,
+      currentUserRole: this.data.find(r => r.name === this.currentUser?.role),
+      currentUserLevel: this.currentUserLevel
+    });
+  
     if (!this.currentUser) return false;
+    
     const currentRole = this.data.find(r => r.name === this.currentUser?.role);
-    return currentRole ? currentRole.level < targetRole.level : false;
+    const canManage = currentRole ? currentRole.level < targetRole.level : false;
+    
+    console.log("Can manage result:", canManage);
+    return this.currentUserLevel < targetRole.level;
   }
 
   private showAlertMessage(
