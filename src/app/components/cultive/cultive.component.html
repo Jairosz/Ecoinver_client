@@ -1,38 +1,64 @@
 <div class="mt-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
   <!-- Encabezado: Búsqueda, Selector de Columnas y Selector de Items por Página -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4"
+  >
     <!-- Búsqueda -->
     <div class="mb-2 sm:mb-0 sm:mr-4">
-      <input [(ngModel)]="searchQuery" (ngModelChange)="filterData()" type="text" placeholder="Buscar..." class="block w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md
-               focus:outline-none focus:ring focus:ring-blue-200
-               dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+      <input
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="filterData()"
+        type="text"
+        placeholder="Buscar..."
+        class="block w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+      />
     </div>
 
     <!-- Dropdown "Selector de Columnas" -->
     <div class="relative inline-block text-left mb-4 sm:mb-0">
       <!-- Botón que abre/cierra el menú -->
-      <button type="button" (click)="toggleColumnSelector()" class="inline-flex justify-center items-center rounded-md border border-gray-300 bg-white px-4 py-2
-               text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50
-               dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600
-               focus:outline-none focus:ring-2 focus:ring-blue-200" aria-haspopup="true"
-        [attr.aria-expanded]="showColumnSelector ? 'true' : 'false'">
+      <button
+        type="button"
+        (click)="toggleColumnSelector()"
+        class="inline-flex justify-center items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
+        aria-haspopup="true"
+        [attr.aria-expanded]="showColumnSelector ? 'true' : 'false'"
+      >
         Selector de Columnas
         <!-- Flecha del botón -->
-        <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.2l3.72-3.97a.75.75 
+        <svg
+          class="ml-2 h-5 w-5 text-gray-400"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M5.23 7.21a.75.75 0 011.06.02L10 11.2l3.72-3.97a.75.75 
                0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.2 
-               8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+               8.27a.75.75 0 01.02-1.06z"
+            clip-rule="evenodd"
+          />
         </svg>
       </button>
 
       <!-- Menú desplegable de columnas -->
-      <div class="origin-top-right absolute mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black
-               ring-opacity-5 focus:outline-none dark:bg-gray-700 z-50" role="menu" *ngIf="showColumnSelector">
+      <div
+        class="origin-top-right absolute mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 z-50"
+        role="menu"
+        *ngIf="showColumnSelector"
+      >
         <div class="py-2" role="none">
-          <label *ngFor="let col of allColumns" class="flex items-center px-3 py-1 text-sm text-gray-700
-                   hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 cursor-pointer">
-            <input type="checkbox" [checked]="selectedColumns.includes(col.name)" (change)="toggleColumn(col.name)"
-              class="mr-2" />
+          <label
+            *ngFor="let col of allColumns"
+            class="flex items-center px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              [checked]="selectedColumns.includes(col.name)"
+              (change)="toggleColumn(col.name)"
+              class="mr-2"
+            />
             {{ col.label }}
           </label>
         </div>
@@ -41,11 +67,19 @@
 
     <!-- Selector de Items por página -->
     <div class="flex items-center">
-      <label for="itemsPerPage" class="mr-2 text-sm text-gray-700 dark:text-gray-300">
+      <label
+        for="itemsPerPage"
+        class="mr-2 text-sm text-gray-700 dark:text-gray-300"
+      >
         Mostrar
       </label>
-      <select #selectElem id="itemsPerPage" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange(selectElem.value)"
-        class="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+      <select
+        #selectElem
+        id="itemsPerPage"
+        [(ngModel)]="itemsPerPage"
+        (change)="onItemsPerPageChange(selectElem.value)"
+        class="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+      >
         <option *ngFor="let size of [5, 10, 15, 20, 25]" [value]="size">
           {{ size }}
         </option>
@@ -59,55 +93,99 @@
 
   <!-- Tabla -->
   <div class="overflow-x-auto">
-    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 border-collapse">
-      <thead class="text-xs uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <table
+      class="w-full text-sm text-left text-gray-500 dark:text-gray-400 border-collapse"
+    >
+      <thead
+        class="text-xs uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+      >
         <tr class="h-12">
-          <th *ngFor="let col of allColumns"
+          <th
+            *ngFor="let col of allColumns"
             class="px-4 py-2 align-middle whitespace-nowrap overflow-hidden text-ellipsis"
-            [hidden]="!selectedColumns.includes(col.name)">
+            [hidden]="!selectedColumns.includes(col.name)"
+          >
             {{ col.label }}
           </th>
         </tr>
       </thead>
 
       <tbody>
-        <tr *ngFor="let item of paginatedData" (click)="selectRow(item)"
-          [ngClass]="selectedCultivo?.idCultivo === item.idCultivo ? 'bg-blue-100' : 'bg-white'"
-          class="cursor-pointer border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 h-14">
-          <td *ngFor="let col of allColumns" [hidden]="!selectedColumns.includes(col.name)"
-            class="px-4 py-2 align-middle">
-            <ng-container *ngIf="col.isDate; else normalField">
-              {{ item[col.name] | date: 'dd/MM/yyyy' }}
+        <tr
+          *ngFor="let item of paginatedData"
+          (click)="selectRow(item)"
+          [ngClass]="
+            selectedCultivo?.idCultivo === item.idCultivo
+              ? 'bg-blue-100'
+              : 'bg-white'
+          "
+          class="cursor-pointer border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 h-14"
+        >
+          <td
+            *ngFor="let col of allColumns"
+            [hidden]="!selectedColumns.includes(col.name)"
+            class="px-4 py-2 align-middle"
+          >
+            <!-- 1) Si es fecha -->
+            <ng-container *ngIf="col.isDate; else dataCell">
+              {{ item[col.name] | date : "dd/MM/yyyy" }}
             </ng-container>
-            <ng-template #normalField>
-              {{ item[col.name] }}
+
+            <!-- 2) Para todo lo demás -->
+            <ng-template #dataCell>
+              <!-- 2a) Si es superficie o producción -->
+              <ng-container
+                *ngIf="
+                  col.name === 'superficie' ||
+                    col.name === 'produccionEstimada';
+                  else defaultCell
+                "
+              >
+                {{ item[col.name] | number : "1.0-0" }}
+                <span *ngIf="col.name === 'superficie'"> m²</span>
+                <span *ngIf="col.name === 'produccionEstimada'"> kg</span>
+              </ng-container>
+
+              <!-- 2b) Resto de campos sin formatear -->
+              <ng-template #defaultCell>
+                {{ item[col.name] }}
+              </ng-template>
             </ng-template>
           </td>
         </tr>
       </tbody>
-
-
-
-
     </table>
   </div>
 
   <!-- Paginación -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4">
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4"
+  >
     <div class="text-sm text-gray-600 dark:text-gray-300 mb-2 sm:mb-0">
-      Mostrando de <span class="font-semibold">{{ (currentPage - 1) * itemsPerPage + 1 }}</span>
-      a <span class="font-semibold">{{ Math.min(currentPage * itemsPerPage, filteredData.length) }}</span>
-      sobre <span class="font-semibold">{{ filteredData.length }}</span> resultados
+      Mostrando de
+      <span class="font-semibold">{{
+        (currentPage - 1) * itemsPerPage + 1
+      }}</span>
+      a
+      <span class="font-semibold">{{
+        Math.min(currentPage * itemsPerPage, filteredData.length)
+      }}</span>
+      sobre
+      <span class="font-semibold">{{ filteredData.length }}</span> resultados
     </div>
     <div class="flex space-x-2">
       <button
         class="px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
-        (click)="goToPreviousPage()" [disabled]="currentPage === 1">
+        (click)="goToPreviousPage()"
+        [disabled]="currentPage === 1"
+      >
         Anterior
       </button>
       <button
         class="px-3 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
-        (click)="goToNextPage()" [disabled]="currentPage === totalPages">
+        (click)="goToNextPage()"
+        [disabled]="currentPage === totalPages"
+      >
         Siguiente
       </button>
     </div>
