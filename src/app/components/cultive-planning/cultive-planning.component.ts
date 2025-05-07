@@ -80,9 +80,13 @@ export class CultivePlanningComponent implements OnInit {
 
   // Detección de modo oscuro
   isDarkMode: boolean = false;
+ // Limita el máximo de tramos
+maxTramos = 12;
+numTramosInput: number = 12;
+numTramos: number = this.numTramosInput;
 
-  // Fijo a 12 tramos
-  readonly numTramos: number = 12;
+  
+
   cards: TramoCard[] = [];
 
   // Cultivos disponibles y seleccionados
@@ -173,6 +177,41 @@ export class CultivePlanningComponent implements OnInit {
 
     this.filteredGenderOptions = [...this.genderOptions];
   }
+
+
+
+
+  onNumTramosChange(): void {
+    // Convertir a entero
+    this.numTramosInput = Math.max(1, Math.floor(this.numTramosInput));
+    this.numTramos = this.numTramosInput;
+  
+    // Si hay quincena, reinicializa tramos
+    if (this.selectedQuincena) {
+      const quincena = this.quincenas.find(q => q.id === this.selectedQuincena);
+      if (quincena) {
+        this.initializeTramosPorQuincena(quincena);
+      }
+    }
+  }
+
+  incrementTramos(): void {
+    if (this.numTramosInput < this.maxTramos) {
+      this.numTramosInput++;
+      this.onNumTramosChange();
+    }
+  }
+  
+  decrementTramos(): void {
+    if (this.numTramosInput > 1) {
+      this.numTramosInput--;
+      this.onNumTramosChange();
+    }
+  }
+
+
+
+
 
   /**
    * Función para asegurarse de que los cultivos tengan fechas de siembra
@@ -1425,9 +1464,23 @@ private actualizarPlanificacionExistente(
   existingDetails: CultivePlanningDetails[],
   planificacionId: number | string
 ): void {
-  const updateObs = existingDetails.map(detail => {
-    const idx = detail.tramo - 1;
-    const card = this.cards[idx];
+  // 1️⃣ Separa los detalles a borrar y los que quedan
+  const detallesABorrar = existingDetails.filter(d => d.tramo > this.numTramos);
+  const detallesAActualizar = existingDetails.filter(d => d.tramo <= this.numTramos);
+
+  // 2️⃣ Borra primero los tramos que sobran
+  detallesABorrar.forEach(d => {
+    this.cultivePlanningDetailsService
+      .deleteCultivePlanningDetails(d.id)
+      .subscribe(() => {
+        console.log(`Detalle tramo ${d.tramo} borrado (ahora sobrante)`);
+      });
+  });
+
+  // 3️⃣ Actualiza los tramos existentes dentro de rango
+  const updateObs = detallesAActualizar.map(detail => {
+    const idx = detail.tramo - 1;           // idx < this.numTramos
+    const card = this.cards[idx];           // ¡ya existe!
     return this.cultivePlanningDetailsService.updateCultivePlanningDetails(detail.id, {
       id: detail.id,
       fechaInicio: new Date(card.startDate!),
@@ -1438,14 +1491,36 @@ private actualizarPlanificacionExistente(
     });
   });
 
+  // 4️⃣ Si después de actualizar falta crear nuevos tramos (subir count)
+  const nuevosATraer: any[] = [];
+  for (let tramo = detallesAActualizar.length + 1; tramo <= this.numTramos; tramo++) {
+    const card = this.cards[tramo - 1];
+    nuevosATraer.push({
+      fechaInicio: new Date(card.startDate!),
+      fechaFin:    new Date(card.endDate!),
+      kilos:       card.value || 0,
+      tramo:       tramo
+    });
+  }
+
   forkJoin(updateObs).subscribe(
-    (updatedDetails) => {
-      this.details = updatedDetails;
-      // recargar producciones y luego sincronizar
-      this.loadAndSyncProductions(updatedDetails);
-      // re-asociar cultivos si lo necesitas
-      this.asociarCultivosAPlanificacion(planificacionId);
-      this.mostrarMensajeExito('Planificación actualizada correctamente');
+    updatedDetails => {
+      // 5️⃣ Crear los detalles nuevos si hacen falta
+      if (nuevosATraer.length) {
+        this.cultivePlanningDetailsService
+          .createMultiplePlanningDetails(planificacionId.toString(), nuevosATraer)
+          .subscribe(created => {
+            this.details = [...updatedDetails, ...created];
+            this.loadAndSyncProductions(this.details);
+            this.asociarCultivosAPlanificacion(planificacionId);
+            this.mostrarMensajeExito('Planificación actualizada correctamente');
+          });
+      } else {
+        this.details = updatedDetails;
+        this.loadAndSyncProductions(this.details);
+        this.asociarCultivosAPlanificacion(planificacionId);
+        this.mostrarMensajeExito('Planificación actualizada correctamente');
+      }
     },
     err => {
       console.error('Error actualizando detalles:', err);
@@ -1453,7 +1528,6 @@ private actualizarPlanificacionExistente(
     }
   );
 }
-
 
 
 
