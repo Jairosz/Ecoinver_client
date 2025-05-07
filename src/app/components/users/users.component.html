@@ -40,40 +40,42 @@
     </div>
     <!-- Header: Search, Buttons, and Pagination Selector -->
     <div
-      class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4"
+      class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4"
     >
-      <!-- Search -->
-      <div class="mb-2 sm:mb-0 sm:mr-4">
-        <input
-          [(ngModel)]="searchQuery"
-          (ngModelChange)="filterData()"
-          type="text"
-          placeholder="Buscar..."
-          class="block w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-        />
-      </div>
-      <!-- Edit/Delete Buttons -->
-      <div class="mb-4 flex space-x-2">
-        <button
-          (click)="openCreateModal()"
-          class="cursor-pointer px-3 py-1 text-sm text-white  rounded-md border-1 border-[#437d3f] bg-[#437d3f] hover:bg-[#274925] hover:border-1"
-        >
-          Crear
-        </button>
-        <button
-  *ngIf="selectedUsuario && canManageUser(selectedUsuario)"
-  (click)="edit()"
-  class="action-button cursor-pointer px-3 py-1 text-sm text-white  rounded-md border-1 border-[#437d3f] bg-[#437d3f] hover:bg-[#274925] hover:border-1"
->
-  Editar
-</button>
-<button
-*ngIf="selectedUsuario && canManageUser(selectedUsuario)"
-(click)="delete()"
-class="action-button px-3 py-1 text-sm text-white bg-red-600 border border-red-600 rounded-md hover:bg-red-700"
->
-Borrar
-</button>
+      <div class="flex flex-col gap-3 w-full md:flex-row md:items-center md:w-auto">
+        <!-- Search -->
+        <div class="w-full md:w-auto md:mr-4">
+          <input
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="filterData()"
+            type="text"
+            placeholder="Buscar..."
+            class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+          />
+        </div>
+        <!-- Edit/Delete Buttons -->
+        <div class="flex flex-wrap gap-2">
+          <button
+            (click)="openCreateModal()"
+            class="cursor-pointer px-3 py-1 text-sm text-white rounded-md border-1 border-[#437d3f] bg-[#437d3f] hover:bg-[#274925] hover:border-1"
+          >
+            Crear
+          </button>
+          <button
+            *ngIf="selectedUsuario && canManageUser(selectedUsuario)"
+            (click)="edit()"
+            class="action-button cursor-pointer px-3 py-1 text-sm text-white rounded-md border-1 border-[#437d3f] bg-[#437d3f] hover:bg-[#274925] hover:border-1"
+          >
+            Editar
+          </button>
+          <button
+            *ngIf="selectedUsuario && canManageUser(selectedUsuario)"
+            (click)="delete()"
+            class="action-button px-3 py-1 text-sm text-white bg-red-600 border border-red-600 rounded-md hover:bg-red-700"
+          >
+            Borrar
+          </button>
+        </div>
       </div>
       <!-- Items per Page Selector -->
       <div class="flex items-center">
@@ -108,11 +110,11 @@ Borrar
           class="text-xs uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
         >
           <tr>
-            <th scope="col" class="px-4 py-3">Nombre</th>
-            <th scope="col" class="px-4 py-3">Usuario</th>
-            <th scope="col" class="px-4 py-3">Contraseña</th>
-            <th scope="col" class="px-4 py-3">Rol</th>
-            <th scope="col" class="px-4 py-3">Email</th>
+            <th scope="col" class="px-4 py-3 whitespace-nowrap">Nombre</th>
+            <th scope="col" class="px-4 py-3 whitespace-nowrap">Usuario</th>
+            <th scope="col" class="px-4 py-3 whitespace-nowrap">Contraseña</th>
+            <th scope="col" class="px-4 py-3 whitespace-nowrap">Rol</th>
+            <th scope="col" class="px-4 py-3 whitespace-nowrap">Email</th>
             <!-- Nueva columna para Email -->
           </tr>
         </thead>
@@ -131,16 +133,18 @@ Borrar
             >
               {{ item.nombreCompleto }}
             </td>
-            <td class="px-4 py-3">{{ item.userName }}</td>
-            <td class="px-4 py-3">
-              <div class="flex items-center gap-0 w-[40px]">
-                <span class="font-mono w-[100px] inline-block">
+            <td class="px-4 py-3 whitespace-nowrap">{{ item.userName }}</td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              <div class="flex items-center gap-0 w-[40px] md:w-auto">
+                <span class="font-mono w-[100px] md:w-auto inline-block overflow-hidden text-ellipsis">
                   {{ item.showPassword ? item.password : "•••••••••" }}
                 </span>
               </div>
             </td>
-            <td class="px-4 py-3">{{ item.role }}</td>
-            <td class="px-4 py-3">{{ item.email }}</td>
+            <td class="px-4 py-3 whitespace-nowrap">{{ item.role }}</td>
+            <td class="px-4 py-3 whitespace-nowrap overflow-hidden text-ellipsis max-w-xs">
+              {{ item.email }}
+            </td>
             <!-- Mostrar email -->
           </tr>
         </tbody>
@@ -149,7 +153,7 @@ Borrar
 
     <!-- Pagination Controls -->
     <div
-      class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4"
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-2"
     >
       <!-- Page Info -->
       <div class="text-sm text-gray-600 dark:text-gray-300 mb-2 sm:mb-0">
@@ -226,8 +230,8 @@ Borrar
           </button>
         </div>
         <form class="p-4 md:p-5" (ngSubmit)="saveUser()" #userForm="ngForm">
-          <div class="grid gap-4 mb-4 grid-cols-2">
-            <div class="col-span-2">
+          <div class="grid gap-4 mb-4 grid-cols-1 sm:grid-cols-2">
+            <div class="col-span-1 sm:col-span-2">
               <label
                 for="nombreCompleto"
                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -251,7 +255,7 @@ Borrar
                 Nombre requerido (máximo 30 caracteres).
               </p>
             </div>
-            <div class="col-span-2">
+            <div class="col-span-1 sm:col-span-2">
               <label
                 for="userName"
                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -275,7 +279,7 @@ Borrar
                 Usuario requerido (máximo 30 caracteres).
               </p>
             </div>
-            <div class="col-span-2">
+            <div class="col-span-1 sm:col-span-2">
               <label
                 for="email"
                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -299,7 +303,7 @@ Borrar
                 Por favor ingresa un correo válido (ejemplo&#64;dominio.com).
               </p>
             </div>
-            <div class="col-span-2 sm:col-span-1">
+            <div class="col-span-1">
               <label
                 for="contrasena"
                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -323,7 +327,7 @@ Borrar
                 Contraseña requerida (máximo 30 caracteres).
               </p>
             </div>
-            <div class="col-span-2 sm:col-span-1">
+            <div class="col-span-1">
               <label
                 for="role"
                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -354,7 +358,7 @@ Borrar
               </p>
             </div>
           </div>
-          <div class="flex justify-end space-x-2">
+          <div class="flex flex-col-reverse sm:flex-row justify-end gap-2">
             <button
               type="button"
               (click)="closeModal()"
@@ -439,19 +443,21 @@ Borrar
           <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
             ¿Estás seguro de que quieres borrar este usuario?
           </h3>
-          <button
-            (click)="confirmDelete()"
-            class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
-          >
-            Sí, estoy seguro
-          </button>
-          <button
-            (click)="cancelDelete()"
-            type="button"
-            class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-          >
-            No, cancelar
-          </button>
+          <div class="flex flex-col sm:flex-row justify-center gap-2">
+            <button
+              (click)="confirmDelete()"
+              class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center justify-center px-5 py-2.5 w-full sm:w-auto"
+            >
+              Sí, estoy seguro
+            </button>
+            <button
+              (click)="cancelDelete()"
+              type="button"
+              class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 w-full sm:w-auto"
+            >
+              No, cancelar
+            </button>
+          </div>
         </div>
       </div>
     </div>
