@@ -35,7 +35,7 @@ export class RankingComponent implements OnInit {
   selectedFamilia: string = 'todas';
   familias: string[] = [];
   producReal: RealProduction[] = [];
-
+  opcion: string = '1';
 
   constructor(
     private genderService: GenderService,
@@ -210,10 +210,11 @@ export class RankingComponent implements OnInit {
     let index: number = 0;
     for (let i = 0; i < this.producReal.length; i++) {
       for (let k = 0; k < this.agricultores.length; k++) {
-
-        if (this.producReal[i].nombreAgricultor === this.agricultores[k].nombre) {
-          variab = true;
-          index = k;
+        if (cultivosFiltrados.find(item => item.idCultivo == this.producReal[i].idCultivo)) {
+          if (this.producReal[i].nombreAgricultor === this.agricultores[k].nombre) {
+            variab = true;
+            index = k;
+          }
         }
 
 
@@ -230,7 +231,7 @@ export class RankingComponent implements OnInit {
             producc: this.producReal[i].kilosNetos + (this.agricultores[index].producc ?? 0),
             kgm2: this.producReal[i].kilosM2
           }
-          
+
           variab = false;
         }
         else {
@@ -258,9 +259,37 @@ export class RankingComponent implements OnInit {
         longitudCorrecta++;
       }
     }
+    this.agricultores.sort((a, b) => b.kgm2 - a.kgm2);
+    for(let i=0;i<this.agricultores.length;i++){
+      this.agricultores[i].pos=i+1;
+    }
     this.media = this.agricultores.reduce((a, b) => a + (b.kgm2 ?? 0), 0) / longitudCorrecta || 0;
     const factor = Math.pow(10, 2);
     this.media = Math.trunc(this.media * factor) / factor;
+
+
+  }
+
+  cambiarFiltro() {
+    switch (this.opcion) {
+      case '1':
+        this.agricultores.sort((a, b) => b.kgm2 - a.kgm2);
+        for(let i=0;i<this.agricultores.length;i++){
+          this.agricultores[i].pos=i+1;
+        }
+        break;
+      case '2':
+        this.agricultores.sort((a, b) => (b.producc ?? 0) - (a.producc ?? 0));
+        for(let i=0;i<this.agricultores.length;i++){
+          this.agricultores[i].pos=i+1;
+        }
+        break;
+      case '3':
+        this.agricultores.sort((a, b) => b.superficie - a.superficie);
+        for(let i=0;i<this.agricultores.length;i++){
+          this.agricultores[i].pos=i+1;
+        }
+    }
 
   }
 

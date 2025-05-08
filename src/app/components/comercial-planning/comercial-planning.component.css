@@ -1,0 +1,154 @@
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes fadeInUp {
+    from { 
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeInLeft {
+    from { 
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes fadeInRight {
+    from { 
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes fadeInDown {
+    from { 
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes expandLine {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  
+  @keyframes pulseLight {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+  
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  @keyframes zoomIn {
+    from { 
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to { 
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes scaleUp {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+  }
+  
+  @keyframes checkmark {
+    0% { 
+      stroke-dashoffset: 100; 
+      opacity: 0;
+    }
+    100% { 
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+  }
+  
+  @keyframes progressLoad {
+    from { width: 0; }
+    to { width: var(--progress-width); }
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+  
+  .animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+  
+  .animate-fadeInLeft {
+    animation: fadeInLeft 0.6s ease-out forwards;
+  }
+  
+  .animate-fadeInRight {
+    animation: fadeInRight 0.6s ease-out forwards;
+  }
+  
+  .animate-fadeInDown {
+    animation: fadeInDown 0.6s ease-out forwards;
+  }
+  
+  .animate-expandLine {
+    animation: expandLine 1s ease-out forwards;
+  }
+  
+  .animate-pulseLight {
+    animation: pulseLight 2s infinite;
+  }
+  
+  .animate-bounce-slow {
+    animation: bounce-slow 3s infinite;
+  }
+  
+ 
+  
+  .animate-zoomIn {
+    animation: zoomIn 0.4s ease-out forwards;
+  }
+  
+  .animate-scaleUp {
+    animation: scaleUp 0.5s ease-out forwards;
+  }
+  
+  .animate-checkmark {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: checkmark 1s ease-in-out forwards;
+    animation-delay: 0.2s;
+  }
+  
+  .animate-progressLoad {
+    animation: progressLoad 1s ease-out forwards;
+  }

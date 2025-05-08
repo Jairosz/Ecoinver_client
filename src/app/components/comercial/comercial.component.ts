@@ -9,6 +9,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { Client } from '../../types/Client';
 import { GenderService } from '../../services/Gender.service';
 import { Gender } from '../../types/gender';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 
 export interface Comercial {
@@ -29,6 +30,7 @@ export interface Comercial {
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgSelectModule],
   templateUrl: './comercial.component.html',
   styleUrls: ['./comercial.component.css']
+  
 })
 export class ComercialComponent implements OnInit {
   // Propiedad para acceder a Math desde el template
