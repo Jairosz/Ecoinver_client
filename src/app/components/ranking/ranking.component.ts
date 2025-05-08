@@ -24,6 +24,8 @@ export class RankingComponent implements OnInit {
   generoCargado: boolean = false;
   cultivoCargado: boolean = false;
   sumaArea: number = 0;
+  produccionTotal: number = 0;
+  media: number = 0;
 
   // Variables para el filtrado y selección
   searchGeneroTerm: string = '';
@@ -33,6 +35,8 @@ export class RankingComponent implements OnInit {
   selectedFamilia: string = 'todas';
   familias: string[] = [];
   producReal: RealProduction[] = [];
+
+
   constructor(
     private genderService: GenderService,
     private cultivoService: CultivoService, private pReal: RealProductionService
@@ -180,7 +184,7 @@ export class RankingComponent implements OnInit {
   tabla() {
     // Limpiamos la lista de agricultores
     this.agricultores = [];
-    let j=1;
+    let j = 1;
     let agri: Cultive = {
       id: 0,
       idCultivo: 0,
@@ -197,14 +201,39 @@ export class RankingComponent implements OnInit {
     };
 
 
-   
-      // Filtrar cultivos por el género seleccionado
-      const cultivosFiltrados = this.cultivos.filter(
-        c => c.idGenero === this.selectedGeneroId
-      );
 
-      for (let i = 0; i < this.producReal.length; i++) {
-        if (cultivosFiltrados.find(item => item.idCultivo == this.producReal[i].idCultivo)) {
+    // Filtrar cultivos por el género seleccionado
+    const cultivosFiltrados = this.cultivos.filter(
+      c => c.idGenero === this.selectedGeneroId
+    );
+    let variab: boolean = false;
+    let index: number = 0;
+    for (let i = 0; i < this.producReal.length; i++) {
+      for (let k = 0; k < this.agricultores.length; k++) {
+
+        if (this.producReal[i].nombreAgricultor === this.agricultores[k].nombre) {
+          variab = true;
+          index = k;
+        }
+
+
+      }
+      if (cultivosFiltrados.find(item => item.idCultivo == this.producReal[i].idCultivo)) {
+        if (variab) {
+          agri = cultivosFiltrados.find(item => item.idCultivo == this.producReal[i].idCultivo)!;
+          this.agricultores[index] = {
+            pos: index + 1,
+            nombre: this.producReal[i].nombreAgricultor,
+            provincia: agri.provincia,
+            nombreCultivo: agri.nombreGenero,
+            superficie: agri.superficie + this.agricultores[index].superficie,
+            producc: this.producReal[i].kilosNetos + (this.agricultores[index].producc ?? 0),
+            kgm2: this.producReal[i].kilosM2
+          }
+          
+          variab = false;
+        }
+        else {
           agri = cultivosFiltrados.find(item => item.idCultivo == this.producReal[i].idCultivo)!;
           this.agricultores.push({
             pos: j,
@@ -215,15 +244,24 @@ export class RankingComponent implements OnInit {
             producc: this.producReal[i].kilosNetos,
             kgm2: this.producReal[i].kilosM2
           });
+
           j++;
         }
 
-
       }
-      
-      this.sumaArea = this.agricultores.reduce((a, b) => a + b.superficie, 0);
-     
     }
-   
-  
+    let longitudCorrecta: number = 0;
+    this.sumaArea = this.agricultores.reduce((a, b) => a + b.superficie, 0);
+    this.produccionTotal = this.agricultores.reduce((a, b) => a + (b.producc ?? 0), 0);
+    for (let i = 0; i < this.agricultores.length; i++) {
+      if (this.agricultores[i].kgm2) {
+        longitudCorrecta++;
+      }
+    }
+    this.media = this.agricultores.reduce((a, b) => a + (b.kgm2 ?? 0), 0) / longitudCorrecta || 0;
+    const factor = Math.pow(10, 2);
+    this.media = Math.trunc(this.media * factor) / factor;
+
+  }
+
 }
