@@ -1,3 +1,4 @@
+//cultive planning component
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -22,7 +23,7 @@ import {
   UpdateCultivePlanningDto,
 } from '../../types/CultivePlanningTypes';
 import { GenderService } from '../../services/Gender.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, map } from 'rxjs';
 
 // Interface para quincenas
 interface Quincena {
@@ -466,7 +467,7 @@ buscarCultivosEnQuincena(quincena: Quincena): void {
       
       if (fechaInicio > fechaFin) {
         // Si la fecha inicio es posterior a la fecha fin, ajustar la fecha fin
-        alert('La fecha de fin debe ser posterior a la fecha de inicio. Se ajustará automáticamente.');
+        //alert('La fecha de fin debe ser posterior a la fecha de inicio. Se ajustará automáticamente.');
         card.endDate = card.startDate;
       }
     }
@@ -1006,18 +1007,30 @@ buscarDatosQuincena(): void {
     return quincena ? quincena.nombre : '';
   }
 
-  private loadProductionsForDetails(details: CultivePlanningDetails[]) {
-    this.productionService.getAllCultiveProductions().subscribe((allProds) => {
-      // Filtra solo los de estos details
-      const detailIds = new Set(details.map((d) => d.id));
+  // 1. Improved loadProductionsForDetails - Make it return an Observable
+private loadProductionsForDetails(details: CultivePlanningDetails[]) {
+  // Extract detail IDs as numbers for proper comparison
+  const detailIds = new Set(details.map((d) => d.id));
+  
+  // Return the observable so we can wait for it to complete
+  return this.productionService.getAllCultiveProductions().pipe(
+    map(allProds => {
+      // Clear the map to avoid stale data
+      this.produccionesMap.clear();
+      
+      // Filter and store productions related to our details
       allProds
         .filter((p) => detailIds.has(p.cultivePlanningDetailsId))
         .forEach((p) => {
           const key = `${p.cultivePlanningDetailsId}_${p.cultiveId}`;
           this.produccionesMap.set(key, p);
         });
-    });
-  }
+      
+      console.log(`Loaded ${this.produccionesMap.size} productions for details`);
+      return this.produccionesMap;
+    })
+  );
+}
 
 
 
@@ -1040,8 +1053,9 @@ buscarDatosQuincena(): void {
       disabled: false,
       nombreFamilia: g.nombreFamilia
     }));
-    // Aplica el filtro inicial (sin texto ni familia)
-    this.filterGeneros();
+    
+    // Aplica el filtro inicial sin criterios
+    this.filteredGenderOptions = [...this.genderOptions];
   }
 
   
@@ -1049,17 +1063,17 @@ buscarDatosQuincena(): void {
    * Aplica ambos criterios (texto y familia) para poblar filteredGenderOptions.
    */
   private filterGeneros(): void {
+    // Aplicar filtros de búsqueda y familia
     const term = this.searchGeneroTerm.trim().toLowerCase();
+    
     this.filteredGenderOptions = this.genderOptions.filter(g => {
-      // 1) filtro por familia
-      if (this.selectedFamilia !== 'todas' && g.nombreFamilia !== this.selectedFamilia) {
-        return false;
-      }
-      // 2) filtro por texto en el nombre del género
-      if (term && !g.nombreGenero.toLowerCase().includes(term)) {
-        return false;
-      }
-      return true;
+      // Filtrar por término de búsqueda
+      const matchesSearch = !term || g.nombreGenero.toLowerCase().includes(term);
+      
+      // Filtrar por familia seleccionada
+      const matchesFamily = this.selectedFamilia === 'todas' || g.nombreFamilia === this.selectedFamilia;
+      
+      return matchesSearch && matchesFamily;
     });
   }
 
@@ -1167,8 +1181,8 @@ buscarDatosQuincena(): void {
             cultivePlanningDetailsId: detail.id,
             cultiveId: cultiveId,
             kilos: kilosStr,
-            fechaInicio: card.startDate!,
-            fechaFin: card.endDate!,
+            fechaInicio: new Date(card.startDate!).toISOString(),
+            fechaFin: new Date(card.endDate!).toISOString(),
           };
 
           if (existing) {
@@ -1431,8 +1445,8 @@ private syncAllProductions(): void {
         cultivePlanningDetailsId: detail.id,
         cultiveId:                cultiveId,
         kilos:                    kilosStr,
-        fechaInicio:              card.startDate!,
-        fechaFin:                 card.endDate!
+        fechaInicio:              new Date(card.startDate!).toISOString(),
+        fechaFin:                 new Date(card.endDate!).toISOString()
       };
 
       if (existing) {
@@ -1649,8 +1663,8 @@ private crearNuevaPlanificacion(): void {
                   cultivePlanningDetailsId: detail.id,
                   cultiveId:                cultiveId,
                   kilos:                    kilosStr,
-                  fechaInicio:              card.startDate!,
-                  fechaFin:                 card.endDate!
+                  fechaInicio:              new Date(card.startDate!).toISOString(),
+                  fechaFin:                 new Date(card.endDate!).toISOString()
                 };
                 // Crear sin comprobar, porque son todas nuevas
                 this.productionService
@@ -1676,4 +1690,70 @@ private crearNuevaPlanificacion(): void {
     }
   );
 }
+
+
+// Método para seleccionar un género
+selectGenero(generoId: number): void {
+  this.selectedGeneroId = generoId;
+  
+  // Si no está en la lista de seleccionados, añadirlo
+  if (!this.selectedCultivosIds.includes(generoId)) {
+    this.selectedCultivosIds.push(generoId);
+  }
+  
+  // Obtener el objeto de género seleccionado
+  const generoObj = this.genderList.find(g => g.idGenero === generoId);
+  if (generoObj) {
+    this.selectedGenre = generoObj.nombreGenero;
+    this.idGnero = generoObj.id;
+    
+    // Filtrar cultivos por el género seleccionado
+    if (this.cultivosPorGenero[this.selectedGenre]) {
+      this.filteredCultivos = this.cultivosPorGenero[this.selectedGenre];
+    } else {
+      this.filteredCultivos = [...this.cultivo];
+    }
+    
+    // Actualizar los displayNames para el selector
+    this.prepareDisplayNames();
+  }
+  
+  // Si hay una quincena seleccionada, buscar cultivos que comiencen dentro de ella
+  if (this.selectedQuincena) {
+    const quincena = this.quincenas.find(q => q.id === this.selectedQuincena);
+    if (quincena) {
+      this.buscarCultivosEnQuincena(quincena);
+    }
+  }
+}
+
+
+// Métodos para la interfaz de usuario
+mostrarTodos(): void {
+  // Volver a aplicar los filtros actuales sin restringir por seleccionados
+  this.filterGeneros();
+}
+
+mostrarSeleccionados(): void {
+  // Mostrar solo los géneros seleccionados
+  if (this.selectedCultivosIds.length > 0) {
+    this.filteredGenderOptions = this.genderOptions.filter(g => 
+      this.selectedCultivosIds.includes(g.idGenero)
+    );
+  }
+}
+
+limpiarFiltros(): void {
+  // Limpiar filtros
+  this.searchGeneroTerm = '';
+  this.selectedFamilia = 'todas';
+  this.filterGeneros();
+}
+
+
+
+
+
+
+
 }

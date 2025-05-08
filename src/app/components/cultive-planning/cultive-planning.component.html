@@ -27,109 +27,132 @@
       </div>
     </div>
 
-    <!-- 1st Part - Genre Selection Panel -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200/50 dark:border-gray-700/50 overflow-hidden transition-all duration-200 hover:shadow-lg w-full mx-auto mb-6 backdrop-blur-sm backdrop-filter">
-      <div class="px-5 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-800/80">
-        <div class="flex items-center gap-3">
-          <div class="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 dark:text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
-              <line x1="12" y1="9" x2="12" y2="13"></line>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-          </div>
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Géneros de Cultivos</h2>
-        </div>
-        <div class="flex items-center gap-2 w-full sm:w-auto">
-          <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 flex text-xs w-full sm:w-auto shadow-sm">
-            <button class="py-1.5 px-4 rounded-md bg-white dark:bg-gray-600 shadow-sm font-medium dark:text-white flex-1 sm:flex-none transition-all">
-              Todos
-            </button>
-            <button class="py-1.5 px-4 rounded-md text-gray-600 dark:text-gray-300 flex-1 sm:flex-none hover:bg-gray-50 dark:hover:bg-gray-700/70 transition-all">
-              Seleccionados <span class="inline-flex items-center justify-center ml-1 w-5 h-5 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">{{selectedCultivosIds.length}}</span>
-            </button>
-          </div>
-        </div>
+    <!-- Componente de Filtro de Género -->
+<!-- Panel de Filtros Animado -->
+<div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200/50 dark:border-gray-700/50 overflow-hidden transition-all duration-300 hover:shadow-lg hover:translate-y-[-2px] backdrop-blur-sm backdrop-filter">
+  <!-- Encabezado con título y selector de vista -->
+  <div class="px-5 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-800/80">
+    <div class="flex items-center gap-3">
+      <div class="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg transition-transform duration-300 hover:scale-110 hover:rotate-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 dark:text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
       </div>
-
-      <!-- Search bar and filters -->
-      <div class="px-5 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Search -->
-        <div class="relative group">
-          <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 dark:group-focus-within:text-green-400 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input 
-            type="text" 
-            placeholder="Buscar cultivos..." 
-            [(ngModel)]="searchGeneroTerm"
-            (ngModelChange)="onSearchGenero()"
-            class="pl-10 h-10 w-full text-sm bg-gray-50 dark:bg-gray-700/70 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent dark:text-white dark:placeholder-gray-400 transition-all"
-          />
-        </div>
-
-        <!-- Family filter -->
-        <div class="flex gap-3">
-          <div class="relative flex-1 group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 dark:group-focus-within:text-green-400 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-            </svg>
-            <select 
-              [(ngModel)]="selectedFamilia"
-              (change)="onFamilyChange()"
-              class="pl-10 h-10 w-full text-sm bg-gray-50 dark:bg-gray-700/70 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent dark:text-white appearance-none transition-all"
-            >
-              <option value="todas">Todas las familias</option>
-              <option *ngFor="let fam of familias" [value]="fam">{{ fam }}</option>
-            </select>
-            <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-          <button 
-            class="h-10 px-4 text-xs border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium transition-all flex items-center gap-1.5"
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white animate-fade-in">Géneros de Cultivos</h2>
+    </div>
+    <div class="flex items-center gap-2 w-full sm:w-auto">
+      <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 flex text-xs w-full sm:w-auto shadow-sm animate-slide-in-right">
+        <button 
+          (click)="mostrarTodos()" 
+          class="py-1.5 px-4 rounded-md transition-all duration-200 hover:scale-105" 
+          [ngClass]="{'bg-white dark:bg-gray-600 shadow-sm font-medium dark:text-white': filteredGenderOptions.length === genderOptions.length || filteredGenderOptions.length > selectedCultivosIds.length, 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/70': filteredGenderOptions.length !== genderOptions.length && filteredGenderOptions.length <= selectedCultivosIds.length}"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-            Limpiar
-          </button>
-        </div>
+          Todos
+        </button>
+        <button 
+          (click)="mostrarSeleccionados()" 
+          class="py-1.5 px-4 rounded-md transition-all duration-200 hover:scale-105"
+          [ngClass]="{'bg-white dark:bg-gray-600 shadow-sm font-medium dark:text-white': filteredGenderOptions.length === selectedCultivosIds.length && selectedCultivosIds.length > 0, 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/70': filteredGenderOptions.length !== selectedCultivosIds.length || selectedCultivosIds.length === 0}"
+          >
+          Seleccionados <span class="inline-flex items-center justify-center ml-1 w-5 h-5 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 transition-transform duration-300 animate-pulse">{{selectedCultivosIds.length}}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controles de filtro mejorados -->
+  <div class="px-5 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <!-- Búsqueda (ampliada) -->
+      <div class="relative group lg:col-span-5 animate-fade-in" style="animation-delay: 100ms;">
+        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 dark:group-focus-within:text-green-400 transition-colors transition-transform duration-300 group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Buscar cultivos..." 
+          [(ngModel)]="searchGeneroTerm"
+          (ngModelChange)="onSearchGenero()"
+          class="pl-10 h-10 w-full text-sm bg-gray-50 dark:bg-gray-700/70 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent dark:text-white dark:placeholder-gray-400 transition-all duration-300 hover:border-green-300 dark:hover:border-green-500 focus:scale-[1.01]"
+        />
       </div>
 
-      <!-- Crop genres list -->
-      <div class="p-5 sm:px-6 py-4">
-        <!-- Scrollable container for crop genres -->
-        <div class="max-h-60 overflow-y-auto pr-1 custom-scrollbar">
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            <!-- Crop genre items from genderOptions -->
-            <div
-              *ngFor="let genero of filteredGenderOptions"
-              class="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all"
-              [class.opacity-50]="genero.disabled"
-              [class.border-green-200]="selectedGeneroId === genero.idGenero"
-              [class.dark:border-green-700]="selectedGeneroId === genero.idGenero"
-              [class.bg-green-50]="selectedGeneroId === genero.idGenero"
-              [class.dark:bg-green-900]="selectedGeneroId === genero.idGenero"
-            >
-              <div class="relative flex items-center justify-center">
-                <input
-                  type="checkbox"
-                  [disabled]="genero.disabled"
-                  [checked]="selectedGeneroId === genero.idGenero"
-                  (change)="selectedGeneroId = genero.idGenero; onGenreChange()"
-                  class="h-4 w-4 text-green-600 rounded border-gray-300 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 transition-colors"
-                />
-                <div *ngIf="selectedGeneroId === genero.idGenero" class="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></div>
-              </div>
-              <span class="text-sm text-gray-700 dark:text-gray-300 font-medium">{{ genero.nombreGenero }}</span>
+      <!-- Filtro de familia (ampliado) -->
+      <div class="relative group lg:col-span-5 animate-fade-in" style="animation-delay: 200ms;">
+        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 dark:group-focus-within:text-green-400 transition-colors transition-transform duration-300 group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        <select 
+          [(ngModel)]="selectedFamilia"
+          (change)="onFamilyChange()"
+          class="pl-10 h-10 w-full text-sm bg-gray-50 dark:bg-gray-700/70 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent dark:text-white appearance-none transition-all duration-300 hover:border-green-300 dark:hover:border-green-500 focus:scale-[1.01]"
+        >
+          <option value="todas">Todas las familias</option>
+          <option *ngFor="let fam of familias" [value]="fam">{{ fam }}</option>
+        </select>
+        <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500 pointer-events-none transition-transform duration-300 group-hover:translate-y-[2px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+
+      <!-- Botón limpiar -->
+      <div class="lg:col-span-2 animate-fade-in" style="animation-delay: 300ms;">
+        <button 
+          (click)="limpiarFiltros()"
+          class="h-10 px-4 w-full text-sm border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium transition-all duration-300 hover:scale-[1.03] hover:shadow-md flex items-center justify-center gap-1.5 hover:border-red-200 dark:hover:border-red-800"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 transition-transform duration-300 group-hover:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de cultivos mejorada -->
+  <div class="p-5 sm:px-6 py-5">
+    <!-- Contenedor desplazable para géneros de cultivos -->
+    <div class="max-h-64 overflow-y-auto pr-1 custom-scrollbar">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+        <!-- Elementos de género de cultivo con animaciones -->
+        <div
+          *ngFor="let genero of filteredGenderOptions; let i = index"
+          class="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-md animate-slide-up"
+          [style]="{'animation-delay': i * 50 + 'ms'}"
+          [class.border-green-200]="selectedGeneroId === genero.idGenero"
+          [class.dark:border-green-700]="selectedGeneroId === genero.idGenero"
+          [class.bg-green-50]="selectedGeneroId === genero.idGenero"
+          [class.dark:bg-green-900]="selectedGeneroId === genero.idGenero"
+          (click)="selectGenero(genero.idGenero)"
+        >
+          <div class="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+            <span class="text-green-700 dark:text-green-400 font-medium text-sm">{{genero.nombreGenero.charAt(0).toUpperCase()}}</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white truncate">{{genero.nombreGenero}}</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{genero.nombreFamilia || 'Sin familia'}}</p>
+          </div>
+          <!-- Indicador de selección con animación -->
+          <div class="flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300"
+               [class.border-gray-300]="selectedGeneroId !== genero.idGenero"
+               [class.dark:border-gray-600]="selectedGeneroId !== genero.idGenero"
+               [class.border-green-500]="selectedGeneroId === genero.idGenero"
+               [class.dark:border-green-400]="selectedGeneroId === genero.idGenero"
+               [class.scale-110]="selectedGeneroId === genero.idGenero">
+            <div *ngIf="selectedGeneroId === genero.idGenero" 
+                 class="w-3 h-3 bg-green-500 dark:bg-green-400 rounded-full animate-scale-in">
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
     <!-- 2nd Part - Bi-weekly Period Selector (Quincenas) -->
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200/50 dark:border-gray-700/50 overflow-hidden transition-all duration-200 hover:shadow-lg w-full mx-auto mb-6 backdrop-blur-sm backdrop-filter">
