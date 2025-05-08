@@ -1,4 +1,4 @@
-<div class="bg-gray-50 dark:bg-gray-900 theme-transition">
+<div class="mt-9 bg-gray-50 dark:bg-gray-900 theme-transition">
   
 <!-- Género Selection Panel -->
 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200/50 dark:border-gray-700/50 overflow-hidden transition-all duration-200 hover:shadow-lg w-full mx-auto mb-6 backdrop-blur-sm backdrop-filter">
@@ -154,17 +154,33 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            @for(agricultor of agricultores;track agricultores){
+            @for(agricultor of agricultores;track agricultor){
             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 theme-transition">
-              <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.pos}}</td>
+             
+                <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.pos}}</td>
+              
+              
               <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.nombre}}</td>
               <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.provincia}}</td>
               <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.nombreCultivo}}</td>
               <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.superficie}}</td>
-              <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.producc}}</td>
-              <td class="py-3 px-4">
-                <span class="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 font-medium px-2.5 py-1 rounded-md metric-badge theme-transition">{{agricultor.kgm2}}</span>
-              </td>
+              @if(agricultor.producc){
+                <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">{{agricultor.producc}}</td>
+              }
+              @else {
+                <td class="py-3 px-4 text-gray-800 dark:text-gray-200 theme-transition">No hay datos</td>
+              }
+              @if(agricultor.kgm2){
+                <td class="py-3 px-4">
+                  <span class="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 font-medium px-2.5 py-1 rounded-md metric-badge theme-transition">{{agricultor.kgm2}}</span>
+                </td>
+              }
+              @else {
+                <td class="py-3 px-4">
+                  <span class="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 font-medium px-2.5 py-1 rounded-md metric-badge theme-transition">No hay datos</span>
+                </td>
+              }
+             
             </tr>
             }
 

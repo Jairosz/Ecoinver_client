@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Agricult } from '../../types/agricult';
+import { Agricult } from '../../types/Agricult';
 import { Cultive } from '../../types/Cultive';
 import { Gender } from '../../types/gender';
 import { GenderService } from '../../services/Gender.service';
 import { CultivoService } from '../../services/Cultivo.service';
+import { RealProduction } from '../../types/RealProduction';
+import { RealProductionService } from '../../services/RealProduction.service';
 
 @Component({
   selector: 'app-ranking',
@@ -21,7 +23,7 @@ export class RankingComponent implements OnInit {
   genero: Gender[] = [];
   generoCargado: boolean = false;
   cultivoCargado: boolean = false;
-  sumaArea:number=0;
+  sumaArea: number = 0;
 
   // Variables para el filtrado y selección
   searchGeneroTerm: string = '';
@@ -30,11 +32,11 @@ export class RankingComponent implements OnInit {
   selectedCultivosIds: number[] = [];
   selectedFamilia: string = 'todas';
   familias: string[] = [];
-
+  producReal: RealProduction[] = [];
   constructor(
     private genderService: GenderService,
-    private cultivoService: CultivoService
-  ) {}
+    private cultivoService: CultivoService, private pReal: RealProductionService
+  ) { }
 
   ngOnInit(): void {
     // Cargamos los géneros
@@ -44,10 +46,10 @@ export class RankingComponent implements OnInit {
         this.genero.sort((a, b) => a.nombreGenero.localeCompare(b.nombreGenero));
         this.filteredGenderOptions = [...this.genero]; // Inicializamos lista filtrada
         this.generoCargado = true;
-        
+
         // Extraemos las familias únicas para el filtro
         this.extractFamilias();
-        
+
         this.checkDatos();
       },
       (error) => {
@@ -65,6 +67,17 @@ export class RankingComponent implements OnInit {
       (error) => {
         console.log(error);
       }
+    );
+    //Nos treamos la producción real.
+    this.pReal.get().subscribe(
+      (data) => {
+        this.producReal = data;
+
+      },
+      (error) => {
+        console.log(error);
+      }
+
     );
   }
 
@@ -101,32 +114,32 @@ export class RankingComponent implements OnInit {
   // Aplicar filtros de búsqueda y familia
   applyFilters() {
     let filtered = [...this.genero];
-    
+
     // Filtrar por término de búsqueda
     if (this.searchGeneroTerm && this.searchGeneroTerm.trim() !== '') {
       const searchTerm = this.searchGeneroTerm.toLowerCase().trim();
-      filtered = filtered.filter(g => 
+      filtered = filtered.filter(g =>
         g.nombreGenero.toLowerCase().includes(searchTerm)
       );
     }
-    
+
     // Filtrar por familia seleccionada
     if (this.selectedFamilia !== 'todas') {
       filtered = filtered.filter(g => g.nombreFamilia === this.selectedFamilia);
     }
-    
+
     this.filteredGenderOptions = filtered;
   }
 
   // Maneja la selección de un género
   selectGenero(generoId: number) {
     this.selectedGeneroId = generoId;
-      this.selectedCultivosIds=[];
+    this.selectedCultivosIds = [];
     // Si no está en la lista de seleccionados, añadirlo
     if (!this.selectedCultivosIds.includes(generoId)) {
       this.selectedCultivosIds.push(generoId);
     }
-    
+
     // Actualizar la tabla con el género seleccionado
     this.tabla();
   }
@@ -142,7 +155,7 @@ export class RankingComponent implements OnInit {
   toggleView(view: 'todos' | 'seleccionados') {
     // Implementar cambio de vista entre todos los géneros y solo los seleccionados
     if (view === 'seleccionados') {
-      this.filteredGenderOptions = this.genero.filter(g => 
+      this.filteredGenderOptions = this.genero.filter(g =>
         this.selectedCultivosIds.includes(g.idGenero)
       );
     } else {
@@ -165,40 +178,52 @@ export class RankingComponent implements OnInit {
 
   // Genera la tabla con los datos filtrados - mantenida para compatibilidad
   tabla() {
-   // Limpiamos la lista de agricultores
-   this.agricultores = [];
+    // Limpiamos la lista de agricultores
+    this.agricultores = [];
+    let j=1;
+    let agri: Cultive = {
+      id: 0,
+      idCultivo: 0,
+      nombreAgricultor: '',
+      nombreFinca: '',
+      nombreNave: '',
+      idGenero: 0,
+      nombreGenero: '',
+      nombreVariedad: '',
+      superficie: 0,
+      idCultivePlanning: null,
+      tecnico: '',
+      provincia: ''
+    };
 
-   // Si se seleccionó 'todos' o no hay selección, mostrar todos
-   if (this.selectedGeneroId === null) {
-     for (let i = 0; i < this.cultivos.length; i++) {
-       this.agricultores.push({
-         pos: i + 1,
-         nombre: this.cultivos[i].nombreAgricultor,
-         provincia: this.cultivos[i].provincia,
-         nombreCultivo: this.cultivos[i].nombreGenero,
-         superficie: this.cultivos[i].superficie,
-         producc: this.cultivos[i].produccionEstimada,
-         kgm2:  this.cultivos[i].produccionEstimada ?? 0 / this.cultivos[i].superficie
-       });
-     }
-   } else {
-     // Filtrar cultivos por el género seleccionado
-     const cultivosFiltrados = this.cultivos.filter(
-       c => c.idGenero === this.selectedGeneroId
-     );
+
+   
+      // Filtrar cultivos por el género seleccionado
+      const cultivosFiltrados = this.cultivos.filter(
+        c => c.idGenero === this.selectedGeneroId
+      );
+
+      for (let i = 0; i < this.producReal.length; i++) {
+        if (cultivosFiltrados.find(item => item.idCultivo == this.producReal[i].idCultivo)) {
+          agri = cultivosFiltrados.find(item => item.idCultivo == this.producReal[i].idCultivo)!;
+          this.agricultores.push({
+            pos: j,
+            nombre: this.producReal[i].nombreAgricultor,
+            provincia: agri.provincia,
+            nombreCultivo: agri.nombreGenero,
+            superficie: agri.superficie,
+            producc: this.producReal[i].kilosNetos,
+            kgm2: this.producReal[i].kilosM2
+          });
+          j++;
+        }
+
+
+      }
+      
+      this.sumaArea = this.agricultores.reduce((a, b) => a + b.superficie, 0);
      
-     for (let i = 0; i < cultivosFiltrados.length; i++) {
-       this.agricultores.push({
-         pos: i + 1,
-         nombre: cultivosFiltrados[i].nombreAgricultor,
-         provincia: cultivosFiltrados[i].provincia,
-         nombreCultivo: cultivosFiltrados[i].nombreGenero,
-         superficie: cultivosFiltrados[i].superficie,
-         producc: cultivosFiltrados[i].produccionEstimada,
-         kgm2: cultivosFiltrados[i].produccionEstimada ?? 0/ cultivosFiltrados[i].superficie 
-       });
-     }
-   }
-  this.sumaArea=this.agricultores.reduce((a,b)=>a+b.superficie,0)
-  }
+    }
+   
+  
 }
